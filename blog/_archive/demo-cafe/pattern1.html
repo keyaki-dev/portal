@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カフェ</title>
+<style>
+  body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #333;
+  }
+  header {
+    background: #6f4e37;
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 2rem;
+  }
+  header p {
+    margin-top: 8px;
+    font-size: 1rem;
+    opacity: 0.85;
+  }
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  section {
+    margin-bottom: 40px;
+  }
+  h2 {
+    font-size: 1.4rem;
+    border-bottom: 2px solid #6f4e37;
+    padding-bottom: 6px;
+    margin-bottom: 16px;
+  }
+  .menu-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+  }
+  .hours-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .hours-table td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+  }
+  .hours-table td:first-child {
+    font-weight: bold;
+    width: 40%;
+  }
+  footer {
+    background: #f5f0eb;
+    text-align: center;
+    padding: 24px 20px;
+    font-size: 0.85rem;
+    color: #888;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CAFE</h1>
+  <p>心安らぐひとときを</p>
+</header>
+
+<main>
+  <section>
+    <h2>メニュー</h2>
+    <div class="menu-item"><span>ブレンドコーヒー</span><span>¥450</span></div>
+    <div class="menu-item"><span>カフェラテ</span><span>¥500</span></div>
+    <div class="menu-item"><span>カプチーノ</span><span>¥500</span></div>
+    <div class="menu-item"><span>紅茶</span><span>¥400</span></div>
+    <div class="menu-item"><span>ケーキセット</span><span>¥850</span></div>
+  </section>
+
+  <section>
+    <h2>営業時間</h2>
+    <table class="hours-table">
+      <tr><td>月〜金</td><td>9:00 - 19:00</td></tr>
+      <tr><td>土日祝</td><td>10:00 - 18:00</td></tr>
+      <tr><td>定休日</td><td>水曜日</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>アクセス</h2>
+    <p>〒000-0000 東京都○○区○○ 1-2-3</p>
+    <p>○○駅より徒歩5分</p>
+  </section>
+</main>
+
+<footer>
+  &copy; 2026 CAFE. All rights reserved.
+</footer>
+
+</body>
+</html>

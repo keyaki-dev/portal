@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>欅珈琲 | KEYAKI COFFEE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&display=swap');
+
+  :root {
+    --espresso: #2c1810;
+    --dark-roast: #3d2b1f;
+    --walnut: #5c4033;
+    --latte: #c4a882;
+    --cream: #f5efe7;
+    --milk: #faf7f2;
+    --gold: #b8965a;
+    --sage: #8a9a7b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Serif JP', serif;
+    color: var(--dark-roast);
+    background: var(--milk);
+    line-height: 1.9;
+    overflow-x: hidden;
+  }
+
+  /* ===== Hero ===== */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background:
+      radial-gradient(ellipse at 30% 50%, rgba(196,168,130,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 40%, rgba(138,154,123,0.1) 0%, transparent 50%),
+      linear-gradient(175deg, var(--espresso) 0%, var(--dark-roast) 40%, #4a3728 100%);
+    color: var(--cream);
+    padding: 60px 24px;
+    position: relative;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: linear-gradient(transparent, var(--milk));
+  }
+  .hero-badge {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 32px;
+  }
+  .hero-logo {
+    font-family: 'Zen Old Mincho', serif;
+    font-size: clamp(2.8rem, 6vw, 4.5rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .hero-logo-en {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.9rem;
+    font-weight: 300;
+    letter-spacing: 0.5em;
+    opacity: 0.6;
+    margin-bottom: 48px;
+  }
+  .hero-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(var(--gold), transparent);
+    margin: 0 auto 32px;
+  }
+  .hero-tagline {
+    font-weight: 300;
+    font-size: 1rem;
+    letter-spacing: 0.15em;
+    line-height: 2.4;
+    opacity: 0.8;
+  }
+  .hero-scroll {
+    position: absolute;
+    bottom: 140px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    opacity: 0.4;
+    writing-mode: vertical-rl;
+  }
+
+  /* ===== Nav ===== */
+  nav {
+    background: rgba(250,247,242,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(196,168,130,0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  nav ul {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    list-style: none;
+    padding: 18px 0;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav a {
+    text-decoration: none;
+    color: var(--walnut);
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    transition: all 0.3s;
+    position: relative;
+  }
+  nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    width: 0;
+    height: 1px;
+    background: var(--gold);
+    transition: all 0.3s;
+    transform: translateX(-50%);
+  }
+  nav a:hover { color: var(--espresso); }
+  nav a:hover::after { width: 100%; }
+
+  /* ===== Sections ===== */
+  .section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 100px 32px;
+  }
+  .section-header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+  .section-header .en {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 12px;
+  }
+  .section-header h2 {
+    font-family: 'Zen Old Mincho', serif;
+    font-size: 1.8rem;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+  }
+  .section-header .line {
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    margin: 20px auto 0;
+  }
+
+  /* ===== Concept ===== */
+  .concept-body {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .concept-body .divider {
+    background: linear-gradient(transparent, var(--latte), transparent);
+    height: 200px;
+  }
+  .concept-text {
+    font-size: 0.92rem;
+    font-weight: 300;
+    line-height: 2.4;
+    color: var(--walnut);
+  }
+  .concept-text p + p { margin-top: 1.5em; }
+  .concept-quote {
+    text-align: center;
+    font-family: 'Zen Old Mincho', serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    line-height: 2.4;
+    color: var(--walnut);
+  }
+  .concept-quote .accent {
+    color: var(--gold);
+    font-size: 1.3rem;
+  }
+
+  /* ===== Menu ===== */
+  .menu-section-bg { background: var(--cream); }
+
+  .menu-block + .menu-block { margin-top: 56px; }
+  .menu-block h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .menu-list {
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(196,168,130,0.2);
+  }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-name {
+    font-size: 0.92rem;
+    font-weight: 400;
+  }
+  .menu-detail {
+    font-size: 0.75rem;
+    color: var(--latte);
+    margin-top: 2px;
+    font-weight: 300;
+  }
+  .menu-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.95rem;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    margin-left: 20px;
+  }
+
+  /* ===== Lunch ===== */
+  .lunch-intro {
+    text-align: center;
+    font-size: 0.88rem;
+    font-weight: 300;
+    color: var(--walnut);
+    margin-bottom: 48px;
+    line-height: 2.2;
+  }
+  .lunch-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .lunch-card {
+    background: var(--cream);
+    border-radius: 16px;
+    padding: 36px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+  .lunch-card:hover { transform: translateY(-4px); }
+  .lunch-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .lunch-card .label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .lunch-card .name {
+    font-family: 'Zen Old Mincho', serif;
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+    letter-spacing: 0.08em;
+  }
+  .lunch-card .desc {
+    font-size: 0.78rem;
+    font-weight: 300;
+    color: var(--walnut);
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+  .lunch-card .price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+  }
+  .lunch-card .includes {
+    font-size: 0.7rem;
+    color: var(--latte);
+    margin-top: 8px;
+  }
+
+  /* ===== Info ===== */
+  .info-bg { background: var(--cream); }
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+  .info-block h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .info-row {
+    display: flex;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(196,168,130,0.15);
+    font-size: 0.88rem;
+  }
+  .info-row dt {
+    width: 100px;
+    flex-shrink: 0;
+    font-weight: 400;
+    color: var(--walnut);
+  }
+  .info-row dd { font-weight: 300; }
+
+  .note-box {
+    background: var(--milk);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-top: 32px;
+    font-size: 0.82rem;
+    font-weight: 300;
+    line-height: 2;
+    color: var(--walnut);
+    border-left: 2px solid var(--gold);
+  }
+
+  /* ===== Footer ===== */
+  footer {
+    background: var(--espresso);
+    color: rgba(245,239,231,0.5);
+    text-align: center;
+    padding: 64px 24px;
+  }
+  .footer-logo {
+    font-family: 'Zen Old Mincho', serif;
+    font-size: 1.4rem;
+    color: var(--cream);
+    letter-spacing: 0.2em;
+    margin-bottom: 4px;
+  }
+  .footer-logo-en {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    opacity: 0.4;
+    margin-bottom: 24px;
+  }
+  .footer-info {
+    font-size: 0.75rem;
+    line-height: 2;
+    opacity: 0.5;
+  }
+  .footer-copy {
+    margin-top: 32px;
+    font-size: 0.7rem;
+    opacity: 0.3;
+    font-family: 'Cormorant Garamond', serif;
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 768px) {
+    .concept-body { grid-template-columns: 1fr; }
+    .concept-body .divider { display: none; }
+    .lunch-cards { grid-template-columns: 1fr; }
+    .info-grid { grid-template-columns: 1fr; gap: 40px; }
+    nav ul { gap: 24px; }
+    .section { padding: 64px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">est. 2026 &mdash; musashino, tokyo</div>
+  <div class="hero-logo">欅珈琲</div>
+  <div class="hero-logo-en">KEYAKI COFFEE</div>
+  <div class="hero-line"></div>
+  <div class="hero-tagline">
+    一杯の珈琲が、静かに時間を整える。<br>
+    大通りの喧騒から一歩、奥へ。
+  </div>
+  <div class="hero-scroll">scroll</div>
+</div>
+
+<nav>
+  <ul>
+    <li><a href="#concept">想い</a></li>
+    <li><a href="#menu">珈琲</a></li>
+    <li><a href="#lunch">食事</a></li>
+    <li><a href="#info">案内</a></li>
+  </ul>
+</nav>
+
+<!-- Concept -->
+<section class="section" id="concept">
+  <div class="section-header">
+    <span class="en">Concept</span>
+    <h2>欅の木陰で、珈琲を。</h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="concept-body">
+    <div class="concept-text">
+      <p>欅珈琲は、大通り沿いの欅並木のたもとに佇む珈琲店です。</p>
+      <p>広い窓から差し込む陽の光と、高い天井が生む静けさ。<br>ここでは、時間がすこしだけゆっくり流れます。</p>
+      <p>焙煎士が毎朝焼き上げる豆を、一杯ずつハンドドリップで。<br>お昼には、珈琲に寄り添う洋食もご用意しています。</p>
+    </div>
+    <div class="divider"></div>
+    <div class="concept-quote">
+      <span class="accent">「</span><br>
+      慌ただしい一日の中に、<br>
+      ふと立ち止まれる場所を<br>
+      つくりたかった。<br>
+      <span class="accent">」</span>
+      <div style="margin-top: 16px; font-size: 0.78rem; color: var(--latte);">── 店主</div>
+    </div>
+  </div>
+</section>
+
+<!-- Menu -->
+<div class="menu-section-bg">
+  <section class="section" id="menu">
+    <div class="section-header">
+      <span class="en">Coffee &amp; Tea</span>
+      <h2>珈琲・お飲み物</h2>
+      <div class="line"></div>
+    </div>
+
+    <div class="menu-block">
+      <h3>COFFEE</h3>
+      <div class="menu-list">
+        <div class="menu-item">
+          <div>
+            <div class="menu-name">欅ブレンド</div>
+            <div class="menu-detail">深煎り。チョコレートのような余韻</div>
+          </div>
+          <div class="menu-price">&yen;520</div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <div class="menu-name">本日の一杯</div>
+            <div class="menu-detail">焙煎士が選ぶシングルオリジン</div>
+          </div>
+          <div class="menu-price">&yen;580</div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <div class="menu-name">水出し珈琲</div>
+            <div class="menu-detail">8時間かけてゆっくり抽出</div>
+          </div>
+          <div class="menu-price">&yen;600</div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <div class="menu-name">カフェラテ</div>
+            <div class="menu-detail">エスプレッソ＆北海道産ミルク</div>
+          </div>
+          <div class="menu-price">&yen;580</div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <div class="menu-name">カプチーノ</div>
+          </div>
+          <div class="menu-price">&yen;580</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-block">
+      <h3>TEA &amp; OTHERS</h3>
+      <div class="menu-list">
+        <div class="menu-item">
+          <div>
+            <div class="menu-name">ダージリン</div>
+            <div class="menu-detail">ファーストフラッシュ</div>
+          </div>
+          <div class="menu-price">&yen;500</div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <div class="menu-name">アールグレイ</div>
+          </div>
+          <div class="menu-price">&yen;500</div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <div class="menu-name">自家製ジンジャーエール</div>
+            <div class="menu-detail">高知県産生姜使用</div>
+          </div>
+          <div class="menu-price">&yen;520</div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <div class="menu-name">クリームソーダ</div>
+            <div class="menu-detail">メロン / いちご / 珈琲</div>
+          </div>
+          <div class="menu-price">&yen;600</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Lunch -->
+<section class="section" id="lunch">
+  <div class="section-header">
+    <span class="en">Lunch 11:00 &ndash; 14:00</span>
+    <h2>お昼のお食事</h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="lunch-intro">
+    すべてのランチセットに、本日のスープ・ミニサラダ・お好きなドリンクが付きます。<br>
+    どのメニューも、珈琲との相性を考えてお作りしています。
+  </div>
+
+  <div class="lunch-cards">
+    <div class="lunch-card">
+      <div class="label">Popular</div>
+      <div class="name">欅カレー</div>
+      <div class="desc">スパイスから煮込む欧風カレー。<br>ルーの奥に珈琲の香りが薫ります。</div>
+      <div class="price">&yen;1,100</div>
+      <div class="includes">スープ・サラダ・ドリンク付</div>
+    </div>
+    <div class="lunch-card">
+      <div class="label">Classic</div>
+      <div class="name">ナポリタン</div>
+      <div class="desc">昔ながらの喫茶店の味。<br>太麺にケチャップをしっかり絡めて。</div>
+      <div class="price">&yen;1,000</div>
+      <div class="includes">スープ・サラダ・ドリンク付</div>
+    </div>
+    <div class="lunch-card">
+      <div class="label">Light</div>
+      <div class="name">BLTサンド</div>
+      <div class="desc">毎朝届く自家製パンと、<br>厚切りベーコンの贅沢サンド。</div>
+      <div class="price">&yen;950</div>
+      <div class="includes">スープ・サラダ・ドリンク付</div>
+    </div>
+  </div>
+</section>
+
+<!-- Info -->
+<div class="info-bg">
+  <section class="section" id="info">
+    <div class="section-header">
+      <span class="en">Information</span>
+      <h2>ご案内</h2>
+      <div class="line"></div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-block">
+        <h3>Hours</h3>
+        <dl>
+          <div class="info-row"><dt>平日</dt><dd>8:00 &ndash; 20:00</dd></div>
+          <div class="info-row"><dt>土日祝</dt><dd>9:00 &ndash; 19:00</dd></div>
+          <div class="info-row"><dt>ランチ</dt><dd>11:00 &ndash; 14:00</dd></div>
+          <div class="info-row"><dt>定休日</dt><dd>毎週火曜日</dd></div>
+        </dl>
+      </div>
+      <div class="info-block">
+        <h3>Access</h3>
+        <dl>
+          <div class="info-row"><dt>住所</dt><dd>東京都武蔵野市中町1-2-3<br>欅ビル 1F</dd></div>
+          <div class="info-row"><dt>最寄駅</dt><dd>JR三鷹駅 北口より徒歩8分</dd></div>
+          <div class="info-row"><dt>駐車場</dt><dd>店舗前に6台分</dd></div>
+          <div class="info-row"><dt>席数</dt><dd>42席（テラス8席含む）</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="note-box">
+      店内はWi-Fi・電源を完備しております。お仕事や読書にもどうぞ。<br>
+      テラス席はペット同伴可です。お気軽にお声がけください。
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="footer-logo">欅珈琲</div>
+  <div class="footer-logo-en">KEYAKI COFFEE</div>
+  <div class="footer-info">
+    東京都武蔵野市中町1-2-3 欅ビル 1F<br>
+    JR三鷹駅 北口より徒歩8分<br>
+    TEL 0422-00-0000
+  </div>
+  <div class="footer-copy">&copy; 2026 Keyaki Coffee. All rights reserved.</div>
+</footer>
+
+</body>
+</html>

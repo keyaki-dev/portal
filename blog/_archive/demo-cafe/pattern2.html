@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>欅珈琲 | KEYAKI COFFEE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: #3a3a3a;
+    background: #faf8f5;
+    line-height: 1.8;
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(rgba(40,30,20,0.55), rgba(40,30,20,0.55)),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect fill="%23d4c4a8" width="400" height="300"/></svg>');
+    background-size: cover;
+    background-position: center;
+    min-height: 480px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #fff;
+    padding: 60px 20px;
+  }
+  .hero-logo {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+  }
+  .hero-sub {
+    font-size: 0.95rem;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    opacity: 0.85;
+    margin-bottom: 24px;
+  }
+  .hero-tagline {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    border-top: 1px solid rgba(255,255,255,0.3);
+    padding-top: 20px;
+    max-width: 500px;
+  }
+
+  /* Navigation */
+  nav {
+    background: #fff;
+    border-bottom: 1px solid #e8e3dc;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  nav ul {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    list-style: none;
+    padding: 16px 0;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav a {
+    text-decoration: none;
+    color: #6b5b4a;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    transition: color 0.3s;
+  }
+  nav a:hover { color: #3a2d1e; }
+
+  /* Section base */
+  .section {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 80px 24px;
+  }
+  .section-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.6rem;
+    text-align: center;
+    margin-bottom: 8px;
+    color: #3a2d1e;
+  }
+  .section-title-en {
+    text-align: center;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    color: #b0a696;
+    margin-bottom: 48px;
+  }
+
+  /* Concept */
+  .concept-text {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+    font-size: 0.95rem;
+    line-height: 2.2;
+    color: #5a5047;
+  }
+
+  /* Menu */
+  .menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+  .menu-category h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.1rem;
+    color: #6b5b4a;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #d4c9ba;
+  }
+  .menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px dotted #e0d8ce;
+  }
+  .menu-name { font-size: 0.9rem; }
+  .menu-desc { font-size: 0.75rem; color: #999; margin-top: 2px; }
+  .menu-price { font-size: 0.9rem; color: #8b7355; white-space: nowrap; margin-left: 16px; }
+
+  /* Lunch */
+  .lunch-banner {
+    background: #f0ebe3;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    margin-top: 48px;
+  }
+  .lunch-banner h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.2rem;
+    color: #6b5b4a;
+    margin-bottom: 8px;
+  }
+  .lunch-banner p { font-size: 0.85rem; color: #8a7e70; }
+  .lunch-items {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .lunch-item {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px 28px;
+    text-align: center;
+    min-width: 200px;
+  }
+  .lunch-item .name { font-weight: 500; margin-bottom: 4px; }
+  .lunch-item .price { color: #8b7355; font-size: 0.9rem; }
+  .lunch-item .note { font-size: 0.75rem; color: #aaa; margin-top: 4px; }
+
+  /* Info */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+  .info-block h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.05rem;
+    color: #6b5b4a;
+    margin-bottom: 16px;
+  }
+  .info-table { width: 100%; }
+  .info-table tr td {
+    padding: 10px 0;
+    border-bottom: 1px solid #ece6dd;
+    font-size: 0.88rem;
+    vertical-align: top;
+  }
+  .info-table tr td:first-child {
+    font-weight: 500;
+    width: 35%;
+    color: #6b5b4a;
+  }
+
+  /* Footer */
+  footer {
+    background: #3a2d1e;
+    color: #c8bfb0;
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 0.8rem;
+  }
+  footer .footer-logo {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.2rem;
+    color: #e8e0d4;
+    margin-bottom: 8px;
+  }
+
+  @media (max-width: 640px) {
+    .menu-grid, .info-grid { grid-template-columns: 1fr; }
+    .hero-logo { font-size: 2.2rem; }
+    nav ul { gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-logo">欅珈琲</div>
+  <div class="hero-sub">KEYAKI COFFEE</div>
+  <div class="hero-tagline">一杯の珈琲と、穏やかな時間を。</div>
+</div>
+
+<nav>
+  <ul>
+    <li><a href="#concept">コンセプト</a></li>
+    <li><a href="#menu">メニュー</a></li>
+    <li><a href="#lunch">ランチ</a></li>
+    <li><a href="#info">店舗情報</a></li>
+  </ul>
+</nav>
+
+<section class="section" id="concept">
+  <div class="section-title">こだわり</div>
+  <div class="section-title-en">CONCEPT</div>
+  <div class="concept-text">
+    欅珈琲は、大通り沿いの広々とした空間で<br>
+    静かなひとときをお過ごしいただくための珈琲店です。<br><br>
+    厳選した豆を一杯ずつ丁寧にドリップし、<br>
+    焼きたてのパンとともにお届けします。<br><br>
+    ランチタイムには、珈琲に合う洋食メニューもご用意。<br>
+    お一人でも、ご友人とでも、どうぞごゆっくり。
+  </div>
+</section>
+
+<section class="section" id="menu" style="background:#fff;">
+  <div class="section-title">メニュー</div>
+  <div class="section-title-en">MENU</div>
+
+  <div class="menu-grid">
+    <div class="menu-category">
+      <h3>珈琲</h3>
+      <div class="menu-item">
+        <div>
+          <div class="menu-name">欅ブレンド</div>
+          <div class="menu-desc">当店オリジナルの深煎りブレンド</div>
+        </div>
+        <div class="menu-price">¥520</div>
+      </div>
+      <div class="menu-item">
+        <div>
+          <div class="menu-name">カフェラテ</div>
+          <div class="menu-desc">エスプレッソ＆スチームミルク</div>
+        </div>
+        <div class="menu-price">¥580</div>
+      </div>
+      <div class="menu-item">
+        <div>
+          <div class="menu-name">カプチーノ</div>
+        </div>
+        <div class="menu-price">¥580</div>
+      </div>
+      <div class="menu-item">
+        <div>
+          <div class="menu-name">アイスコーヒー</div>
+        </div>
+        <div class="menu-price">¥520</div>
+      </div>
+      <div class="menu-item">
+        <div>
+          <div class="menu-name">水出しコーヒー</div>
+          <div class="menu-desc">8時間かけて抽出</div>
+        </div>
+        <div class="menu-price">¥600</div>
+      </div>
+    </div>
+
+    <div class="menu-category">
+      <h3>ティー・その他</h3>
+      <div class="menu-item">
+        <div>
+          <div class="menu-name">ダージリン</div>
+        </div>
+        <div class="menu-price">¥480</div>
+      </div>
+      <div class="menu-item">
+        <div>
+          <div class="menu-name">アールグレイ</div>
+        </div>
+        <div class="menu-price">¥480</div>
+      </div>
+      <div class="menu-item">
+        <div>
+          <div class="menu-name">抹茶ラテ</div>
+        </div>
+        <div class="menu-price">¥550</div>
+      </div>
+      <div class="menu-item">
+        <div>
+          <div class="menu-name">オレンジジュース</div>
+        </div>
+        <div class="menu-price">¥450</div>
+      </div>
+      <div class="menu-item">
+        <div>
+          <div class="menu-name">クリームソーダ</div>
+        </div>
+        <div class="menu-price">¥550</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="lunch">
+  <div class="section-title">ランチ</div>
+  <div class="section-title-en">LUNCH 11:00 - 14:00</div>
+
+  <div class="lunch-banner">
+    <h3>ランチセット</h3>
+    <p>すべてのランチにスープ・サラダ・ドリンクが付きます</p>
+    <div class="lunch-items">
+      <div class="lunch-item">
+        <div class="name">欅カレー</div>
+        <div class="price">¥1,100</div>
+        <div class="note">じっくり煮込んだ欧風カレー</div>
+      </div>
+      <div class="lunch-item">
+        <div class="name">ナポリタン</div>
+        <div class="price">¥1,000</div>
+        <div class="note">昔ながらの喫茶店の味</div>
+      </div>
+      <div class="lunch-item">
+        <div class="name">BLTサンド</div>
+        <div class="price">¥950</div>
+        <div class="note">自家製パンを使用</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="info" style="background:#fff;">
+  <div class="section-title">店舗情報</div>
+  <div class="section-title-en">INFORMATION</div>
+
+  <div class="info-grid">
+    <div class="info-block">
+      <h3>営業時間</h3>
+      <table class="info-table">
+        <tr><td>平日</td><td>8:00 - 20:00</td></tr>
+        <tr><td>土日祝</td><td>9:00 - 19:00</td></tr>
+        <tr><td>ランチ</td><td>11:00 - 14:00</td></tr>
+        <tr><td>定休日</td><td>毎週火曜日</td></tr>
+      </table>
+    </div>
+    <div class="info-block">
+      <h3>アクセス</h3>
+      <table class="info-table">
+        <tr><td>住所</td><td>東京都武蔵野市中町1-2-3 欅ビル1F</td></tr>
+        <tr><td>最寄駅</td><td>JR三鷹駅 北口より徒歩8分</td></tr>
+        <tr><td>駐車場</td><td>店舗前に6台分あり</td></tr>
+        <tr><td>席数</td><td>42席（テラス8席含む）</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">欅珈琲</div>
+  <p>&copy; 2026 KEYAKI COFFEE. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

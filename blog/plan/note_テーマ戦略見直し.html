@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>note テーマ戦略見直し — keyaki</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;600;700;900&display=swap');
+  :root {
+    --dark: #0F172A; --mid: #1E293B; --teal: #0D9488; --mint: #5EEAD4;
+    --off-white: #F8FAFC; --light-gray: #E2E8F0; --med-gray: #94A3B8;
+    --body: #334155; --red: #EF4444; --amber: #F59E0B; --green: #10B981;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Noto Sans JP',-apple-system,sans-serif; background:var(--off-white); color:var(--body); line-height:1.7; }
+
+  .hero { background:linear-gradient(135deg,var(--dark),var(--mid)); color:#fff; padding:3rem 2rem; position:relative; }
+  .hero::after { content:''; position:absolute; top:0;left:0;right:0; height:4px; background:linear-gradient(90deg,var(--teal),var(--mint)); }
+  .hero-inner { max-width:860px; margin:0 auto; }
+  .hero h1 { font-size:2rem; font-weight:900; margin-bottom:0.3rem; }
+  .hero h1 span { color:var(--mint); }
+  .hero p { color:var(--med-gray); font-size:0.95rem; }
+  .hero-date { color:var(--med-gray); font-size:0.8rem; margin-top:0.8rem; border-top:2px solid var(--teal); padding-top:0.5rem; display:inline-block; }
+
+  .container { max-width:860px; margin:0 auto; padding:0 1.5rem; }
+  section { padding:2.5rem 0; border-bottom:1px solid var(--light-gray); }
+  section:last-of-type { border-bottom:none; }
+
+  h2 { font-size:1.3rem; font-weight:900; color:var(--dark); margin-bottom:1.2rem; display:flex; align-items:center; gap:0.5rem; }
+  h2 .num { color:var(--teal); font-size:1.6rem; }
+  h2::after { content:''; flex:1; height:3px; background:linear-gradient(90deg,var(--teal),transparent); }
+
+  /* Comparison table */
+  .compare-table { width:100%; border-collapse:collapse; font-size:0.85rem; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.06); margin-bottom:1rem; }
+  .compare-table th { background:var(--teal); color:#fff; padding:0.6rem 0.8rem; font-weight:600; text-align:center; }
+  .compare-table th:first-child { text-align:left; }
+  .compare-table td { padding:0.5rem 0.8rem; border-bottom:1px solid var(--light-gray); text-align:center; }
+  .compare-table td:first-child { text-align:left; font-weight:600; color:var(--dark); }
+  .compare-table tr:nth-child(even) { background:#F0FDFA; }
+  .badge-good { background:#ECFDF5; color:var(--green); padding:0.15rem 0.5rem; border-radius:4px; font-size:0.75rem; font-weight:700; }
+  .badge-ok { background:#FFFBEB; color:var(--amber); padding:0.15rem 0.5rem; border-radius:4px; font-size:0.75rem; font-weight:700; }
+  .badge-low { background:#FEF2F2; color:var(--red); padding:0.15rem 0.5rem; border-radius:4px; font-size:0.75rem; font-weight:700; }
+  .delta { font-size:0.75rem; color:var(--green); }
+  .delta.neg { color:var(--red); }
+
+  /* Insight box */
+  .insight { background:#ECFDF5; border-radius:8px; padding:1rem 1.2rem; margin:1rem 0; display:flex; gap:0.6rem; align-items:flex-start; font-size:0.88rem; color:var(--teal); }
+  .insight.warn { background:#FFFBEB; color:#92400E; }
+  .insight .icon { font-size:1.2rem; flex-shrink:0; }
+
+  /* Rule card */
+  .rule { background:#fff; border-radius:10px; padding:1.5rem; box-shadow:0 1px 4px rgba(0,0,0,0.06); margin-bottom:1rem; border-left:4px solid var(--teal); }
+  .rule h3 { font-size:1rem; font-weight:700; color:var(--dark); margin-bottom:0.5rem; }
+  .rule p { font-size:0.88rem; }
+
+  .before-after { display:grid; grid-template-columns:1fr auto 1fr; gap:0.8rem; align-items:center; margin:0.8rem 0; }
+  .ba-box { background:#F1F5F9; border-radius:8px; padding:0.8rem 1rem; font-size:0.85rem; }
+  .ba-box.before { border-left:3px solid var(--red); }
+  .ba-box.after { border-left:3px solid var(--green); }
+  .ba-arrow { font-size:1.5rem; color:var(--teal); text-align:center; }
+  .ba-label { font-size:0.7rem; font-weight:700; color:var(--med-gray); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.3rem; }
+
+  /* Neta grid */
+  .neta-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .neta-card { background:#fff; border-radius:10px; padding:1.2rem; box-shadow:0 1px 4px rgba(0,0,0,0.06); position:relative; }
+  .neta-card h4 { font-size:0.95rem; font-weight:700; color:var(--dark); margin-bottom:0.3rem; padding-right:3rem; }
+  .neta-card p { font-size:0.82rem; color:var(--body); }
+  .neta-card .cat { position:absolute; top:1rem; right:1rem; font-size:0.65rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:3px; color:#fff; }
+  .neta-card .cat.emp { background:var(--teal); }
+  .neta-card .cat.dx { background:#0E7490; }
+  .neta-card .cat.rev { background:#115E59; }
+  .neta-card .cat.col { background:#475569; }
+  .neta-card .reason { margin-top:0.5rem; font-size:0.78rem; color:var(--teal); font-style:italic; }
+  .priority { display:inline-flex; gap:2px; margin-top:0.5rem; }
+  .priority .dot { width:8px; height:8px; border-radius:50%; background:var(--light-gray); }
+  .priority .dot.on { background:var(--teal); }
+
+  /* Summary */
+  .summary-footer { background:linear-gradient(135deg,var(--dark),var(--mid)); color:#fff; padding:2.5rem 2rem; }
+  .summary-footer .inner { max-width:860px; margin:0 auto; }
+  .summary-footer h2 { color:#fff; margin-bottom:1rem; }
+  .summary-footer h2::after { background:linear-gradient(90deg,var(--teal),transparent); }
+  .sum-item { display:flex; gap:0.6rem; align-items:center; margin-bottom:0.6rem; font-size:0.95rem; }
+  .sum-item .ch { color:var(--mint); flex-shrink:0; }
+  .sum-highlight { background:rgba(30,41,59,0.8); border-radius:8px; padding:0.8rem 1.2rem; margin-top:1.5rem; font-weight:600; color:var(--mint); font-size:1rem; }
+
+  @media (max-width:768px) { .neta-grid, .before-after { grid-template-columns:1fr; } .ba-arrow { transform:rotate(90deg); } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <h1><span>note</span> テーマ戦略見直し</h1>
+    <p>データから読み解く「書くべきネタ」の方向性</p>
+    <div class="hero-date">keyaki &nbsp;|&nbsp; 2026.03.16 振り返り</div>
+  </div>
+</header>
+
+<!-- 1: DATA COMPARISON -->
+<section>
+  <div class="container">
+    <h2><span class="num">01</span> 10日間の推移データ</h2>
+
+    <table class="compare-table">
+      <thead><tr><th>記事</th><th>3/6<br>ビュー</th><th>3/16<br>ビュー</th><th>増分</th><th>スキ</th><th>スキ率</th><th>評価</th></tr></thead>
+      <tbody>
+        <tr><td>Claude Codeを使い倒すエンジニアのリアル</td><td>419</td><td>586</td><td class="delta">+167</td><td>12</td><td>2.0%</td><td><span class="badge-ok">流入型</span></td></tr>
+        <tr><td>Obsidianが最強のツールだと思う理由</td><td>305</td><td>499</td><td class="delta">+194</td><td>35</td><td>7.0%</td><td><span class="badge-good">高評価</span></td></tr>
+        <tr><td>Obsidianを最強のノートアプリに魔改造した</td><td>159</td><td>303</td><td class="delta">+144</td><td>10</td><td>3.3%</td><td><span class="badge-good">成長中</span></td></tr>
+        <tr><td>Claude CodeでGoogle DriveのMCP追加</td><td>82</td><td>125</td><td class="delta">+43</td><td>2</td><td>1.6%</td><td><span class="badge-ok">検索型</span></td></tr>
+        <tr><td>AIには敬語を使うべきか？[雑談]</td><td>24</td><td>95</td><td class="delta">+71</td><td>4</td><td>4.2%</td><td><span class="badge-good">じわ伸び</span></td></tr>
+        <tr><td>気軽に始める社内DX｜GAS</td><td>—</td><td>56</td><td class="delta">new</td><td>4</td><td>7.1%</td><td><span class="badge-good">好反応</span></td></tr>
+        <tr style="background:#ECFDF5"><td>AIで「作る」はじめの一歩｜Claude</td><td>—</td><td>39</td><td class="delta">new</td><td>9</td><td><strong>23.1%</strong></td><td><span class="badge-good">大当たり</span></td></tr>
+        <tr><td>私のAI活用遍歴｜「先生」から「主導者」へ</td><td>—</td><td>25</td><td class="delta">new</td><td>2</td><td>8.0%</td><td><span class="badge-ok">普通</span></td></tr>
+        <tr><td>GAS + Gemini API 自律型リマインドBot</td><td>20</td><td>23</td><td class="delta">+3</td><td>1</td><td>4.3%</td><td><span class="badge-low">停滞</span></td></tr>
+        <tr><td>エンジニア向けAIツール洗い出し 2026</td><td>—</td><td>19</td><td class="delta">new</td><td>3</td><td>15.8%</td><td><span class="badge-ok">少数精鋭</span></td></tr>
+        <tr><td>Function Calling入門</td><td>—</td><td>18</td><td class="delta">new</td><td>1</td><td>5.6%</td><td><span class="badge-low">不発</span></td></tr>
+        <tr><td>Claude Codeの便利な機能5選</td><td>—</td><td>10</td><td class="delta">new</td><td>2</td><td>20.0%</td><td><span class="badge-low">不発</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="insight">
+      <span class="icon">&#128161;</span>
+      <div><strong>既存記事が稼ぎ頭。</strong>上位3記事が10日で+505ビュー。新記事5本は合計111ビュー。1本あたり平均22ビューで、新記事の初速が課題。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2: PATTERN ANALYSIS -->
+<section>
+  <div class="container">
+    <h2><span class="num">02</span> 伸びる記事 vs 伸びない記事</h2>
+
+    <div class="rule">
+      <h3>伸びる記事のパターン</h3>
+      <p>「自分の体験・主観」×「具体的なツール名」の組み合わせ。読者は情報よりも「この人はなぜそれを選んだのか」というストーリーに反応する。</p>
+      <div style="margin-top:0.8rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <span class="badge-good">Obsidianが最強だと思う理由 → スキ率7.0%</span>
+        <span class="badge-good">AIで「作る」はじめの一歩 → スキ率23.1%</span>
+        <span class="badge-good">気軽に始める社内DX → スキ率7.1%</span>
+      </div>
+    </div>
+
+    <div class="rule" style="border-left-color:var(--red)">
+      <h3>伸びない記事のパターン</h3>
+      <p>「リスト型」「入門・解説型」「機能紹介型」。Qiita/Zennなら需要があるが、noteでは刺さらない。タイトルに主観が入っていないのも特徴。</p>
+      <div style="margin-top:0.8rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <span class="badge-low">Function Calling入門 → 18ビュー</span>
+        <span class="badge-low">Claude Codeの便利な機能5選 → 10ビュー</span>
+        <span class="badge-low">エンジニア向けAIツール洗い出し → 19ビュー</span>
+      </div>
+    </div>
+
+    <div class="insight warn">
+      <span class="icon">&#9888;&#65039;</span>
+      <div><strong>計画とのズレ：</strong>運用計画では「共感型40%」としていたが、新記事5本中、体験型は1〜2本。技術ハウツーに偏っている。計画に沿った配分に戻すことが最優先。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 3: REWRITE RULE -->
+<section>
+  <div class="container">
+    <h2><span class="num">03</span> 同じネタでも「角度」を変える</h2>
+    <p style="font-size:0.9rem; margin-bottom:1.2rem; color:var(--body)">技術的なネタを捨てる必要はありません。「情報提供」から「体験共有」に角度を変えるだけで、noteでの反応は大きく変わります。</p>
+
+    <div class="before-after">
+      <div class="ba-box before">
+        <div class="ba-label">&#10060; Before（情報提供型）</div>
+        Function Calling入門｜LLMに"手足"を与える技術の全体像
+      </div>
+      <div class="ba-arrow">&#8594;</div>
+      <div class="ba-box after">
+        <div class="ba-label">&#10004; After（体験型）</div>
+        Function Callingで社内の在庫確認を自動化したら、上司の反応が予想外だった
+      </div>
+    </div>
+
+    <div class="before-after">
+      <div class="ba-box before">
+        <div class="ba-label">&#10060; Before</div>
+        みんな知ってる？Claude Codeの便利な機能5選
+      </div>
+      <div class="ba-arrow">&#8594;</div>
+      <div class="ba-box after">
+        <div class="ba-label">&#10004; After</div>
+        Claude Codeで1日分の仕事が30分で終わった日の話
+      </div>
+    </div>
+
+    <div class="before-after">
+      <div class="ba-box before">
+        <div class="ba-label">&#10060; Before</div>
+        エンジニア向けAIツール洗い出し 2026
+      </div>
+      <div class="ba-arrow">&#8594;</div>
+      <div class="ba-box after">
+        <div class="ba-label">&#10004; After</div>
+        AI開発ツールを20個試して、結局3つに絞った理由
+      </div>
+    </div>
+
+    <div class="insight">
+      <span class="icon">&#128273;</span>
+      <div><strong>変換ルール：</strong>「〇〇とは / 〇〇の方法 / 〇〇選」→「〇〇してみたら / 〇〇だった話 / 〇〇を選んだ理由」。主語を「技術」から「自分」に変えるだけ。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 4: NETA CANDIDATES -->
+<section>
+  <div class="container">
+    <h2><span class="num">04</span> 今後のネタ候補リスト</h2>
+    <p style="font-size:0.9rem; margin-bottom:1.2rem; color:var(--body)">データで実証された「共感 × 具体」のフォーマットで、Kentaさんの強み（不動産×テック、Obsidian、Claude Code）を活かしたネタ候補です。</p>
+
+    <div class="neta-grid">
+      <div class="neta-card">
+        <span class="cat emp">共感・体験</span>
+        <h4>非IT企業で「社内唯一のエンジニア」として働くリアル</h4>
+        <p>孤独感、やりがい、周囲との温度差。不動産会社エンジニアならではの体験を書く。</p>
+        <div class="reason">&#8594; ポジション共感で拡散性が高い。転職・フリーランス層にも刺さる</div>
+        <div class="priority"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></div>
+      </div>
+
+      <div class="neta-card">
+        <span class="cat emp">共感・体験</span>
+        <h4>Claude Codeで1日分の仕事が30分で終わった日の話</h4>
+        <p>具体的な業務と所要時間のビフォーアフター。衝撃の数字で引きを作る。</p>
+        <div class="reason">&#8594; 「AIで作るはじめの一歩」の成功パターンを踏襲</div>
+        <div class="priority"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></div>
+      </div>
+
+      <div class="neta-card">
+        <span class="cat emp">共感・体験</span>
+        <h4>Obsidianで「第二の脳」を作る｜1年間の試行錯誤</h4>
+        <p>Obsidianシリーズの続編。運用の変遷と現在のワークフローを赤裸々に。</p>
+        <div class="reason">&#8594; Obsidian記事は実績あり。シリーズ化でリピーターを獲得</div>
+        <div class="priority"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></div>
+      </div>
+
+      <div class="neta-card">
+        <span class="cat dx">社内DX</span>
+        <h4>「それ、GASでできるよ」と言い続けた半年間の記録</h4>
+        <p>社内で提案→実装→反応のストーリー。非エンジニアの反応をリアルに。</p>
+        <div class="reason">&#8594; 社内DX系 + 体験型のハイブリッド。社員公開時にも使える</div>
+        <div class="priority"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></div>
+      </div>
+
+      <div class="neta-card">
+        <span class="cat dx">社内DX</span>
+        <h4>不動産会社にAIチャットBotを導入してみた結果</h4>
+        <p>導入の経緯、社内の反応、実際の利用率。成功も失敗も含めて書く。</p>
+        <div class="reason">&#8594; 業界特化のDX事例は競合が少なく、検索にも強い</div>
+        <div class="priority"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></div>
+      </div>
+
+      <div class="neta-card">
+        <span class="cat rev">ツール比較</span>
+        <h4>AI開発ツールを20個試して、結局3つに絞った理由</h4>
+        <p>選定プロセスと「なぜこれを選んだか」の主観を軸にレビュー。</p>
+        <div class="reason">&#8594; リスト型の失敗パターンを「選定ストーリー」に変換</div>
+        <div class="priority"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></div>
+      </div>
+
+      <div class="neta-card">
+        <span class="cat emp">共感・体験</span>
+        <h4>エンジニア転職を考え始めたので、まずnoteを始めた話</h4>
+        <p>なぜnoteなのか、何を目指しているのか。メタ的な発信で共感を呼ぶ。</p>
+        <div class="reason">&#8594; 情報発信を始めたい人への共感記事。フォロワー獲得に有効</div>
+        <div class="priority"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></div>
+      </div>
+
+      <div class="neta-card">
+        <span class="cat col">コラム</span>
+        <h4>非エンジニアの妻にClaude Codeを使わせてみた</h4>
+        <p>完全な初心者がAI開発ツールに触れたらどうなるか。社内展開の予行演習にも。</p>
+        <div class="reason">&#8594; 社内Claude Code普及の布石。「誰でもできる感」を演出</div>
+        <div class="priority"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5: REVISED SCHEDULE -->
+<section>
+  <div class="container">
+    <h2><span class="num">05</span> 修正版・投稿ルール</h2>
+
+    <div class="rule">
+      <h3>&#9312; ペースを落とす：週2本（火・金）</h3>
+      <p>10日で5本は多すぎた。1記事あたりの構想・推敲時間を確保し、質で勝負する。隔週でコラム1本を加えて最大週3本。</p>
+    </div>
+
+    <div class="rule">
+      <h3>&#9313; タイトルの「主語チェック」</h3>
+      <p>投稿前に必ず確認：タイトルの主語は「技術」ではなく「自分」になっているか？ 「〇〇入門」「〇〇の方法」は原則noteには出さず、Zenn/Qiitaに回す。</p>
+    </div>
+
+    <div class="rule">
+      <h3>&#9314; ヒット記事の「シリーズ化」</h3>
+      <p>Obsidian記事の成功を再現する。反応が良かったテーマは続編・深掘りで連載にし、マガジンでまとめてリピーターを呼ぶ。</p>
+    </div>
+
+    <div class="rule">
+      <h3>&#9315; 配分を厳守する</h3>
+      <p>共感・体験型 50%（前回40%→引き上げ）、社内DX 25%、ツール比較 15%、コラム 10%。技術ハウツーをnoteに出す場合は必ず「体験型」に角度変換する。</p>
+    </div>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<footer class="summary-footer">
+  <div class="inner">
+    <h2>まとめ：3つの方針転換</h2>
+    <div class="sum-item"><span class="ch">&#10004;</span>「情報提供」から「体験共有」へ ── 主語を技術から自分に変える</div>
+    <div class="sum-item"><span class="ch">&#10004;</span> 量より質へ ── 週2本に落として1記事の密度を上げる</div>
+    <div class="sum-item"><span class="ch">&#10004;</span> ヒットの再現へ ── Obsidian・Claude Code体験のシリーズ化</div>
+    <div class="sum-highlight">&#11088; 技術ハウツーは Zenn/Qiita へ。noteには「あなたの物語」だけを。</div>
+  </div>
+</footer>
+
+</body>
+</html>
