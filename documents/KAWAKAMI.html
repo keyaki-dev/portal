@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>川上 成長計画書</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1117; --surface: #161b22; --border: #30363d;
+  --text: #e6edf3; --muted: #7d8590;
+  --accent: #58a6ff; --green: #3fb950; --red: #f85149;
+  --yellow: #d29922; --purple: #bc8cff;
+}
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.deck { width: 100%; height: 100%; position: relative; }
+.slide { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 48px 64px; opacity: 0; pointer-events: none; transition: opacity .4s; }
+.slide.active { opacity: 1; pointer-events: all; }
+#nav { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 16px; z-index: 100; background: var(--surface); border: 1px solid var(--border); border-radius: 40px; padding: 10px 20px; }
+#nav button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 4px 8px; border-radius: 6px; transition: color .15s, background .15s; }
+#nav button:hover { color: var(--text); background: var(--border); }
+#page-indicator { font-size: 13px; color: var(--muted); min-width: 60px; text-align: center; }
+.slide-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 16px; }
+h1 { font-size: 52px; font-weight: 800; line-height: 1.1; }
+h2 { font-size: 36px; font-weight: 700; }
+.accent { color: var(--accent); }
+.green { color: var(--green); }
+.yellow { color: var(--yellow); }
+.purple { color: var(--purple); }
+.muted { color: var(--muted); }
+
+/* S1 Title */
+#s1 { text-align: center; }
+#s1 .badge { display: inline-flex; align-items: center; gap: 8px; background: #1f3a5f; border: 1px solid var(--accent); border-radius: 20px; padding: 6px 16px; font-size: 13px; color: var(--accent); margin-bottom: 32px; }
+#s1 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+#s1 h1 { font-size: 64px; margin-bottom: 12px; }
+#s1 .subtitle { font-size: 20px; color: var(--muted); margin-bottom: 40px; }
+#s1 .meta { display: flex; gap: 32px; justify-content: center; }
+#s1 .meta-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+#s1 .meta-value { font-size: 24px; font-weight: 700; }
+#s1 .meta-label { font-size: 12px; color: var(--muted); }
+
+/* S2 Architecture */
+.arch { width: 100%; max-width: 860px; }
+.arch-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 8px; }
+.arch-arrow { display: flex; justify-content: center; align-items: center; height: 28px; font-size: 13px; color: var(--muted); }
+.arch-box { border-radius: 10px; padding: 14px 20px; font-size: 14px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; min-width: 140px; }
+.arch-box .sub { font-size: 11px; font-weight: 400; color: var(--muted); }
+.ab-user   { background: #1c2a3d; border: 1px solid var(--accent); color: var(--accent); }
+.ab-claude { background: #2a1a0e; border: 1px solid var(--yellow); color: var(--yellow); }
+.ab-fs     { background: #1f2937; border: 1px solid var(--muted); color: var(--text); }
+
+/* S3 Dir Structure */
+.dir-tree { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 36px; font-family: 'SF Mono','Consolas',monospace; font-size: 14px; line-height: 2; width: 100%; max-width: 680px; }
+.dir-tree .d { color: var(--accent); }
+.dir-tree .f { color: var(--text); }
+.dir-tree .c { color: var(--muted); font-size: 12px; }
+.dir-tree .link { color: var(--green); }
+
+/* S4 Usage */
+.flow { width: 100%; max-width: 820px; display: flex; flex-direction: column; gap: 10px; }
+.flow-step { display: flex; align-items: flex-start; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; }
+.flow-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: #0d1117; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.flow-content h3 { font-size: 15px; margin-bottom: 4px; }
+.flow-content p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.flow-content code { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; font-size: 12px; color: var(--accent); font-family: 'SF Mono','Consolas',monospace; }
+
+/* S5 Manual */
+.manual { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; max-width: 900px; }
+.manual-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+.manual-card h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 14px; }
+.cmd-list { display: flex; flex-direction: column; gap: 8px; }
+.cmd-row { display: flex; flex-direction: column; gap: 2px; }
+.cmd-code { font-family: 'SF Mono','Consolas',monospace; font-size: 13px; color: var(--accent); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; }
+.cmd-desc { font-size: 12px; color: var(--muted); padding: 0 4px; }
+
+/* S6 Roadmap */
+.roadmap { width: 100%; max-width: 860px; }
+.rm-phase { display: flex; gap: 20px; position: relative; padding-bottom: 8px; }
+.rm-phase:not(:last-child)::after { content: ''; position: absolute; left: 19px; top: 40px; bottom: 0; width: 2px; background: var(--border); }
+.rm-dot { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; position: relative; z-index: 1; }
+.rm-dot.active { background: var(--green); color: #0d1117; }
+.rm-dot.next   { background: var(--accent); color: #0d1117; }
+.rm-dot.future { background: var(--surface); border: 2px solid var(--border); color: var(--muted); }
+.rm-body { padding: 8px 0 28px; flex: 1; }
+.rm-body h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.rm-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; margin-left: 8px; }
+.tag-now    { background: #1d2a1d; color: var(--green); }
+.tag-next   { background: #1c2a3d; color: var(--accent); }
+.tag-future { background: #2a1e2a; color: var(--purple); }
+.rm-body ul { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.rm-body li { font-size: 14px; color: var(--muted); display: flex; align-items: flex-start; gap: 8px; }
+.rm-body li::before { content: '—'; color: var(--border); flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- S1: Title -->
+<div class="slide active" id="s1">
+  <div class="badge"><div class="dot"></div> 稼働中</div>
+  <h1>川上 <span class="muted" style="font-weight:400;font-size:44px">成長計画書</span></h1>
+  <div class="subtitle">山下のパーソナル AI パートナー — Claude Code 直結型</div>
+  <div class="meta">
+    <div class="meta-item"><div class="meta-value accent">GCE</div><div class="meta-label">e2-standard-2</div></div>
+    <div class="meta-item"><div class="meta-value green">Claude</div><div class="meta-label">サブスク認証済み</div></div>
+    <div class="meta-item"><div class="meta-value" style="color:var(--yellow)">~$50</div><div class="meta-label">月コスト</div></div>
+    <div class="meta-item"><div class="meta-value" style="color:var(--purple)">24h</div><div class="meta-label">常時稼働</div></div>
+  </div>
+</div>
+
+<!-- S2: Architecture -->
+<div class="slide" id="s2">
+  <div class="slide-title">アーキテクチャ</div>
+  <h2 style="margin-bottom:28px">VM = <span class="accent">常時起動のリモート Claude 端末</span></h2>
+  <div class="arch">
+    <div class="arch-row">
+      <div class="arch-box ab-user">👤 山下<div class="sub">PC / スマホ</div></div>
+    </div>
+    <div class="arch-arrow">↓ make cli（SSH）</div>
+    <div class="arch-row">
+      <div class="arch-box ab-claude" style="min-width:280px">🤖 claude（対話モード）<div class="sub">~/agent で起動 / Claude Code サブスク</div></div>
+    </div>
+    <div class="arch-arrow">↓ 読み書き・Bash 実行</div>
+    <div class="arch-row">
+      <div class="arch-box ab-fs">📄 AGENTS.md<div class="sub">行動定義</div></div>
+      <div class="arch-box ab-fs">📝 DOCS.md<div class="sub">外部記憶</div></div>
+      <div class="arch-box ab-fs">📁 ~/keyaki/<div class="sub">作業リポジトリ</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- S3: Directory -->
+<div class="slide" id="s3">
+  <div class="slide-title">ディレクトリ構成</div>
+  <h2 style="margin-bottom:24px">VM 上の<span class="accent">ファイル配置</span></h2>
+  <div class="dir-tree">
+    <span class="c">~/  (VM: /home/yamashita/)</span><br>
+    ├── <span class="link">AGENTS.md</span> <span class="c">→ ~/agent/AGENTS.md （symlink）</span><br>
+    ├── <span class="d">agent/</span><br>
+    │&nbsp;&nbsp;&nbsp;├── <span class="f">AGENTS.md</span> <span class="c">← 川上の行動定義</span><br>
+    │&nbsp;&nbsp;&nbsp;└── <span class="f">DOCS.md</span> <span class="c">← 外部記憶・作業ログ</span><br>
+    ├── <span class="d">keyaki/</span> <span class="c">← 作業リポジトリ置き場</span><br>
+    │&nbsp;&nbsp;&nbsp;└── <span class="d">portal/</span><br>
+    └── <span class="d">.claude/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="f">CLAUDE.md</span> <span class="c">← @~/agent/AGENTS.md を import</span>
+  </div>
+  <p style="font-size:13px;color:var(--muted);margin-top:16px">AGENTS.md / DOCS.md / CLAUDE.md は <code style="background:var(--surface);padding:2px 6px;border-radius:4px;font-family:monospace">make deploy</code> で GitHub から配布</p>
+</div>
+
+<!-- S4: Usage -->
+<div class="slide" id="s4">
+  <div class="slide-title">使い方</div>
+  <h2 style="margin-bottom:24px">SSH で<span class="green">直接対話</span></h2>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-num">1</div>
+      <div class="flow-content">
+        <h3>VM を起動する（停止中の場合）</h3>
+        <p><code>make start</code> で起動。<code>make status</code> で確認。</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">2</div>
+      <div class="flow-content">
+        <h3>川上と接続する</h3>
+        <p><code>make cli</code> で SSH + tmux セッション起動。川上が DOCS.md を読んで前回の文脈を把握してから待機。<br>既存セッションがあれば自動で再接続。</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">3</div>
+      <div class="flow-content">
+        <h3>指示を出す</h3>
+        <p>自然言語で OK。<code>portal のバグを調べて</code> / <code>社内ポータルを作って</code> など。大きな変更は着手前に提案のみ。</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">4</div>
+      <div class="flow-content">
+        <h3>DOCS.md を更新して離席</h3>
+        <p>川上が経緯・決定事項を DOCS.md に記録。<code>Ctrl+B → D</code> で tmux から切り離せば PC シャットダウン後も川上は VM 上で動き続ける。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S5: Manual -->
+<div class="slide" id="s5">
+  <div class="slide-title">稼働マニュアル</div>
+  <h2 style="margin-bottom:24px">よく使う<span class="accent">コマンド</span></h2>
+  <div class="manual">
+    <div class="manual-card">
+      <h3>🖥 VM 管理</h3>
+      <div class="cmd-list">
+        <div class="cmd-row"><div class="cmd-code">make start</div><div class="cmd-desc">VM を起動する</div></div>
+        <div class="cmd-row"><div class="cmd-code">make stop</div><div class="cmd-desc">VM を停止する（課金停止）</div></div>
+        <div class="cmd-row"><div class="cmd-code">make status</div><div class="cmd-desc">VM の状態確認</div></div>
+      </div>
+    </div>
+    <div class="manual-card">
+      <h3>🤝 川上と接続</h3>
+      <div class="cmd-list">
+        <div class="cmd-row"><div class="cmd-code">make cli</div><div class="cmd-desc">SSH + tmux セッション起動（再接続も同じコマンド）</div></div>
+        <div class="cmd-row"><div class="cmd-code">make ssh</div><div class="cmd-desc">SSH のみ（生接続）</div></div>
+        <div class="cmd-row"><div class="cmd-code">make deploy</div><div class="cmd-desc">AGENTS.md / DOCS.md / CLAUDE.md を VM に反映</div></div>
+      </div>
+    </div>
+    <div class="manual-card">
+      <h3>📺 tmux 操作</h3>
+      <div class="cmd-list">
+        <div class="cmd-row"><div class="cmd-code">Ctrl+B → D</div><div class="cmd-desc">セッションから切り離す（VM は動き続ける）</div></div>
+        <div class="cmd-row"><div class="cmd-code">Ctrl+B → [</div><div class="cmd-desc">スクロールモード（Q で終了）</div></div>
+        <div class="cmd-row"><div class="cmd-code">tmux ls</div><div class="cmd-desc">セッション一覧（VM 内で）</div></div>
+      </div>
+    </div>
+    <div class="manual-card">
+      <h3>📂 重要ファイル（GitHub 管理）</h3>
+      <div class="cmd-list">
+        <div class="cmd-row"><div class="cmd-code">agent/AGENTS.md</div><div class="cmd-desc">川上の行動定義</div></div>
+        <div class="cmd-row"><div class="cmd-code">agent/DOCS.md</div><div class="cmd-desc">外部記憶・作業ログ</div></div>
+        <div class="cmd-row"><div class="cmd-code">claude/CLAUDE.md</div><div class="cmd-desc">~/.claude/CLAUDE.md として配布</div></div>
+      </div>
+    </div>
+    <div class="manual-card">
+      <h3>⚙️ 初回セットアップ</h3>
+      <div class="cmd-list">
+        <div class="cmd-row"><div class="cmd-code">bash setup.sh</div><div class="cmd-desc">Node.js + claude CLI インストール</div></div>
+        <div class="cmd-row"><div class="cmd-code">claude auth login</div><div class="cmd-desc">サブスクで認証（VM 上で一度だけ）</div></div>
+        <div class="cmd-row"><div class="cmd-code">make deploy</div><div class="cmd-desc">設定ファイルを VM に配布</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S6: Roadmap -->
+<div class="slide" id="s6">
+  <div class="slide-title">ロードマップ</div>
+  <h2 style="margin-bottom:28px">川上の<span class="purple">成長計画</span></h2>
+  <div class="roadmap">
+    <div class="rm-phase">
+      <div class="rm-dot active">1</div>
+      <div class="rm-body">
+        <h3>Phase 1 — SSH 直接セッション <span class="rm-tag tag-now">現在</span></h3>
+        <ul>
+          <li>make cli → SSH → claude 対話</li>
+          <li>DOCS.md でセッション間の記憶を引き継ぎ</li>
+          <li>PC が閉じていても VM は稼働し続ける</li>
+        </ul>
+      </div>
+    </div>
+    <div class="rm-phase">
+      <div class="rm-dot next">2</div>
+      <div class="rm-body">
+        <h3>Phase 2 — Slack 非同期コミュニケーション <span class="rm-tag tag-next">次のステップ</span></h3>
+        <ul>
+          <li>Slack DM → VM で claude -p を自動実行</li>
+          <li>claude が Slack に自分で返信</li>
+          <li>スマホからも指示を出せる</li>
+        </ul>
+      </div>
+    </div>
+    <div class="rm-phase">
+      <div class="rm-dot future">3</div>
+      <div class="rm-body">
+        <h3>Phase 3 — 完全自律稼働 <span class="rm-tag tag-future">将来</span></h3>
+        <ul>
+          <li>定期スキャン → 改善提案・自動 PR</li>
+          <li>GitHub Actions・CI 連携</li>
+          <li>寝てる間に PR が溜まってる</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<div id="nav">
+  <button id="prev">←</button>
+  <span id="page-indicator">1 / 6</span>
+  <button id="next">→</button>
+</div>
+<script>
+const slides = document.querySelectorAll('.slide')
+const total = slides.length
+let current = 0
+function go(n) {
+  slides[current].classList.remove('active')
+  current = (n + total) % total
+  slides[current].classList.add('active')
+  document.getElementById('page-indicator').textContent = `${current + 1} / ${total}`
+}
+document.getElementById('prev').addEventListener('click', () => go(current - 1))
+document.getElementById('next').addEventListener('click', () => go(current + 1))
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(current + 1)
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') go(current - 1)
+})
+</script>
+</body>
+</html>
