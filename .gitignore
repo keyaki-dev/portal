@@ -1,2 +1,13 @@
 .DS_Store
 *.swp
+
+# Next.js
+.next/
+out/
+node_modules/
+npm-debug.log*
+
+# env
+.env
+.env.local
+.env.*.local
