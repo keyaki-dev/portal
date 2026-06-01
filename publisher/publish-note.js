@@ -101,8 +101,8 @@ async function publishToNote(filename) {
 
     if (!titleFilled) {
       // スクリーンショットを保存して確認用に
-      await page.screenshot({ path: "/tmp/note-debug.png" });
-      throw new Error("タイトル入力欄が見つかりません。/tmp/note-debug.png を確認してください");
+      await page.screenshot({ path: `${screenshotDir}/note-debug.png` });
+      throw new Error("タイトル入力欄が見つかりません。note-debug.png を確認してください");
     }
 
     // Tab で本文へ移動
@@ -203,8 +203,8 @@ async function publishToNote(filename) {
     }
 
     if (!published) {
-      await page.screenshot({ path: "/tmp/note-before-publish.png" });
-      throw new Error("投稿ボタンが見つかりません。/tmp/note-before-publish.png を確認してください");
+      await page.screenshot({ path: `${screenshotDir}/note-before-publish.png` });
+      throw new Error("投稿ボタンが見つかりません。note-before-publish.png を確認してください");
     }
 
     await page.waitForTimeout(2000);

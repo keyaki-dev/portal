@@ -68,11 +68,11 @@ jobs:
         with:
           name: note-debug-screenshots
           path: |
-            note-login.png
-            note-login-failed.png
-            note-after-login-click.png
-            note-before-publish.png
-            note-debug.png
+            ${{ github.workspace }}/note-login.png
+            ${{ github.workspace }}/note-login-failed.png
+            ${{ github.workspace }}/note-after-login-click.png
+            ${{ github.workspace }}/note-before-publish.png
+            ${{ github.workspace }}/note-debug.png
           if-no-files-found: ignore
 
       - name: Commit frontmatter update
