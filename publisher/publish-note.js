@@ -112,7 +112,29 @@ async function publishToNote(filename) {
       throw new Error("パスワード入力欄が見つかりません");
     }
 
-    await page.click('button[type="submit"]');
+    // ログインボタンをクリック
+    const submitSelectors = [
+      'button[type="submit"]',
+      'button:has-text("ログイン")',
+      'input[type="submit"]',
+      '[data-testid="login-button"]',
+      'form button',
+    ];
+    let submitClicked = false;
+    for (const sel of submitSelectors) {
+      try {
+        await page.waitForSelector(sel, { timeout: 5000 });
+        await page.click(sel);
+        submitClicked = true;
+        console.log(`ログインボタンクリック (${sel})`);
+        break;
+      } catch {}
+    }
+    if (!submitClicked) {
+      await page.screenshot({ path: `${screenshotDir}/note-login-failed.png` });
+      throw new Error("ログインボタンが見つかりません");
+    }
+
     await page.waitForURL((url) => !url.href.includes("/login"), { timeout: 15000 });
     console.log("ログイン完了");
 
