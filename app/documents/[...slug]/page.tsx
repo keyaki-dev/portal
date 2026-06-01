@@ -1,17 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight, FileCode2, FileText, Home } from "lucide-react";
-import { getDocumentBySlug, getAllDocuments } from "@/lib/documents";
+import { getDocumentBySlug } from "@/lib/documents";
 import { MarkdownViewer } from "@/components/document/MarkdownViewer";
 import type { Metadata } from "next";
 
 interface Props {
   params: Promise<{ slug: string[] }>;
-}
-
-export async function generateStaticParams() {
-  const docs = getAllDocuments();
-  return docs.map((doc) => ({ slug: doc.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -81,7 +76,7 @@ export default async function DocumentPage({ params }: Props) {
       ) : (
         <div className="card-warm overflow-hidden rounded-xl" style={{ height: "75vh" }}>
           <iframe
-            src={`/api/raw/${slug.join("/")}`}
+            src={`/api/raw/${slug.map(encodeURIComponent).join("/")}`}
             className="h-full w-full border-0"
             title={meta.title}
           />
