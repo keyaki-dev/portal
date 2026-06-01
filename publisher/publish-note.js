@@ -181,31 +181,12 @@ async function publishToNote(filename) {
       }
     }
 
-    // 投稿ボタンをクリック
-    const publishSelectors = [
-      "button:has-text('投稿する')",
-      "button:has-text('公開する')",
-      "[data-testid='publish-button']",
-      ".publish-button",
-    ];
-
-    let published = false;
-    for (const sel of publishSelectors) {
-      try {
-        const btn = await page.$(sel);
-        if (btn) {
-          await btn.click();
-          published = true;
-          console.log(`投稿ボタンクリック (selector: ${sel})`);
-          break;
-        }
-      } catch {}
-    }
-
-    if (!published) {
-      await page.screenshot({ path: `${screenshotDir}/note-before-publish.png` });
-      throw new Error("投稿ボタンが見つかりません。note-before-publish.png を確認してください");
-    }
+    // 「公開に進む」ボタンをクリック
+    await page.waitForSelector("button:has-text('公開に進む')", { timeout: 10000 });
+    await page.click("button:has-text('公開に進む')");
+    console.log("「公開に進む」クリック");
+    await page.waitForTimeout(2000);
+    await page.screenshot({ path: `${screenshotDir}/note-before-publish.png` });
 
     await page.waitForTimeout(2000);
 
