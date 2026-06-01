@@ -152,14 +152,38 @@ async function publishToNote(filename) {
       } catch (e) {
         console.warn("予約投稿の設定に失敗しました:", e.message);
       }
+    } else {
+      // 即時公開：「投稿する」ボタンをクリック
+      await page.waitForSelector("button:has-text('投稿する')", { timeout: 10000 });
+      await page.click("button:has-text('投稿する')");
+      console.log("「投稿する」クリック");
+      await page.waitForTimeout(3000);
+
+      // 「記事が公開されました」モーダルを待つ
+      await page.waitForSelector("text=記事が公開されました", { timeout: 15000 });
+      console.log("投稿成功！");
+
+      // editorのURLからnoteIDを取得して公開URLを構築
+      const currentUrl = page.url();
+      const noteId = currentUrl.match(/\/notes\/(n[a-z0-9]+)\//)?.[1];
+      const publishedLink = await page.evaluate((nid) => {
+        const ogUrl = document.querySelector('meta[property="og:url"]')?.content;
+        if (ogUrl && ogUrl.includes("/n/")) return ogUrl;
+        if (nid) {
+          const link = document.querySelector(`a[href*="/${nid}"]`);
+          if (link) return link.href;
+        }
+        return null;
+      }, noteId);
+
+      const finalUrl = publishedLink || (noteId ? `https://note.com/keyaki_dev/n/${noteId}` : currentUrl);
+      console.log(`公開URL: ${finalUrl}`);
+      setOutput("note_url", finalUrl);
+      return finalUrl;
     }
 
-    // 公開設定ページのURLを下書きレビューURLとして返す
-    // 山下さんがこのURLを開いて内容を確認し、「投稿する」を押して公開する
-    const reviewUrl = page.url();
-    console.log(`下書きレビューURL: ${reviewUrl}`);
-    setOutput("note_url", reviewUrl);
-    return reviewUrl;
+    const fallbackUrl = page.url();
+    return fallbackUrl;
 
   } finally {
     await browser.close();
