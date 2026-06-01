@@ -248,14 +248,15 @@ async function publishToNote(filename) {
         } catch {}
       }
     } else {
-      // 即時投稿の確認ダイアログ
+      // 即時投稿の確認パネルで「公開する」をクリック
       try {
-        const confirmBtn = await page.$("button:has-text('公開する')");
-        if (confirmBtn) {
-          await confirmBtn.click();
-          console.log("公開確認ダイアログで公開ボタンをクリック");
-        }
-      } catch {}
+        await page.waitForSelector("button:has-text('公開する')", { timeout: 10000 });
+        await page.click("button:has-text('公開する')");
+        console.log("「公開する」クリック");
+      } catch (e) {
+        console.warn("「公開する」ボタンが見つかりませんでした:", e.message);
+        await page.screenshot({ path: `${screenshotDir}/note-before-publish.png` });
+      }
     }
 
     // URL 取得
