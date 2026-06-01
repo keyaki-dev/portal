@@ -11,6 +11,14 @@ on:
         description: "記事タイトル"
         required: true
         type: string
+      cover_image:
+        description: "カバー画像ファイル名 (例: 2026-05-26.png)"
+        required: false
+        type: string
+      scheduled_at:
+        description: "予約投稿日時 (ISO 8601形式: 2026-06-01T07:00:00+09:00)"
+        required: false
+        type: string
 
 jobs:
   publish:
@@ -44,6 +52,8 @@ jobs:
           NOTE_EMAIL: ${{ secrets.NOTE_EMAIL }}
           NOTE_PASSWORD: ${{ secrets.NOTE_PASSWORD }}
           BLOG_DIR: ${{ github.workspace }}/blog
+          COVER_IMAGE: ${{ inputs.cover_image && format('{0}/blog/images/{1}', github.workspace, inputs.cover_image) || '' }}
+          SCHEDULED_AT: ${{ inputs.scheduled_at }}
 
       - name: Update blog frontmatter
         if: steps.publish.outputs.note_url != ''

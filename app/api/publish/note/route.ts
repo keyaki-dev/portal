@@ -7,7 +7,10 @@ const PORTAL_REPO = "portal";
 const WORKFLOW_FILE = "publish-note.yml";
 
 export async function POST(req: NextRequest) {
-  const { slug } = (await req.json()) as { slug: string };
+  const { slug, scheduledAt } = (await req.json()) as {
+    slug: string;
+    scheduledAt?: string;
+  };
   if (!slug) return NextResponse.json({ error: "slug is required" }, { status: 400 });
 
   if (!GITHUB_TOKEN) {
@@ -17,7 +20,14 @@ export async function POST(req: NextRequest) {
   const post = getBlogPostBySlug(slug);
   if (!post) return NextResponse.json({ error: "記事が見つかりません" }, { status: 404 });
 
-  // Trigger GitHub Actions workflow dispatch
+  const inputs: Record<string, string> = {
+    filename: post.filename,
+    title: post.title,
+  };
+
+  if (post.image) inputs.cover_image = post.image;
+  if (scheduledAt) inputs.scheduled_at = scheduledAt;
+
   const dispatchRes = await fetch(
     `https://api.github.com/repos/${PORTAL_OWNER}/${PORTAL_REPO}/actions/workflows/${WORKFLOW_FILE}/dispatches`,
     {
@@ -27,13 +37,7 @@ export async function POST(req: NextRequest) {
         "Content-Type": "application/json",
         "X-GitHub-Api-Version": "2022-11-28",
       },
-      body: JSON.stringify({
-        ref: "main",
-        inputs: {
-          filename: post.filename,
-          title: post.title,
-        },
-      }),
+      body: JSON.stringify({ ref: "main", inputs }),
     }
   );
 

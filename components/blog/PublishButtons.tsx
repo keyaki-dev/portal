@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, ExternalLink, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import { Upload, ExternalLink, CheckCircle2, Loader2, AlertCircle, Clock } from "lucide-react";
 
 type Destination = "portfolio" | "note";
 type Status = "idle" | "loading" | "success" | "error";
@@ -23,34 +23,74 @@ export function PublishButtons({ slug, isPublished, publishedUrl }: PublishButto
   const [noteStatus, setNoteStatus] = useState<Status>("idle");
   const [portfolioResult, setPortfolioResult] = useState<PublishResult | null>(null);
   const [noteResult, setNoteResult] = useState<PublishResult | null>(null);
+  const [useSchedule, setUseSchedule] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState("");
 
-  async function publish(destination: Destination) {
-    const setStatus = destination === "portfolio" ? setPortfolioStatus : setNoteStatus;
-    const setResult = destination === "portfolio" ? setPortfolioResult : setNoteResult;
-
-    setStatus("loading");
-    setResult(null);
+  async function publishPortfolio() {
+    setPortfolioStatus("loading");
+    setPortfolioResult(null);
 
     try {
-      const res = await fetch(`/api/publish/${destination}`, {
+      const res = await fetch("/api/publish/portfolio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug }),
       });
-
       const data = await res.json() as PublishResult & { error?: string };
 
       if (!res.ok) {
-        setStatus("error");
-        setResult({ message: data.error ?? "投稿に失敗しました" });
+        setPortfolioStatus("error");
+        setPortfolioResult({ message: data.error ?? "投稿に失敗しました" });
         return;
       }
-
-      setStatus("success");
-      setResult(data);
+      setPortfolioStatus("success");
+      setPortfolioResult(data);
     } catch {
-      setStatus("error");
-      setResult({ message: "ネットワークエラーが発生しました" });
+      setPortfolioStatus("error");
+      setPortfolioResult({ message: "ネットワークエラーが発生しました" });
+    }
+  }
+
+  async function publishNote() {
+    setNoteStatus("loading");
+    setNoteResult(null);
+
+    try {
+      const body: { slug: string; scheduledAt?: string } = { slug };
+      if (useSchedule && scheduledAt) {
+        body.scheduledAt = new Date(scheduledAt).toISOString();
+      }
+
+      const res = await fetch("/api/publish/note", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json() as PublishResult & { error?: string };
+
+      if (!res.ok) {
+        setNoteStatus("error");
+        setNoteResult({ message: data.error ?? "投稿に失敗しました" });
+        return;
+      }
+      setNoteStatus("success");
+      setNoteResult(data);
+    } catch {
+      setNoteStatus("error");
+      setNoteResult({ message: "ネットワークエラーが発生しました" });
+    }
+  }
+
+  // 最低5分後の日時を初期値に
+  function handleScheduleToggle(checked: boolean) {
+    setUseSchedule(checked);
+    if (checked && !scheduledAt) {
+      const d = new Date(Date.now() + 5 * 60 * 1000);
+      d.setSeconds(0, 0);
+      const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+      setScheduledAt(local);
     }
   }
 
@@ -58,11 +98,11 @@ export function PublishButtons({ slug, isPublished, publishedUrl }: PublishButto
     <div className="space-y-3">
       <h3 className="mono-label">投稿先</h3>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-3">
         {/* Portfolio */}
-        <div className="flex-1">
+        <div>
           <button
-            onClick={() => publish("portfolio")}
+            onClick={publishPortfolio}
             disabled={portfolioStatus === "loading"}
             className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium transition-all hover:border-accent/40 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -95,10 +135,33 @@ export function PublishButtons({ slug, isPublished, publishedUrl }: PublishButto
         </div>
 
         {/* Note */}
-        <div className="flex-1">
+        <div className="space-y-2">
+          {/* 時間指定トグル */}
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={useSchedule}
+              onChange={(e) => handleScheduleToggle(e.target.checked)}
+              className="h-3.5 w-3.5 accent-[var(--accent)]"
+            />
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              時間指定で投稿
+            </span>
+          </label>
+
+          {useSchedule && (
+            <input
+              type="datetime-local"
+              value={scheduledAt}
+              onChange={(e) => setScheduledAt(e.target.value)}
+              className="w-full rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-accent/40"
+            />
+          )}
+
           <button
-            onClick={() => publish("note")}
-            disabled={noteStatus === "loading"}
+            onClick={publishNote}
+            disabled={noteStatus === "loading" || (useSchedule && !scheduledAt)}
             className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium transition-all hover:border-accent/40 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {noteStatus === "loading" ? (
@@ -108,10 +171,11 @@ export function PublishButtons({ slug, isPublished, publishedUrl }: PublishButto
             ) : (
               <Upload className="h-4 w-4 text-muted-foreground" />
             )}
-            Note に投稿
+            {useSchedule ? "Note に予約投稿" : "Note に投稿"}
           </button>
+
           {noteStatus === "success" && (
-            <p className="mt-2 text-xs text-emerald-700">
+            <p className="flex items-center gap-1 text-xs text-emerald-700">
               {noteResult?.url ? (
                 <a
                   href={noteResult.url}
@@ -141,7 +205,7 @@ export function PublishButtons({ slug, isPublished, publishedUrl }: PublishButto
             </p>
           )}
           {noteStatus === "error" && (
-            <p className="mt-2 flex items-center gap-1 text-xs text-red-600">
+            <p className="flex items-center gap-1 text-xs text-red-600">
               <AlertCircle className="h-3 w-3" />
               {noteResult?.message}
             </p>
