@@ -82,9 +82,8 @@ export async function POST(
     const mdSha = await getFileSha(mdPath);
     await putFile(mdPath, Buffer.from(updatedMd).toString("base64"), commitMessage, mdSha);
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    console.error("GitHub API error:", msg);
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("GitHub API error:", e);
+    return NextResponse.json({ error: "GitHub への保存に失敗しました" }, { status: 500 });
   }
 
   return NextResponse.json({ filename });

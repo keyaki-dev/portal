@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 
 const IMAGES_DIR = path.join(process.cwd(), "blog", "images");
+const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/keyaki-dev/portal/main/blog/images";
 
 const CONTENT_TYPES: Record<string, string> = {
   png: "image/png",
@@ -17,23 +18,32 @@ export async function GET(
   { params }: { params: Promise<{ filename: string }> }
 ) {
   const { filename } = await params;
-
-  // path traversal 防止
   const safeName = path.basename(filename);
-  const filePath = path.join(IMAGES_DIR, safeName);
-
-  if (!fs.existsSync(filePath)) {
-    return new NextResponse(null, { status: 404 });
-  }
-
   const ext = safeName.split(".").pop()?.toLowerCase() ?? "";
   const contentType = CONTENT_TYPES[ext] ?? "application/octet-stream";
 
-  const buffer = fs.readFileSync(filePath);
+  // デプロイ済みのファイルはローカルから配信（高速）
+  const localPath = path.join(IMAGES_DIR, safeName);
+  if (fs.existsSync(localPath)) {
+    const buffer = fs.readFileSync(localPath);
+    return new NextResponse(buffer, {
+      headers: {
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=3600",
+      },
+    });
+  }
+
+  // アップロード直後でまだデプロイされていない画像は GitHub raw から取得
+  const githubRes = await fetch(`${GITHUB_RAW_BASE}/${safeName}`);
+  if (!githubRes.ok) return new NextResponse(null, { status: 404 });
+
+  const buffer = await githubRes.arrayBuffer();
   return new NextResponse(buffer, {
     headers: {
       "Content-Type": contentType,
-      "Cache-Control": "public, max-age=3600",
+      // 次のデプロイで local に切り替わるため短めにキャッシュ
+      "Cache-Control": "public, max-age=60",
     },
   });
 }
