@@ -64,10 +64,19 @@ async function publishToNote(filename) {
     httpOnly: true,
     secure: true,
   }]);
+  // クリップボード権限を付与（contenteditable エディタへのペーストに必要）
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   console.log("セッションクッキーをセット");
 
   const page = await context.newPage();
   const screenshotDir = process.env.GITHUB_WORKSPACE || "/tmp";
+
+  // クリップボード経由でテキストをペーストする（React系エディタのState更新に対応）
+  async function pasteText(text) {
+    await page.evaluate((t) => navigator.clipboard.writeText(t), text);
+    await page.keyboard.press("Control+a");
+    await page.keyboard.press("Control+v");
+  }
 
   try {
 
@@ -75,41 +84,18 @@ async function publishToNote(filename) {
     await page.goto("https://note.com/notes/new", { waitUntil: "networkidle" });
     await page.waitForTimeout(2000);
 
-    // タイトル入力
-    const titleSelectors = [
-      '[data-placeholder="タイトル"]',
-      '[placeholder="タイトル"]',
-      ".note-title-input",
-      "[data-testid='title']",
-      "h1[contenteditable]",
-      "div[role='textbox']:first-of-type",
-    ];
+    // タイトル入力（クリップボードペースト）
+    const titleEl = await page.waitForSelector("div[role='textbox']:first-of-type", { timeout: 10000 });
+    await titleEl.click();
+    await pasteText(title);
+    console.log("タイトル入力完了");
+    await page.waitForTimeout(500);
 
-    let titleFilled = false;
-    for (const sel of titleSelectors) {
-      try {
-        const el = await page.waitForSelector(sel, { timeout: 3000 });
-        if (el) {
-          await el.click();
-          await page.keyboard.type(title);
-          titleFilled = true;
-          console.log(`タイトル入力完了 (selector: ${sel})`);
-          break;
-        }
-      } catch {}
-    }
-
-    if (!titleFilled) {
-      // スクリーンショットを保存して確認用に
-      await page.screenshot({ path: `${screenshotDir}/note-debug.png` });
-      throw new Error("タイトル入力欄が見つかりません。note-debug.png を確認してください");
-    }
-
-    // Tab で本文へ移動
+    // 本文入力（クリップボードペースト）
+    // Tab で本文エリアへ移動
     await page.keyboard.press("Tab");
     await page.waitForTimeout(500);
 
-    // 本文入力
     const bodySelectors = [
       '[data-placeholder="本文を入力してください"]',
       ".note-body-input",
@@ -117,17 +103,14 @@ async function publishToNote(filename) {
       "div[role='textbox']:nth-of-type(2)",
     ];
 
+    // 本文エリアにクリップボードペースト
     let bodyFilled = false;
     for (const sel of bodySelectors) {
       try {
         const el = await page.$(sel);
         if (el) {
           await el.click();
-          // クリップボード経由でペースト（長文対応）
-          await page.evaluate((text) => {
-            navigator.clipboard?.writeText(text).catch(() => {});
-          }, body);
-          await page.keyboard.press("Control+v");
+          await pasteText(body);
           bodyFilled = true;
           console.log(`本文入力完了 (selector: ${sel})`);
           break;
@@ -136,9 +119,9 @@ async function publishToNote(filename) {
     }
 
     if (!bodyFilled) {
-      // フォーカスされている場所に直接タイプ（Tab 後の状態を利用）
-      await page.keyboard.type(body, { delay: 5 });
-      console.log("本文を直接タイプしました");
+      // Tab 後のフォーカス位置にペースト
+      await pasteText(body);
+      console.log("本文入力完了（フォーカス位置にペースト）");
     }
 
     await page.waitForTimeout(1000);
