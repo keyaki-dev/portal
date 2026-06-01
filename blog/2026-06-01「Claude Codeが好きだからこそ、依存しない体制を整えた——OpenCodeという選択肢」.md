@@ -1,5 +1,5 @@
 ---
-created: 2026-06-01
+created: 2026-06-01T00:00:00.000Z
 flags:
   - 1_draft
 blog_tag:
@@ -7,8 +7,8 @@ blog_tag:
   - OpenCode
   - 生成AI
   - 開発ツール
-image:
-published_url:
+image: 2026-06-01.png
+published_url: null
 ---
 
 # Claude Codeが好きだからこそ、依存しない体制を整えた——OpenCodeという選択肢
