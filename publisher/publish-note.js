@@ -57,14 +57,61 @@ async function publishToNote(filename) {
   });
   const page = await context.newPage();
 
+  const screenshotDir = process.env.GITHUB_WORKSPACE || "/tmp";
+
   try {
     // ログイン
     console.log("Note にログイン中...");
     await page.goto("https://note.com/login", { waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
+    await page.screenshot({ path: `${screenshotDir}/note-login.png` });
 
-    await page.fill('input[name="email"]', NOTE_EMAIL);
-    await page.fill('input[name="password"]', NOTE_PASSWORD);
+    // メールアドレス入力（複数セレクタを順に試す）
+    const emailSelectors = [
+      'input[name="email"]',
+      'input[type="email"]',
+      'input[placeholder*="メール"]',
+      'input[placeholder*="email"]',
+      '#email',
+      '[data-testid="email"]',
+      'form input:first-of-type',
+    ];
+    let emailFilled = false;
+    for (const sel of emailSelectors) {
+      try {
+        await page.waitForSelector(sel, { timeout: 5000 });
+        await page.fill(sel, NOTE_EMAIL);
+        emailFilled = true;
+        console.log(`メール入力完了 (${sel})`);
+        break;
+      } catch {}
+    }
+    if (!emailFilled) {
+      await page.screenshot({ path: `${screenshotDir}/note-login-failed.png` });
+      throw new Error("メール入力欄が見つかりません。note-login-failed.png を確認してください");
+    }
+
+    // パスワード入力
+    const passwordSelectors = [
+      'input[name="password"]',
+      'input[type="password"]',
+      '[data-testid="password"]',
+    ];
+    let passwordFilled = false;
+    for (const sel of passwordSelectors) {
+      try {
+        await page.waitForSelector(sel, { timeout: 5000 });
+        await page.fill(sel, NOTE_PASSWORD);
+        passwordFilled = true;
+        console.log(`パスワード入力完了 (${sel})`);
+        break;
+      } catch {}
+    }
+    if (!passwordFilled) {
+      await page.screenshot({ path: `${screenshotDir}/note-login-failed.png` });
+      throw new Error("パスワード入力欄が見つかりません");
+    }
+
     await page.click('button[type="submit"]');
     await page.waitForURL((url) => !url.href.includes("/login"), { timeout: 15000 });
     console.log("ログイン完了");

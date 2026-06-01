@@ -63,6 +63,18 @@ jobs:
         env:
           BLOG_DIR: ${{ github.workspace }}/blog
 
+      - name: Upload debug screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: note-debug-screenshots
+          path: |
+            note-login.png
+            note-login-failed.png
+            note-before-publish.png
+            note-debug.png
+          if-no-files-found: ignore
+
       - name: Commit frontmatter update
         if: steps.publish.outputs.note_url != ''
         run: |
