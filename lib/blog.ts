@@ -12,8 +12,11 @@ export interface BlogPost {
   tags: string[];
   image?: string;
   flags: string[];
-  publishedUrl?: string;
+  publishedUrl?: string;   // note.com の公開URL（editor URLの場合は下書きレビューURL）
+  portfolioUrl?: string;   // keyaki-dev.com のポートフォリオURL
   status: "draft" | "published";
+  noteStatus: "none" | "review" | "published";     // none: 未投稿, review: 下書きレビューURL, published: 公開済み
+  portfolioStatus: "none" | "published";
 }
 
 export interface BlogPostWithContent extends BlogPost {
@@ -56,7 +59,15 @@ export function getAllBlogPosts(): BlogPost[] {
         image: data.image as string | undefined,
         flags,
         publishedUrl: (data.published_url as string) || undefined,
+        portfolioUrl: (data.portfolio_url as string) || undefined,
         status: (flags.includes("2_published") ? "published" : "draft") as "draft" | "published",
+        noteStatus: (() => {
+          const url = (data.published_url as string) || "";
+          if (!url) return "none" as const;
+          if (url.includes("note.com/keyaki_dev/n/")) return "published" as const;
+          return "review" as const;
+        })(),
+        portfolioStatus: ((data.portfolio_url as string) ? "published" : "none") as "published" | "none",
       };
     })
     .sort((a, b) => (b.date || "").localeCompare(a.date || ""));

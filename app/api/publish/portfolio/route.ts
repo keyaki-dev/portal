@@ -60,5 +60,41 @@ export async function POST(req: NextRequest) {
   }
 
   const portfolioUrl = `${PORTFOLIO_BASE_URL}/${post.date}`;
+
+  // blog frontmatter の portfolio_url を更新
+  const PORTAL_OWNER = "keyaki-dev";
+  const PORTAL_REPO = "portal";
+  const mdPath = `blog/${post.filename}`;
+  try {
+    const checkRes = await fetch(
+      `https://api.github.com/repos/${PORTAL_OWNER}/${PORTAL_REPO}/contents/${mdPath}`,
+      { headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, "X-GitHub-Api-Version": "2022-11-28" } }
+    );
+    if (checkRes.ok) {
+      const existing = (await checkRes.json()) as { sha: string; content: string };
+      const decoded = Buffer.from(existing.sha ? "" : "", "base64");
+      // gray-matter をサーバーサイドでは使えないため簡易正規表現で更新
+      const rawContent = Buffer.from(existing.content, "base64").toString("utf-8");
+      const updatedContent = rawContent.includes("portfolio_url:")
+        ? rawContent.replace(/portfolio_url:.*/, `portfolio_url: '${portfolioUrl}'`)
+        : rawContent.replace(/^---/, `---\nportfolio_url: '${portfolioUrl}'`);
+      void decoded;
+      await fetch(
+        `https://api.github.com/repos/${PORTAL_OWNER}/${PORTAL_REPO}/contents/${mdPath}`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, "Content-Type": "application/json", "X-GitHub-Api-Version": "2022-11-28" },
+          body: JSON.stringify({
+            message: `content: portfolio_url を更新 — ${post.title}`,
+            content: Buffer.from(updatedContent).toString("base64"),
+            sha: existing.sha,
+          }),
+        }
+      );
+    }
+  } catch (e) {
+    console.error("frontmatter更新エラー（続行）:", e);
+  }
+
   return NextResponse.json({ url: portfolioUrl });
 }

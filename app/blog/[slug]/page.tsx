@@ -90,8 +90,10 @@ export default async function BlogPostPage({ params }: Props) {
           <div className="card-warm p-5 space-y-5">
             <PublishButtons
               slug={slug}
-              isPublished={post.status === "published"}
+              noteStatus={post.noteStatus}
+              portfolioStatus={post.portfolioStatus}
               publishedUrl={post.publishedUrl}
+              portfolioUrl={post.portfolioUrl}
             />
 
             <div className="border-t border-border pt-4">

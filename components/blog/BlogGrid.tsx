@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { PenLine, CheckCircle2, Clock, LayoutGrid, List, ImageIcon } from "lucide-react";
+import { PenLine, CheckCircle2, Clock, LayoutGrid, List, ImageIcon, FileEdit } from "lucide-react";
 import type { BlogPost } from "@/lib/blog";
 
 type View = "gallery" | "list";
@@ -53,6 +53,23 @@ function GalleryCard({ post }: { post: BlogPost }) {
         <p className="font-medium text-foreground leading-snug line-clamp-2 group-hover:text-accent transition-colors">
           {post.title}
         </p>
+        {/* note / portfolio 公開状況 */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {post.noteStatus === "published" ? (
+            <span className="flex items-center gap-0.5 rounded bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 text-[9px] font-mono text-emerald-700">
+              <CheckCircle2 className="h-2 w-2" /> note
+            </span>
+          ) : post.noteStatus === "review" ? (
+            <span className="flex items-center gap-0.5 rounded bg-amber-50 border border-amber-100 px-1.5 py-0.5 text-[9px] font-mono text-amber-700">
+              <FileEdit className="h-2 w-2" /> note下書き
+            </span>
+          ) : null}
+          {post.portfolioStatus === "published" && (
+            <span className="flex items-center gap-0.5 rounded bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 text-[9px] font-mono text-emerald-700">
+              <CheckCircle2 className="h-2 w-2" /> portfolio
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-2 flex-wrap">
           <span className="mono-label text-[10px]">{post.date}</span>
           {post.tags.slice(0, 3).map((tag) => (
@@ -106,9 +123,18 @@ function ListCard({ post }: { post: BlogPost }) {
             </span>
           )}
         </div>
-        <div className="mt-1 flex items-center gap-2">
+        <div className="mt-1 flex items-center gap-2 flex-wrap">
           <p className="text-xs text-muted-foreground">{post.date}</p>
-          {post.tags.slice(0, 3).map((tag) => (
+          {post.noteStatus === "published" && (
+            <span className="flex items-center gap-0.5 rounded bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 text-[9px] font-mono text-emerald-700"><CheckCircle2 className="h-2 w-2" />note</span>
+          )}
+          {post.noteStatus === "review" && (
+            <span className="flex items-center gap-0.5 rounded bg-amber-50 border border-amber-100 px-1.5 py-0.5 text-[9px] font-mono text-amber-700"><FileEdit className="h-2 w-2" />note下書き</span>
+          )}
+          {post.portfolioStatus === "published" && (
+            <span className="flex items-center gap-0.5 rounded bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 text-[9px] font-mono text-emerald-700"><CheckCircle2 className="h-2 w-2" />portfolio</span>
+          )}
+          {post.tags.slice(0, 2).map((tag) => (
             <span key={tag} className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
               {tag}
             </span>
