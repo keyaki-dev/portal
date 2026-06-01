@@ -28,10 +28,14 @@ export function SlideViewer({ src, title, breadcrumbs, updatedAt }: Props) {
   }, []);
 
   const toggleFullscreen = useCallback(async () => {
-    if (!document.fullscreenElement) {
-      await containerRef.current?.requestFullscreen();
-    } else {
-      await document.exitFullscreen();
+    try {
+      if (!document.fullscreenElement) {
+        await containerRef.current?.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch {
+      // iOS Safari 15以前はfullscreen API未サポートのため無視
     }
   }, []);
 
@@ -43,8 +47,11 @@ export function SlideViewer({ src, title, breadcrumbs, updatedAt }: Props) {
     >
       {/* Top bar */}
       <div className="flex items-center gap-2 px-3 sm:px-4 py-2 border-b border-border bg-card flex-shrink-0">
-        {/* Mobile: title only */}
-        <div className="flex-1 min-w-0 sm:hidden">
+        {/* Mobile: home button + title */}
+        <div className="flex items-center gap-1.5 flex-1 min-w-0 sm:hidden">
+          <Link href="/" className="flex-shrink-0 rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="ホームに戻る">
+            <Home className="h-4 w-4" />
+          </Link>
           <p className="text-sm font-medium truncate text-foreground">{title}</p>
         </div>
 
