@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>フォーカス for ADHD — Go-To-Market 戦略 | ケ開発</title>
+<style>
+:root {
+  --bg:          #F8F5F1;
+  --bg-card:     #FDFAF7;
+  --bg-muted:    #F2EDE8;
+  --fg:          #2C2C2C;
+  --fg-muted:    #6B6560;
+  --border:      #E5DDD6;
+  --accent:      #C45E3E;
+  --accent-soft: #F5E1D6;
+  --green:       #4A7C6F;
+  --green-soft:  #E6F0EE;
+  --yellow:      #8A6A2E;
+  --yellow-soft: #F5EDD6;
+  --blue:        #3A5F8A;
+  --blue-soft:   #DDE8F5;
+  --font-sans:   'Hiragino Kaku Gothic ProN','Yu Gothic','Segoe UI',system-ui,sans-serif;
+  --font-serif:  'Hiragino Mincho ProN','Yu Mincho',Georgia,serif;
+  --font-mono:   'Fira Code','Geist Mono',monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:var(--font-sans);background:var(--bg);color:var(--fg);overflow:hidden;-webkit-font-smoothing:antialiased;}
+.deck{width:100%;height:100vh;position:relative;}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;align-items:center;padding:52px 68px;overflow:hidden;}
+.slide.active{display:flex;}
+.slide::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.025;pointer-events:none;}
+#nav{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;z-index:200;background:var(--bg-card);border:1px solid var(--border);border-radius:40px;padding:9px 20px;box-shadow:0 4px 24px rgba(196,94,62,0.06);}
+#nav button{background:none;border:none;color:var(--fg-muted);cursor:pointer;font-size:16px;padding:4px 10px;border-radius:20px;transition:all 0.15s;}
+#nav button:hover{background:var(--bg-muted);color:var(--fg);}
+#counter{color:var(--fg-muted);font-size:12px;min-width:44px;text-align:center;font-family:var(--font-mono);}
+.dot-row{display:flex;gap:5px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border);cursor:pointer;transition:all 0.2s;}
+.dot.active{background:var(--accent);transform:scale(1.4);}
+.mono-label{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+h1{font-family:var(--font-serif);font-size:clamp(34px,5vw,64px);font-weight:500;line-height:1.1;letter-spacing:-0.02em;}
+h2{font-family:var(--font-serif);font-size:clamp(24px,3.6vw,44px);font-weight:500;line-height:1.15;letter-spacing:-0.02em;}
+h3{font-size:17px;font-weight:600;line-height:1.3;}
+.sub{font-size:clamp(13px,1.5vw,16px);color:var(--fg-muted);line-height:1.75;margin-top:14px;}
+.at{color:var(--accent);}
+.full{width:100%;}
+.center{text-align:center;}
+.row{display:flex;gap:22px;width:100%;}
+.col{flex:1;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;width:100%;}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px;}
+.card-sm{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;}
+.stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;text-align:center;}
+.stat-num{font-family:var(--font-serif);font-size:clamp(26px,3.8vw,46px);font-weight:500;line-height:1;color:var(--accent);}
+.stat-label{font-size:11px;color:var(--fg-muted);margin-top:6px;}
+.tag{display:inline-block;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;background:var(--accent-soft);color:var(--accent);border:1px solid var(--border);}
+.tag.green{background:var(--green-soft);color:var(--green);}
+.tag.yellow{background:var(--yellow-soft);color:var(--yellow);}
+.tag.blue{background:var(--blue-soft);color:var(--blue);}
+.fl{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.fl li{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--fg-muted);line-height:1.6;}
+.fl li::before{content:'—';color:var(--accent);font-weight:700;flex-shrink:0;}
+.divider{width:36px;height:2px;background:var(--accent);border-radius:1px;margin:14px 0;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;padding:9px 13px;color:var(--fg-muted);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--bg-muted);}
+td{padding:10px 13px;border-bottom:1px solid var(--border);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--accent-soft);}
+
+/* Phase timeline */
+.phase-row{display:flex;gap:0;width:100%;margin-top:24px;}
+.phase{flex:1;position:relative;padding:0 8px;}
+.phase::after{content:'';position:absolute;top:20px;right:-1px;width:2px;height:calc(100% - 20px);background:var(--border);}
+.phase:last-child::after{display:none;}
+.phase-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.phase-num{width:36px;height:36px;border-radius:50%;background:var(--accent-soft);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent);flex-shrink:0;font-family:var(--font-mono);}
+.phase-title{font-size:13px;font-weight:700;line-height:1.2;}
+.phase-period{font-size:10px;color:var(--fg-muted);font-family:var(--font-mono);}
+
+/* Channel cards */
+.channel-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.ch-icon{font-size:22px;margin-bottom:8px;}
+.ch-name{font-size:14px;font-weight:700;margin-bottom:4px;}
+.ch-role{font-size:11px;color:var(--accent);font-family:var(--font-mono);font-weight:600;margin-bottom:10px;}
+.priority-bar{height:4px;border-radius:2px;background:var(--border);margin-bottom:3px;overflow:hidden;}
+.priority-fill{height:100%;border-radius:2px;background:var(--accent);}
+
+/* Funnel */
+.funnel-step{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;gap:14px;}
+.funnel-num{width:28px;height:28px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;font-family:var(--font-mono);}
+.funnel-arrow{text-align:center;color:var(--border);font-size:12px;margin-bottom:2px;}
+
+/* KPI table highlight */
+.kpi-ok{color:var(--green);font-weight:600;}
+.kpi-warn{color:var(--yellow);}
+
+.slide.active .anim{animation:fadeUp 0.42s cubic-bezier(0.2,0.8,0.2,1) both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.d1{animation-delay:0.05s!important}.d2{animation-delay:0.10s!important}
+.d3{animation-delay:0.15s!important}.d4{animation-delay:0.20s!important}
+.d5{animation-delay:0.25s!important}
+#s0::before{content:'';position:absolute;top:-100px;right:-100px;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(196,94,62,0.08) 0%,transparent 70%);pointer-events:none;}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- ── 0: Title ── -->
+<div class="slide" id="s0">
+  <div class="center" style="max-width:680px;">
+    <div class="mono-label anim">ケ開発 — GTM戦略 2026年6月</div>
+    <h1 class="anim d1"><span class="at">フォーカス for ADHD</span><br>Go-To-Market 戦略</h1>
+    <p class="sub anim d2">
+      アプリを作るだけでは届かない。<br>
+      「誰に・どこで・どう知ってもらうか」を設計する。
+    </p>
+    <div style="margin-top:28px;display:flex;gap:9px;justify-content:center;flex-wrap:wrap;" class="anim d3">
+      <span class="tag">集客戦略</span>
+      <span class="tag green">コミュニティ</span>
+      <span class="tag blue">ASO</span>
+      <span class="tag yellow">コンテンツ</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── 1: 前提認識 ── -->
+<div class="slide">
+  <div class="full" style="max-width:900px;">
+    <div class="mono-label anim">前提</div>
+    <h2 class="anim d1">「作るだけ」では<span class="at">絶対に届かない</span></h2>
+    <div class="grid-2" style="margin-top:24px;">
+      <div class="card anim d2">
+        <h3 style="margin-bottom:12px;">📱 アプリの現実</h3>
+        <ul class="fl">
+          <li>App Store / Google Play 合計で<strong style="color:var(--fg);">400万以上</strong>のアプリが存在</li>
+          <li>新規アプリの<strong style="color:var(--fg);">77%</strong>はリリース3日以内に削除される</li>
+          <li>オーガニック流入だけで成長できるのは全体の<strong style="color:var(--fg);">5%未満</strong></li>
+          <li>noteに1本投稿しただけでは、ADHDコミュニティに届く確率は極めて低い</li>
+        </ul>
+      </div>
+      <div class="card anim d3">
+        <h3 style="margin-bottom:12px;">✅ 勝ちパターン（調査から）</h3>
+        <ul class="fl">
+          <li><strong style="color:var(--fg);">リリース前から</strong>ターゲットコミュニティに入り込む</li>
+          <li>ADHDアカウントとの相互関係を<strong style="color:var(--fg);">3ヶ月以上</strong>かけて作る</li>
+          <li>アプリの宣伝ではなく<strong style="color:var(--fg);">「当事者の悩みを語るコンテンツ」</strong>が刺さる</li>
+          <li>個人開発者自身が「顔」になることで信頼を獲得する</li>
+          <li>事前登録269人 → 初週3,377DL の実績あり（国内事例）</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-sm anim d4" style="margin-top:14px;border-color:var(--accent-soft);">
+      <span style="color:var(--accent);font-weight:600;">基本方針：</span>
+      <span style="color:var(--fg-muted);font-size:13px;">「告知する」のではなく<strong style="color:var(--fg);">「コミュニティに先に貢献する」</strong>。ADHD当事者にとって信頼できる存在になってからアプリを届ける。</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── 2: ターゲット理解 ── -->
+<div class="slide">
+  <div class="full" style="max-width:900px;">
+    <div class="mono-label anim">ターゲット</div>
+    <h2 class="anim d1">誰に届けるか — <span class="at">ペルソナ設計</span></h2>
+    <div class="row" style="margin-top:22px;align-items:flex-start;">
+      <div class="col anim d2">
+        <div class="card" style="height:100%;">
+          <div style="font-size:20px;margin-bottom:10px;">👤</div>
+          <h3 style="margin-bottom:12px;">コアターゲット</h3>
+          <div style="font-size:13px;color:var(--fg-muted);line-height:1.8;">
+            <div style="color:var(--fg);font-weight:600;margin-bottom:6px;">仮称：「田中さん（29歳・会社員）」</div>
+            ADHD と診断された or グレーゾーン。<br>
+            仕事中に集中が続かず悩んでいる。<br>
+            既存のポモドーロアプリを試したが「25分が長すぎて挫折」。<br>
+            X で #ADHD タグを追っており、note で当事者ブログを読む。<br>
+            アプリにお金は払うが、「また続かないかも」という不安がある。
+          </div>
+        </div>
+      </div>
+      <div class="col anim d3">
+        <div class="card" style="margin-bottom:14px;">
+          <h3 style="margin-bottom:10px;">📍 彼らがいる場所</h3>
+          <ul class="fl">
+            <li><strong style="color:var(--fg);">X（旧Twitter）</strong>— #ADHD #発達障害 タグ。当事者アカウントが多数</li>
+            <li><strong style="color:var(--fg);">note</strong>— ADHDライフハック記事。フォロワー数百人規模の発信者が多数存在</li>
+            <li><strong style="color:var(--fg);">YouTube</strong>— 「ADHD 仕事術」「集中できない 対策」で検索</li>
+            <li><strong style="color:var(--fg);">オフ会・当事者会</strong>— こくちーずプロで定期開催</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:10px;">💬 彼らの「言葉」</h3>
+          <ul class="fl">
+            <li>「タスクに取りかかれない」「先延ばし」</li>
+            <li>「普通のタイマーアプリは自分に合わない」</li>
+            <li>「褒めてもらいたい・達成感が欲しい」</li>
+            <li>「完璧にやろうとして結局何もできない」</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 3: フェーズ全体像 ── -->
+<div class="slide">
+  <div class="full" style="max-width:960px;">
+    <div class="mono-label anim">Roadmap</div>
+    <h2 class="anim d1">6ヶ月の<span class="at">GTMロードマップ</span></h2>
+    <div class="phase-row anim d2">
+      <div class="phase">
+        <div class="phase-head">
+          <div class="phase-num">01</div>
+          <div>
+            <div class="phase-title">仕込み期</div>
+            <div class="phase-period">Month 1-2</div>
+          </div>
+        </div>
+        <ul class="fl">
+          <li>X アカウント開設・毎日発信</li>
+          <li>note でADHD記事を書く</li>
+          <li>当事者アカウントをフォロー・交流</li>
+          <li>LP + 事前登録フォーム作成</li>
+          <li>競合アプリを全部触る</li>
+        </ul>
+        <div style="margin-top:12px;">
+          <span class="tag">目標: X 200フォロワー</span>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-head">
+          <div class="phase-num">02</div>
+          <div>
+            <div class="phase-title">MVP開発期</div>
+            <div class="phase-period">Month 2-3</div>
+          </div>
+        </div>
+        <ul class="fl">
+          <li>MVPをスクラッチ開発</li>
+          <li>「開発日記」として X/note に投稿</li>
+          <li>事前登録者にクローズドβ案内</li>
+          <li>ASO用キーワード調査・準備</li>
+          <li>App Store / Play Store 申請準備</li>
+        </ul>
+        <div style="margin-top:12px;">
+          <span class="tag green">目標: 事前登録 100人</span>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-head">
+          <div class="phase-num">03</div>
+          <div>
+            <div class="phase-title">β公開期</div>
+            <div class="phase-period">Month 3-4</div>
+          </div>
+        </div>
+        <ul class="fl">
+          <li>事前登録者 + X フォロワーへ先行公開</li>
+          <li>ADHD 当事者インフルエンサーに提供</li>
+          <li>フィードバックを即反映</li>
+          <li>レビュー依頼（App Store評価）</li>
+          <li>Product Hunt に登録</li>
+        </ul>
+        <div style="margin-top:12px;">
+          <span class="tag yellow">目標: DL 500 / 課金 30人</span>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-head">
+          <div class="phase-num">04</div>
+          <div>
+            <div class="phase-title">グロース期</div>
+            <div class="phase-period">Month 4-6</div>
+          </div>
+        </div>
+        <ul class="fl">
+          <li>正式リリース・Xで告知</li>
+          <li>note マガジン発行（ADHD情報）</li>
+          <li>ASO継続最適化</li>
+          <li>ユーザーの声をコンテンツ化</li>
+          <li>年払いプランを追加</li>
+        </ul>
+        <div style="margin-top:12px;">
+          <span class="tag blue">目標: MRR ¥30,000+</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 4: チャネル戦略 ── -->
+<div class="slide">
+  <div class="full" style="max-width:940px;">
+    <div class="mono-label anim">Channels</div>
+    <h2 class="anim d1">どこで知ってもらうか — <span class="at">チャネル設計</span></h2>
+    <div class="grid-3" style="margin-top:22px;">
+      <div class="channel-card anim d2">
+        <div class="ch-icon">𝕏</div>
+        <div class="ch-name">X（旧Twitter）</div>
+        <div class="ch-role">★★★ 最重要チャネル</div>
+        <ul class="fl" style="margin-bottom:10px;">
+          <li>#ADHD #発達障害 タグで当事者と日常的に交流</li>
+          <li>「今日のADHDあるある」「集中できた方法」を毎日ポスト</li>
+          <li>開発進捗を「開発日記」として発信し共感を集める</li>
+          <li>当事者アカウント（フォロワー500〜5000人）にリプを続ける</li>
+        </ul>
+        <div class="priority-bar"><div class="priority-fill" style="width:95%;"></div></div>
+        <div style="font-size:10px;color:var(--fg-muted);">優先度 95%</div>
+      </div>
+      <div class="channel-card anim d3">
+        <div class="ch-icon">📝</div>
+        <div class="ch-name">note</div>
+        <div class="ch-role">★★★ 信頼構築チャネル</div>
+        <ul class="fl" style="margin-bottom:10px;">
+          <li>「ADHD の人が仕事を続けるための○選」等のSEO記事</li>
+          <li>note のADHD系マガジンに積極的に入れてもらう</li>
+          <li>開発記（なぜADHDアプリを作ったか）で共感・拡散</li>
+          <li>週1本ペースで書き続け検索流入を作る</li>
+        </ul>
+        <div class="priority-bar"><div class="priority-fill" style="width:85%;"></div></div>
+        <div style="font-size:10px;color:var(--fg-muted);">優先度 85%</div>
+      </div>
+      <div class="channel-card anim d4">
+        <div class="ch-icon">🔍</div>
+        <div class="ch-name">ASO（ストア最適化）</div>
+        <div class="ch-role">★★☆ 中長期チャネル</div>
+        <ul class="fl" style="margin-bottom:10px;">
+          <li>狙うキーワード：「ADHD 集中」「発達障害 仕事」「集中できない アプリ」</li>
+          <li>長尾キーワードに絞る（競合少・コンバージョン高）</li>
+          <li>スクリーンショットにADHD当事者の言葉を使う</li>
+          <li>継続率を上げることでアルゴリズム評価が向上</li>
+        </ul>
+        <div class="priority-bar"><div class="priority-fill" style="width:75%;"></div></div>
+        <div style="font-size:10px;color:var(--fg-muted);">優先度 75%</div>
+      </div>
+      <div class="channel-card anim d3">
+        <div class="ch-icon">👥</div>
+        <div class="ch-name">マイクロインフルエンサー</div>
+        <div class="ch-role">★★☆ 信頼転換チャネル</div>
+        <ul class="fl" style="margin-bottom:10px;">
+          <li>フォロワー1,000〜10,000人のADHD当事者アカウントに無料提供</li>
+          <li>正直な感想 + スクショ投稿をお願いする（強制しない）</li>
+          <li>「作った人が当事者に寄り添っている」ことを伝えてもらう</li>
+          <li>大インフルエンサーより当事者コミュ内マイクロが有効</li>
+        </ul>
+        <div class="priority-bar"><div class="priority-fill" style="width:70%;"></div></div>
+        <div style="font-size:10px;color:var(--fg-muted);">優先度 70%</div>
+      </div>
+      <div class="channel-card anim d4">
+        <div class="ch-icon">📺</div>
+        <div class="ch-name">YouTube / TikTok</div>
+        <div class="ch-role">★☆☆ 中期チャネル</div>
+        <ul class="fl" style="margin-bottom:10px;">
+          <li>「ADHD × 集中」ショート動画を週1本（3ヶ月目以降）</li>
+          <li>アプリのデモよりも「悩みへの共感」から入る</li>
+          <li>最初はYouTube Shorts / TikTok で実験、反応次第で拡大</li>
+        </ul>
+        <div class="priority-bar"><div class="priority-fill" style="width:40%;"></div></div>
+        <div style="font-size:10px;color:var(--fg-muted);">優先度 40%（後半から）</div>
+      </div>
+      <div class="channel-card anim d5">
+        <div class="ch-icon">🚀</div>
+        <div class="ch-name">Product Hunt / Zenn</div>
+        <div class="ch-role">★☆☆ 認知拡大チャネル</div>
+        <ul class="fl" style="margin-bottom:10px;">
+          <li>正式リリース時にProduct Hunt へ登録（海外ユーザーも狙う）</li>
+          <li>Zenn に「ADHDアプリを個人開発した話」技術記事を書く</li>
+          <li>エンジニアコミュニティからの応援・拡散を狙う</li>
+        </ul>
+        <div class="priority-bar"><div class="priority-fill" style="width:35%;"></div></div>
+        <div style="font-size:10px;color:var(--fg-muted);">優先度 35%（リリース時）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 5: コンテンツ戦略 ── -->
+<div class="slide">
+  <div class="full" style="max-width:900px;">
+    <div class="mono-label anim">Content</div>
+    <h2 class="anim d1">何を発信するか — <span class="at">コンテンツ設計</span></h2>
+    <div class="row" style="margin-top:22px;align-items:flex-start;">
+      <div class="col anim d2">
+        <div class="card" style="margin-bottom:14px;">
+          <h3 style="margin-bottom:12px;">✅ 刺さるコンテンツ（優先）</h3>
+          <ul class="fl">
+            <li>「ADHDの私が唯一続いた集中法」— 当事者視点で共感を集める</li>
+            <li>「ポモドーロが続かない理由を考えた」— 課題提起 → アプリへ誘導</li>
+            <li>「タスクに取りかかる前の5分間の儀式」— 実用的で拡散しやすい</li>
+            <li>開発日記「ADHDアプリを作ることにした理由」— 人間的な共感</li>
+            <li>ユーザーの声「使ってみたら変わった」— 社会的証明</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:12px;">❌ 避けるコンテンツ</h3>
+          <ul class="fl">
+            <li>「アプリがリリースされました！」— 告知だけは誰も見ない</li>
+            <li>機能説明（スペック訴求）— ADHDの人は感情で動く</li>
+            <li>「使ってみてください」— 義務感を与える言い方</li>
+            <li>医学的・専門的すぎる表現 — 距離感が生まれる</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col anim d3">
+        <div class="card">
+          <h3 style="margin-bottom:14px;">📅 週次投稿スケジュール案</h3>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;gap:10px;align-items:center;">
+              <div style="width:28px;font-size:11px;color:var(--fg-muted);font-family:var(--font-mono);">月</div>
+              <div class="card-sm" style="flex:1;padding:8px 12px;">
+                <div style="font-size:11px;color:var(--accent);font-weight:600;">X</div>
+                <div style="font-size:12px;">ADHDあるある or 集中ライフハック（短文）</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <div style="width:28px;font-size:11px;color:var(--fg-muted);font-family:var(--font-mono);">水</div>
+              <div class="card-sm" style="flex:1;padding:8px 12px;">
+                <div style="font-size:11px;color:var(--accent);font-weight:600;">X</div>
+                <div style="font-size:12px;">開発進捗 or 「なぜこの機能を作るか」</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <div style="width:28px;font-size:11px;color:var(--fg-muted);font-family:var(--font-mono);">金</div>
+              <div class="card-sm" style="flex:1;padding:8px 12px;">
+                <div style="font-size:11px;color:var(--green);font-weight:600;">note</div>
+                <div style="font-size:12px;">ADHD × 仕事術の読み物記事（500〜1000字）</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <div style="width:28px;font-size:11px;color:var(--fg-muted);font-family:var(--font-mono);">随時</div>
+              <div class="card-sm" style="flex:1;padding:8px 12px;">
+                <div style="font-size:11px;color:var(--blue);font-weight:600;">リプ</div>
+                <div style="font-size:12px;">ADHD当事者ポストへの共感・有益リプライ</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 6: ユーザー獲得ファネル ── -->
+<div class="slide">
+  <div class="full" style="max-width:860px;">
+    <div class="mono-label anim">Funnel</div>
+    <h2 class="anim d1">ユーザーを<span class="at">課金まで連れていく</span>設計</h2>
+    <div class="row" style="margin-top:22px;align-items:flex-start;">
+      <div class="col anim d2">
+        <div class="funnel-step">
+          <div class="funnel-num">1</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;">認知（X / note / 検索）</div>
+            <div style="font-size:12px;color:var(--fg-muted);">「ADHD 集中」で検索 or 当事者タイムラインに流れてくる</div>
+          </div>
+        </div>
+        <div class="funnel-arrow">↓</div>
+        <div class="funnel-step">
+          <div class="funnel-num">2</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;">興味・共感（記事 / プロフィール）</div>
+            <div style="font-size:12px;color:var(--fg-muted);">「この人分かってる」→ フォロー or note を読む</div>
+          </div>
+        </div>
+        <div class="funnel-arrow">↓</div>
+        <div class="funnel-step">
+          <div class="funnel-num">3</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;">LP訪問 / 事前登録</div>
+            <div style="font-size:12px;color:var(--fg-muted);">「自分向けのアプリだ」→ メアド登録</div>
+          </div>
+        </div>
+        <div class="funnel-arrow">↓</div>
+        <div class="funnel-step">
+          <div class="funnel-num">4</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;">無料版インストール</div>
+            <div style="font-size:12px;color:var(--fg-muted);">「とりあえず試す」→ 3日間の無料体験</div>
+          </div>
+        </div>
+        <div class="funnel-arrow">↓</div>
+        <div class="funnel-step">
+          <div class="funnel-num">5</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;">課金転換（¥680/月）</div>
+            <div style="font-size:12px;color:var(--fg-muted);">「続けたい」→ 無料期間終了時に課金</div>
+          </div>
+        </div>
+      </div>
+      <div class="col anim d3">
+        <div class="card" style="margin-bottom:14px;">
+          <h3 style="margin-bottom:12px;">🔑 各ステップの離脱を防ぐ施策</h3>
+          <ul class="fl">
+            <li>1→2: Xプロフィールに「ADHD当事者」の明記 + LP URL</li>
+            <li>2→3: LPに「自分もADHDで困ってた」という開発動機を書く</li>
+            <li>3→4: 登録翌日に「あなたが最初に試すべき機能」メールを送る</li>
+            <li>4→5: 3日後「続けられた？」のプッシュ通知 + 成功体験を演出</li>
+            <li>継続: 週次の「先週の集中記録」メールで離脱防止</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:12px;">📊 目標コンバージョン率</h3>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">
+                <span>記事閲覧 → LP訪問</span><span style="color:var(--accent);">5%</span>
+              </div>
+              <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
+                <div style="width:5%;height:100%;background:var(--accent);border-radius:2px;"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">
+                <span>LP → 事前登録</span><span style="color:var(--accent);">20%</span>
+              </div>
+              <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
+                <div style="width:20%;height:100%;background:var(--accent);border-radius:2px;"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">
+                <span>事前登録 → インストール</span><span style="color:var(--green);">60%</span>
+              </div>
+              <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
+                <div style="width:60%;height:100%;background:var(--green);border-radius:2px;"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">
+                <span>無料 → 課金</span><span style="color:var(--yellow);">15%</span>
+              </div>
+              <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
+                <div style="width:15%;height:100%;background:var(--yellow-soft);border:none;border-radius:2px;background:var(--accent-soft);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 7: ASO詳細 ── -->
+<div class="slide">
+  <div class="full" style="max-width:900px;">
+    <div class="mono-label anim">ASO</div>
+    <h2 class="anim d1">ストアで<span class="at">自然に見つけてもらう</span>設計</h2>
+    <div class="grid-2" style="margin-top:22px;">
+      <div class="card anim d2">
+        <h3 style="margin-bottom:12px;">🎯 狙うキーワード（優先順）</h3>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-muted);border-radius:6px;">
+            <span style="font-size:13px;">ADHD 集中 アプリ</span>
+            <span class="tag green" style="font-size:10px;">競合少</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-muted);border-radius:6px;">
+            <span style="font-size:13px;">発達障害 仕事 集中</span>
+            <span class="tag green" style="font-size:10px;">競合少</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-muted);border-radius:6px;">
+            <span style="font-size:13px;">ポモドーロ ADHD</span>
+            <span class="tag green" style="font-size:10px;">競合少</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-muted);border-radius:6px;">
+            <span style="font-size:13px;">集中できない 対策 アプリ</span>
+            <span class="tag yellow" style="font-size:10px;">中程度</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-muted);border-radius:6px;">
+            <span style="font-size:13px;">タスク管理 ADHD</span>
+            <span class="tag yellow" style="font-size:10px;">中程度</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-muted);border-radius:6px;">
+            <span style="font-size:13px;">ポモドーロタイマー</span>
+            <span class="tag" style="font-size:10px;">競合多め</span>
+          </div>
+        </div>
+      </div>
+      <div class="col anim d3" style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card">
+          <h3 style="margin-bottom:10px;">📸 スクリーンショット戦略</h3>
+          <ul class="fl">
+            <li>1枚目に「ADHDの人のために作りました」と明記</li>
+            <li>「25分は長すぎる」等の当事者の言葉をキャプションに</li>
+            <li>達成感が伝わる画面を見せる（数字 / ストリーク）</li>
+            <li>暖かみのある色合い（不安を与えない）</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:10px;">⭐ レビュー獲得戦略</h3>
+          <ul class="fl">
+            <li>「集中できた！」の瞬間（ポモドーロ完了時）にレビュー依頼</li>
+            <li>X / note で感想を書いてくれたユーザーにDMで感謝 + App Store誘導</li>
+            <li>β版ユーザーへの個別お礼 → 高評価レビューを依頼</li>
+            <li>初期100件の★4以上を目標に丁寧に対応する</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 8: KPI / マイルストーン ── -->
+<div class="slide">
+  <div class="full" style="max-width:900px;">
+    <div class="mono-label anim">KPI</div>
+    <h2 class="anim d1">何を<span class="at">測るか</span></h2>
+    <div class="card anim d2" style="margin-top:22px;padding:0;overflow:hidden;">
+      <table>
+        <thead>
+          <tr>
+            <th>指標</th>
+            <th>Month 2</th>
+            <th>Month 4</th>
+            <th>Month 6</th>
+            <th>意味</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>X フォロワー数</strong></td>
+            <td>200人</td>
+            <td>500人</td>
+            <td>1,000人</td>
+            <td>コミュニティへの信頼度</td>
+          </tr>
+          <tr>
+            <td><strong>事前登録数</strong></td>
+            <td>50人</td>
+            <td>150人</td>
+            <td>—</td>
+            <td>需要の確認</td>
+          </tr>
+          <tr>
+            <td><strong>アプリDL数</strong></td>
+            <td>—</td>
+            <td>300</td>
+            <td>1,000</td>
+            <td>認知の広がり</td>
+          </tr>
+          <tr>
+            <td><strong>課金ユーザー数</strong></td>
+            <td>—</td>
+            <td>30人</td>
+            <td>80人</td>
+            <td>¥680×80 = MRR ¥54,400</td>
+          </tr>
+          <tr>
+            <td><strong>Day-30 継続率</strong></td>
+            <td>—</td>
+            <td>25%↑</td>
+            <td>30%↑</td>
+            <td>ADHDアプリの最重要指標</td>
+          </tr>
+          <tr>
+            <td><strong>App Store 評価</strong></td>
+            <td>—</td>
+            <td>★4.0+</td>
+            <td>★4.3+</td>
+            <td>ASO とストア推薦に影響</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-sm anim d3" style="margin-top:14px;border-color:var(--accent-soft);">
+      <span style="color:var(--accent);font-weight:600;">最重要指標：</span>
+      <span style="color:var(--fg-muted);font-size:13px;">Day-30 継続率。DL数より「使い続けてもらえるか」がADHDアプリの命。継続率が高ければASO評価も上がり、口コミも生まれる。</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── 9: Next Actions ── -->
+<div class="slide">
+  <div class="full" style="max-width:860px;">
+    <div class="mono-label anim">Next Actions</div>
+    <h2 class="anim d1">今すぐ<span class="at">やること</span></h2>
+    <div class="grid-2" style="margin-top:22px;">
+      <div class="card anim d2">
+        <h3 style="color:var(--accent);margin-bottom:14px;">今週中（川上が着手）</h3>
+        <ul class="fl">
+          <li>X アカウント「ケ開発 / ADHDフォーカスアプリ開発中」の方向性確認</li>
+          <li>ADHDアプリ LP（Vercel + Next.js）のワイヤーフレーム作成</li>
+          <li>競合アプリ5本の機能・レビューを調査してまとめる</li>
+          <li>アプリ名・コンセプトを確定（「フォーカス for ADHD」or 別名）</li>
+        </ul>
+      </div>
+      <div class="card anim d3">
+        <h3 style="color:var(--green);margin-bottom:14px;">今月中（山下さんに決めてほしいこと）</h3>
+        <ul class="fl">
+          <li>X での発信スタイル — 川上名義 or 山下さん名義どちらで行くか</li>
+          <li>プラットフォーム優先順位 — Web PWA / iOS / Android どれから出すか</li>
+          <li>フリーミアムの無料範囲 — 何が無料で何が有料か</li>
+          <li>note記事を書く人 — 山下さん or 川上 or 共同</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-sm anim d4" style="margin-top:14px;text-align:center;border-color:var(--accent-soft);">
+      <span style="font-size:14px;color:var(--fg-muted);">戦略は決まった。あとは</span>
+      <span style="font-size:14px;color:var(--fg);font-weight:600;">「アプリを作りながら、コミュニティに入り込む」を同時進行</span>
+      <span style="font-size:14px;color:var(--fg-muted);">で動かすだけ。</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+<div id="nav">
+  <button onclick="prev()">←</button>
+  <div class="dot-row" id="dots"></div>
+  <span id="counter">1 / 1</span>
+  <button onclick="next()">→</button>
+</div>
+<script>
+  const slides=document.querySelectorAll('.slide');
+  let cur=0;
+  const dotsEl=document.getElementById('dots');
+  const counterEl=document.getElementById('counter');
+  slides.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>go(i);dotsEl.appendChild(d);});
+  counterEl.textContent='1 / '+slides.length;
+  slides[0].classList.add('active');
+  function go(n){slides[cur].classList.remove('active');dotsEl.children[cur].classList.remove('active');cur=(n+slides.length)%slides.length;slides[cur].classList.add('active');dotsEl.children[cur].classList.add('active');counterEl.textContent=(cur+1)+' / '+slides.length;}
+  function next(){go(cur+1);}function prev(){go(cur-1);}
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}if(e.key==='ArrowLeft'){e.preventDefault();prev();}});
+  let ts=0;
+  document.addEventListener('touchstart',e=>{ts=e.touches[0].clientX;});
+  document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-ts;if(Math.abs(dx)>50)dx<0?next():prev();});
+</script>
+</body>
+</html>
