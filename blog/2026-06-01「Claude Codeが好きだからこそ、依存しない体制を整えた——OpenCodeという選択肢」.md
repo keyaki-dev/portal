@@ -9,7 +9,7 @@ blog_tag:
   - 生成AI
   - 開発ツール
 image: 2026-06-01.png
-published_url: 'https://editor.note.com/notes/n664c68f26479/edit/'
+published_url: 'https://note.com/keyaki_dev/n/n5c808ea772aa'
 portfolio_url: 'https://keyaki-dev.com/blog/2026-06-01'
 ---
 

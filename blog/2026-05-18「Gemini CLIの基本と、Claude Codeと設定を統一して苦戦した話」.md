@@ -10,7 +10,7 @@ blog_tag:
   - スキル管理
   - dotfiles
 image: 2026-05-18.png
-published_url:
+published_url: 'https://note.com/keyaki_dev/n/n083dddc13fda'
 portfolio_url: 'https://keyaki-dev.com/blog/2026-05-18'
 ---
 

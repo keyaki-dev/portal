@@ -8,7 +8,7 @@ blog_tag:
   - ナレッジ管理
   - タスク管理
 image: 2026-04-22.png
-published_url:
+published_url: 'https://note.com/keyaki_dev/n/n3f710acb9123'
 portfolio_url: 'https://keyaki-dev.com/blog/2026-04-21'
 ---
 

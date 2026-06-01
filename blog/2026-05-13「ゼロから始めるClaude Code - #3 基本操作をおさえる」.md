@@ -7,7 +7,7 @@ blog_tag:
   - 生成AI
   - 入門
 image: 2026-05-13.png
-published_url:
+published_url: 'https://note.com/keyaki_dev/n/nfe0a52278b43'
 portfolio_url: 'https://keyaki-dev.com/blog/2026-05-13'
 ---
 
