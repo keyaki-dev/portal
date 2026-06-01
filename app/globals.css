@@ -56,6 +56,12 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .animate-in {
+    animation: none;
+  }
+}
+
 /* Markdown typography */
 .prose {
   color: var(--color-foreground);
@@ -63,8 +69,8 @@
   line-height: 1.8;
   overflow-x: hidden;
 }
-.prose h1 { font-family: var(--font-serif); font-size: 2rem; font-weight: 500; margin: 2rem 0 1rem; line-height: 1.2; }
-.prose h2 { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 500; margin: 2rem 0 0.75rem; border-bottom: 1px solid var(--color-border); padding-bottom: 0.5rem; }
+.prose h1 { font-family: var(--font-serif); font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 500; margin: 2rem 0 1rem; line-height: 1.2; }
+.prose h2 { font-family: var(--font-serif); font-size: clamp(1.2rem, 4vw, 1.5rem); font-weight: 500; margin: 2rem 0 0.75rem; border-bottom: 1px solid var(--color-border); padding-bottom: 0.5rem; }
 .prose h3 { font-size: 1.125rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
 .prose p { margin: 1rem 0; }
 .prose a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
