@@ -83,6 +83,19 @@ export function getBlogPostBySlug(slug: string): BlogPostWithContent | null {
   return { ...meta, content, rawContent: raw };
 }
 
+export function countChars(content: string): number {
+  const stripped = content
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/`[^`]+`/g, "")
+    .replace(/!\[.*?\]\(.*?\)/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/[*_~]/g, "")
+    .replace(/^\s*[-*+\d.]+\s+/gm, "")
+    .replace(/\s/g, "");
+  return stripped.length;
+}
+
 export function markdownToPortfolioMdx(post: BlogPostWithContent): string {
   const body = post.content.replace(/^#\s+.+\n?/m, "").trim();
 
