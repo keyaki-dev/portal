@@ -77,6 +77,11 @@ async function publishToNote(filename) {
     await page.click('button:has-text("ログイン")');
     console.log("ログインボタンクリック");
 
+    // クリック後の状態を記録
+    await page.waitForTimeout(3000);
+    await page.screenshot({ path: `${screenshotDir}/note-after-login-click.png` });
+    console.log(`クリック後URL: ${page.url()}`);
+
     await page.waitForURL((url) => !url.href.includes("/login"), { timeout: 15000 });
     console.log("ログイン完了");
 

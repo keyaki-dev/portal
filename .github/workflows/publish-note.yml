@@ -71,6 +71,7 @@ jobs:
           path: |
             note-login.png
             note-login-failed.png
+            note-after-login-click.png
             note-before-publish.png
             note-debug.png
           if-no-files-found: ignore
