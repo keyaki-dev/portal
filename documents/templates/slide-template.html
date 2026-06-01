@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--
+  ケ開発 スライドテンプレート
+  ─────────────────────────────────────────────────────────────────
+  カラーパレット: portal / portfolio サイトの Warm Minimalist を踏襲
+
+  使い方:
+  1. このファイルをコピーして documents/proposals/ または documents/specs/ に保存
+  2. <title> を変更
+  3. 各 .slide の中身を書き換える
+  4. スライドが足りなければ既存の .slide ブロックをコピー&ペースト
+  5. 不要なスライドは削除（#nav の dots は JS が自動生成するので触らなくてよい）
+
+  スライドの種類（コメントで例示してある）:
+    slide-title       — タイトルスライド（ファーストビュー）
+    slide-section     — セクション区切り
+    slide-content     — テキスト中心
+    slide-two-col     — 2カラム
+    slide-three-col   — 3カラム（比較・特徴列挙）
+    slide-data        — 数値・KPI 強調
+    slide-table       — テーブル
+    slide-closing     — クロージング
+
+  キーボード: ← → / Space で操作
+  タッチ: スワイプで操作
+  ─────────────────────────────────────────────────────────────────
+-->
+<title>タイトル — ケ開発</title>
+<style>
+/* ──────────────────────────────────────────────────────
+   Design Tokens  (portal / portfolio Warm Minimalist)
+────────────────────────────────────────────────────── */
+:root {
+  /* Core palette */
+  --bg:          #F8F5F1;   /* Warm Alabaster */
+  --bg-card:     #FDFAF7;   /* Card surface */
+  --bg-muted:    #F2EDE8;   /* Muted / chip bg */
+  --fg:          #2C2C2C;   /* Soft Charcoal */
+  --fg-muted:    #6B6560;   /* Secondary text */
+  --border:      #E5DDD6;   /* Warm border */
+  --accent:      #C45E3E;   /* Terracotta (portal) */
+  --accent-soft: #F5E1D6;   /* Terracotta tint */
+
+  /* Semantic helpers */
+  --green:       #4A7C6F;
+  --green-soft:  #E6F0EE;
+  --yellow:      #8A6A2E;
+  --yellow-soft: #F5EDD6;
+  --blue:        #3A5F8A;
+  --blue-soft:   #DDE8F5;
+  --red:         #9A3030;
+  --red-soft:    #F5DEDE;
+
+  /* Typography */
+  --font-sans:   'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Segoe UI', system-ui, sans-serif;
+  --font-serif:  'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --font-mono:   'Fira Code', 'Geist Mono', monospace;
+}
+
+/* ──────────────────────────────────────────────────────
+   Reset & Base
+────────────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ──────────────────────────────────────────────────────
+   Slide Engine
+────────────────────────────────────────────────────── */
+.deck { width: 100%; height: 100vh; position: relative; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 56px 72px;
+  overflow: hidden;
+}
+.slide.active { display: flex; }
+
+/* Paper texture overlay (matches portfolio) */
+.slide::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+}
+
+/* ──────────────────────────────────────────────────────
+   Navigation Bar
+────────────────────────────────────────────────────── */
+#nav {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 14px; z-index: 200;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 40px; padding: 9px 20px;
+  box-shadow: 0 4px 24px rgba(196,94,62,0.06);
+}
+#nav button {
+  background: none; border: none; color: var(--fg-muted);
+  cursor: pointer; font-size: 16px; padding: 4px 10px;
+  border-radius: 20px; transition: all 0.15s; font-family: var(--font-sans);
+}
+#nav button:hover { background: var(--bg-muted); color: var(--fg); }
+#counter { color: var(--fg-muted); font-size: 12px; min-width: 44px; text-align: center; font-family: var(--font-mono); }
+.dot-row { display: flex; gap: 5px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); cursor: pointer; transition: all 0.2s; }
+.dot.active { background: var(--accent); transform: scale(1.4); }
+
+/* ──────────────────────────────────────────────────────
+   Typography
+────────────────────────────────────────────────────── */
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 14px;
+}
+
+h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(36px, 5.5vw, 68px);
+  font-weight: 500; line-height: 1.1; letter-spacing: -0.02em;
+  color: var(--fg);
+}
+h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 3.8vw, 48px);
+  font-weight: 500; line-height: 1.15; letter-spacing: -0.02em;
+  color: var(--fg);
+}
+h3 {
+  font-size: 18px; font-weight: 600;
+  color: var(--fg); line-height: 1.3;
+}
+.sub {
+  font-size: clamp(14px, 1.6vw, 17px);
+  color: var(--fg-muted); line-height: 1.75; margin-top: 14px;
+}
+.accent-text { color: var(--accent); }
+.muted      { color: var(--fg-muted); }
+.center     { text-align: center; }
+.full       { width: 100%; }
+
+/* ──────────────────────────────────────────────────────
+   Layout
+────────────────────────────────────────────────────── */
+.row   { display: flex; gap: 24px; width: 100%; }
+.col   { flex: 1; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; width: 100%; }
+
+/* ──────────────────────────────────────────────────────
+   Components
+────────────────────────────────────────────────────── */
+
+/* Card */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px;
+}
+.card-sm {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 18px;
+}
+
+/* Stat / KPI box */
+.stat-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px 24px; text-align: center;
+}
+.stat-num {
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 4.5vw, 52px);
+  font-weight: 500; line-height: 1;
+  color: var(--accent);
+}
+.stat-label { font-size: 12px; color: var(--fg-muted); margin-top: 7px; letter-spacing: 0.5px; }
+
+/* Tag / Badge */
+.tag {
+  display: inline-block; padding: 3px 11px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+  background: var(--accent-soft); color: var(--accent);
+  border: 1px solid var(--border);
+}
+.tag.green  { background: var(--green-soft);  color: var(--green);  }
+.tag.yellow { background: var(--yellow-soft); color: var(--yellow); }
+.tag.blue   { background: var(--blue-soft);   color: var(--blue);   }
+.tag.red    { background: var(--red-soft);    color: var(--red);    }
+
+/* Feature / bullet list */
+.feature-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.feature-list li {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14px; color: var(--fg-muted); line-height: 1.6;
+}
+.feature-list li::before {
+  content: '—'; color: var(--accent); font-weight: 700; flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Divider */
+.divider {
+  width: 40px; height: 2px;
+  background: var(--accent); border-radius: 1px;
+  margin: 18px 0;
+}
+
+/* Progress bar */
+.progress-bar {
+  width: 100%; height: 5px;
+  background: var(--border); border-radius: 3px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 3px;
+  background: var(--accent);
+}
+
+/* Table */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  text-align: left; padding: 10px 14px;
+  color: var(--fg-muted); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-muted);
+}
+td { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--accent-soft); }
+
+/* Quote */
+blockquote {
+  border-left: 2px solid var(--accent);
+  padding: 8px 20px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(16px, 2vw, 22px);
+  color: var(--fg-muted);
+  line-height: 1.7;
+}
+
+/* ──────────────────────────────────────────────────────
+   Section Header decoration (title slide bg accent)
+────────────────────────────────────────────────────── */
+.slide-title-bg::before {
+  content: '';
+  position: absolute; top: -120px; right: -120px;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,94,62,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ──────────────────────────────────────────────────────
+   Animations
+────────────────────────────────────────────────────── */
+.slide.active .anim {
+  animation: fadeInUp 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.d1 { animation-delay: 0.05s !important; }
+.d2 { animation-delay: 0.10s !important; }
+.d3 { animation-delay: 0.15s !important; }
+.d4 { animation-delay: 0.20s !important; }
+.d5 { animation-delay: 0.25s !important; }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE TYPE: title  ── ファーストビュー
+  ══════════════════════════════════════════════════ -->
+  <div class="slide slide-title-bg active">
+    <div class="center" style="max-width: 680px;">
+      <div class="mono-label anim">ケ開発 — 2026年6月</div>  <!-- サブタイトル / 日付 -->
+      <h1 class="anim d1">
+        スライドの<span class="accent-text">タイトル</span><br>ここに入れる
+      </h1>
+      <p class="sub anim d2">
+        サブタイトルや背景説明をここに書く。<br>
+        1〜2行程度がちょうどいい。
+      </p>
+      <div style="margin-top: 32px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;" class="anim d3">
+        <span class="tag">タグ1</span>
+        <span class="tag green">タグ2</span>
+        <span class="tag blue">タグ3</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE TYPE: section  ── セクション区切り
+  ══════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="center" style="max-width: 560px;">
+      <div class="mono-label anim">Section 01</div>
+      <h2 class="anim d1">セクション名</h2>
+      <div class="divider anim d2" style="margin: 18px auto;"></div>
+      <p class="sub anim d3">このセクションで伝えたいことの一行要約。</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE TYPE: data  ── 数値・KPI 強調
+  ══════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="full" style="max-width: 880px;">
+      <div class="mono-label anim">Key Numbers</div>
+      <h2 class="anim d1">数字で見る<span class="accent-text">現状</span></h2>
+      <div class="grid-3" style="margin-top: 28px;">
+        <div class="stat-box anim d2">
+          <div class="stat-num">00%</div>
+          <div class="stat-label">指標の名前<br>補足説明</div>
+        </div>
+        <div class="stat-box anim d3">
+          <div class="stat-num">¥0B</div>
+          <div class="stat-label">指標の名前<br>補足説明</div>
+        </div>
+        <div class="stat-box anim d4">
+          <div class="stat-num">0x</div>
+          <div class="stat-label">指標の名前<br>補足説明</div>
+        </div>
+      </div>
+      <div class="card-sm anim d5" style="margin-top: 18px;">
+        <span style="color: var(--accent); font-weight: 600;">ポイント：</span>
+        <span class="muted" style="font-size: 14px;">数字から読み取れる示唆を1〜2行で。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE TYPE: two-col  ── 2カラム
+  ══════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="full" style="max-width: 900px;">
+      <div class="mono-label anim">比較 / 詳細</div>
+      <h2 class="anim d1">見出しを<span class="accent-text">ここに</span></h2>
+      <div class="row" style="margin-top: 28px; align-items: flex-start;">
+        <div class="col anim d2">
+          <div class="card" style="height: 100%;">
+            <h3 style="margin-bottom: 14px;">左カラムのタイトル</h3>
+            <ul class="feature-list">
+              <li>箇条書きの内容 1</li>
+              <li>箇条書きの内容 2</li>
+              <li>箇条書きの内容 3</li>
+              <li>箇条書きの内容 4</li>
+            </ul>
+          </div>
+        </div>
+        <div class="col anim d3">
+          <div class="card" style="height: 100%;">
+            <h3 style="margin-bottom: 14px;">右カラムのタイトル</h3>
+            <ul class="feature-list">
+              <li>箇条書きの内容 1</li>
+              <li>箇条書きの内容 2</li>
+              <li>箇条書きの内容 3</li>
+              <li>箇条書きの内容 4</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE TYPE: three-col  ── 3カラム
+  ══════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="full" style="max-width: 920px;">
+      <div class="mono-label anim">3つの視点</div>
+      <h2 class="anim d1">見出しを<span class="accent-text">ここに</span></h2>
+      <div class="grid-3" style="margin-top: 28px;">
+        <div class="card anim d2">
+          <div style="font-size: 24px; margin-bottom: 10px;">🔬</div>
+          <h3 style="margin-bottom: 12px;">カラム1のタイトル</h3>
+          <ul class="feature-list">
+            <li>ポイント 1</li>
+            <li>ポイント 2</li>
+            <li>ポイント 3</li>
+          </ul>
+        </div>
+        <div class="card anim d3">
+          <div style="font-size: 24px; margin-bottom: 10px;">📈</div>
+          <h3 style="margin-bottom: 12px;">カラム2のタイトル</h3>
+          <ul class="feature-list">
+            <li>ポイント 1</li>
+            <li>ポイント 2</li>
+            <li>ポイント 3</li>
+          </ul>
+        </div>
+        <div class="card anim d4">
+          <div style="font-size: 24px; margin-bottom: 10px;">💡</div>
+          <h3 style="margin-bottom: 12px;">カラム3のタイトル</h3>
+          <ul class="feature-list">
+            <li>ポイント 1</li>
+            <li>ポイント 2</li>
+            <li>ポイント 3</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE TYPE: content  ── テキスト中心・引用
+  ══════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="full" style="max-width: 760px;">
+      <div class="mono-label anim">Insight</div>
+      <blockquote class="anim d1">
+        引用やキーメッセージをここに。<br>
+        1〜2文で端的に。
+      </blockquote>
+      <div class="divider anim d2"></div>
+      <ul class="feature-list anim d3">
+        <li>補足説明 1</li>
+        <li>補足説明 2</li>
+        <li>補足説明 3</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE TYPE: table  ── テーブル比較
+  ══════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="full" style="max-width: 900px;">
+      <div class="mono-label anim">Comparison</div>
+      <h2 class="anim d1">比較<span class="accent-text">テーブル</span></h2>
+      <div class="card anim d2" style="margin-top: 24px; padding: 0; overflow: hidden;">
+        <table>
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>列 A</th>
+              <th>列 B</th>
+              <th>列 C</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>行 1</strong></td>
+              <td>値</td>
+              <td>値</td>
+              <td><span class="tag green">推奨</span></td>
+            </tr>
+            <tr>
+              <td><strong>行 2</strong></td>
+              <td>値</td>
+              <td>値</td>
+              <td>値</td>
+            </tr>
+            <tr>
+              <td><strong>行 3</strong></td>
+              <td>値</td>
+              <td>値</td>
+              <td>値</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE TYPE: closing  ── まとめ・ネクストステップ
+  ══════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Next Steps</div>
+      <h2 class="anim d1">次に<span class="accent-text">やること</span></h2>
+      <div class="grid-2" style="margin-top: 28px;">
+        <div class="card anim d2" style="height: 100%;">
+          <h3 style="color: var(--accent); margin-bottom: 14px;">フェーズ 1</h3>
+          <ul class="feature-list">
+            <li>アクション 1</li>
+            <li>アクション 2</li>
+            <li>アクション 3</li>
+          </ul>
+        </div>
+        <div class="card anim d3" style="height: 100%;">
+          <h3 style="color: var(--green); margin-bottom: 14px;">フェーズ 2</h3>
+          <ul class="feature-list">
+            <li>アクション 1</li>
+            <li>アクション 2</li>
+            <li>アクション 3</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sm anim d4" style="margin-top: 18px; border-color: var(--accent-soft); text-align: center;">
+        <span class="muted" style="font-size: 14px;">締めの一言・呼びかけ・結論をここに。</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- ──────────────────────────────────────────────────────
+     Navigation
+────────────────────────────────────────────────────── -->
+<div id="nav">
+  <button onclick="prev()" title="前へ">←</button>
+  <div class="dot-row" id="dots"></div>
+  <span id="counter">1 / 1</span>
+  <button onclick="next()" title="次へ">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+  const dotsEl   = document.getElementById('dots');
+  const counterEl = document.getElementById('counter');
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => go(i);
+    dotsEl.appendChild(d);
+  });
+  counterEl.textContent = '1 / ' + slides.length;
+
+  function go(n) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    counterEl.textContent = (cur + 1) + ' / ' + slides.length;
+  }
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+
+  let ts = 0;
+  document.addEventListener('touchstart', e => { ts = e.touches[0].clientX; });
+  document.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - ts;
+    if (Math.abs(dx) > 50) dx < 0 ? next() : prev();
+  });
+</script>
+</body>
+</html>
