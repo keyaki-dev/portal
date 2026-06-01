@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ja">
       <body className="min-h-screen">
         <Header />
-        <main className="mx-auto max-w-5xl px-6 py-10">{children}</main>
+        <main className="px-4 sm:px-6 py-6 sm:py-10">{children}</main>
       </body>
     </html>
   );
