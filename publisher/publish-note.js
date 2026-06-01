@@ -87,46 +87,22 @@ async function publishToNote(filename) {
     await page.goto("https://note.com/notes/new", { waitUntil: "networkidle" });
     await page.waitForTimeout(2000);
 
-    // タイトル入力
-    const titleLocator = page.locator("div[role='textbox']").first();
-    await titleLocator.waitFor({ timeout: 10000 });
-    await insertText(titleLocator, title);
+    const editorFrame = page;
+
+    // タイトル入力（textarea に fill）
+    const titleInput = page.locator('textarea[placeholder="記事タイトル"]').first();
+    await titleInput.waitFor({ timeout: 10000 });
+    await titleInput.fill(title);
     console.log("タイトル入力完了");
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(300);
 
-    // 本文入力
-    await page.keyboard.press("Tab");
-    await page.waitForTimeout(500);
-
-    const bodySelectors = [
-      '[data-placeholder="本文を入力してください"]',
-      ".note-body-input",
-      "[data-testid='body']",
-      "div[role='textbox']:nth-of-type(2)",
-    ];
-
-    // 本文エリアに insertText
-    let bodyFilled = false;
-    for (const sel of bodySelectors) {
-      try {
-        const el = await page.$(sel);
-        if (el) {
-          await insertText(page.locator(sel).first(), body);
-          bodyFilled = true;
-          console.log(`本文入力完了 (selector: ${sel})`);
-          break;
-        }
-      } catch {}
-    }
-
-    if (!bodyFilled) {
-      // フォーカス位置に直接 insertText
-      await page.evaluate((t) => {
-        document.execCommand("selectAll", false, null);
-        document.execCommand("insertText", false, t);
-      }, body);
-      console.log("本文入力完了（フォーカス位置）");
-    }
+    // 本文入力（ProseMirrorエディタをクリックしてキーボード入力）
+    const proseMirror = page.locator("div.ProseMirror").first();
+    await proseMirror.waitFor({ timeout: 10000 });
+    await proseMirror.click();
+    await page.waitForTimeout(300);
+    await page.keyboard.type(body, { delay: 0 });
+    console.log("本文入力完了");
 
     await page.waitForTimeout(1000);
 
@@ -235,30 +211,44 @@ async function publishToNote(filename) {
         } catch {}
       }
     } else {
-      // 即時投稿の確認パネルで「公開する」をクリック
+      // 公開設定ページの「投稿する」ボタンをクリック
       try {
-        await page.waitForSelector("button:has-text('公開する')", { timeout: 10000 });
-        await page.click("button:has-text('公開する')");
-        console.log("「公開する」クリック");
+        await page.waitForSelector("button:has-text('投稿する')", { timeout: 10000 });
+        await page.click("button:has-text('投稿する')");
+        console.log("「投稿する」クリック");
+        // 「記事が公開されました」モーダルを待つ
+        await page.waitForSelector("text=記事が公開されました", { timeout: 15000 });
+        console.log("投稿成功！");
+
+        // editorのURLからnoteIDを取得して公開URLを構築
+        const currentUrl = page.url();
+        const noteId = currentUrl.match(/\/notes\/(n[a-z0-9]+)\//)?.[1];
+
+        // モーダルのDOMから実際の公開URLを探す（share buttonのhrefなど）
+        const publishedLink = await page.evaluate((nid) => {
+          // og:urlメタタグがあれば使う
+          const ogUrl = document.querySelector('meta[property="og:url"]')?.content;
+          if (ogUrl && ogUrl.includes("/n/")) return ogUrl;
+          // noteIDを含むaタグを探す（infoや公式以外のユーザー記事）
+          if (nid) {
+            const link = document.querySelector(`a[href*="/${nid}"]`);
+            if (link) return link.href;
+          }
+          return null;
+        }, noteId);
+
+        const finalPublishedUrl = publishedLink || (noteId ? `https://note.com/keyaki_dev/n/${noteId}` : currentUrl);
+        console.log(`公開URL: ${finalPublishedUrl}`);
+        setOutput("note_url", finalPublishedUrl);
+        return finalPublishedUrl;
       } catch (e) {
-        console.warn("「公開する」ボタンが見つかりませんでした:", e.message);
+        console.warn("投稿またはURL取得に失敗:", e.message);
         await page.screenshot({ path: `${screenshotDir}/note-before-publish.png` });
       }
     }
 
-    // URL 取得
-    await page.waitForTimeout(3000);
+    // URL取得はスケジュール投稿時のフォールバック
     const finalUrl = page.url();
-    console.log(`投稿完了: ${finalUrl}`);
-
-    // Note の記事URLかどうか確認
-    if (finalUrl.includes("note.com") && finalUrl.includes("/n/")) {
-      setOutput("note_url", finalUrl);
-    } else {
-      console.warn(`警告: 予期しないURL: ${finalUrl}`);
-      setOutput("note_url", finalUrl);
-    }
-
     return finalUrl;
   } finally {
     await browser.close();
