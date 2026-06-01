@@ -16,8 +16,8 @@ export interface DocMeta {
 }
 
 // ビルド時に webpack がバンドルするキャッシュ。
-// NODE_ENV === 'production' の条件により、開発時は dead code として除去される。
-// prebuild スクリプトが next build の前に .docs-cache/all.json を生成する。
+// prebuild スクリプトが next build の前に .docs-cache/all.json を生成・更新する。
+// この JSON はリポジトリにコミットされているため webpack が常に参照できる。
 type DocsCache = {
   index: Array<{
     relativePath: string;
@@ -30,11 +30,9 @@ type DocsCache = {
   content: Record<string, string>;
 };
 
-let docsCache: DocsCache | null = null;
-if (process.env.NODE_ENV === "production") {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  docsCache = require("../.docs-cache/all.json") as DocsCache;
-}
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const docsCache = require("../.docs-cache/all.json") as DocsCache;
+const useCache = docsCache.index.length > 0;
 
 function walkDir(dir: string, base: string = dir): DocMeta[] {
   const results: DocMeta[] = [];
@@ -85,7 +83,7 @@ function walkDir(dir: string, base: string = dir): DocMeta[] {
 }
 
 export function getAllDocuments(): DocMeta[] {
-  if (docsCache) {
+  if (useCache) {
     return docsCache.index.map((e) => ({
       slug: e.slug,
       title: e.title,
@@ -104,7 +102,7 @@ export function getAllDocuments(): DocMeta[] {
 export function getDocumentBySlug(slug: string[]): { meta: DocMeta; content: string } | null {
   const relativePath = slug.join("/");
 
-  if (docsCache) {
+  if (useCache) {
     const entry = docsCache.index.find((e) => e.relativePath === relativePath);
     if (!entry) return null;
     const raw = docsCache.content[relativePath] ?? "";
@@ -153,7 +151,7 @@ export function groupByFolder(docs: DocMeta[]): Record<string, DocMeta[]> {
 }
 
 export function getRawHtml(relativePath: string): string | null {
-  if (docsCache) {
+  if (useCache) {
     return docsCache.content[relativePath] ?? null;
   }
   const fullPath = path.join(DOCS_DIR, relativePath);
