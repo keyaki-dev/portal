@@ -10,7 +10,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-sm">
-      <div className="mx-auto flex h-14 max-w-none items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 font-serif text-base sm:text-lg font-medium tracking-tight">
           <span className="text-accent">keyaki</span>
           <span className="text-muted-foreground font-sans text-xs sm:text-sm font-normal">/ portal</span>

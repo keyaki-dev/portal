@@ -17,7 +17,6 @@ interface Props {
 }
 
 export function SlideViewer({ src, title, breadcrumbs, updatedAt }: Props) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [infoOpen, setInfoOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -99,7 +98,6 @@ export function SlideViewer({ src, title, breadcrumbs, updatedAt }: Props) {
 
       {/* Iframe */}
       <iframe
-        ref={iframeRef}
         src={src}
         className="flex-1 w-full border-0 min-h-0"
         title={title}
