@@ -8,6 +8,7 @@ blog_tag:
   - Claude Code
   - バイブコーディング
 published_url: 'https://note.com/keyaki_dev/n/ndd73bfa2663a'
+portfolio_url: 'https://keyaki-dev.com/blog/2026-02-26'
 image: 2026-02-26.png
 mdmap:
   positions:

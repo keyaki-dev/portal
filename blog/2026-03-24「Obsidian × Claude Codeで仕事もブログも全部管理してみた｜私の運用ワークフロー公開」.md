@@ -8,6 +8,7 @@ blog_tag:
   - エンジニア
 image: 2026-03-24.png
 published_url: https://note.com/keyaki_dev/n/ne7114e8a99d2
+portfolio_url: 'https://keyaki-dev.com/blog/2026-03-24'
 ---
 # Obsidian × Claude Codeで仕事もブログも全部管理してみた｜私の運用ワークフロー公開
 

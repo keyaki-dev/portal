@@ -8,6 +8,7 @@ blog_tag:
   - 入門
 image: 2026-05-14.png
 published_url:
+portfolio_url: 'https://keyaki-dev.com/blog/2026-05-14'
 ---
 
 # ゼロから始めるClaude Code - #4 はじめてのアプリを作ってみる

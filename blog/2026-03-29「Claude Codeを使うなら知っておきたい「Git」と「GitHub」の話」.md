@@ -8,6 +8,7 @@ blog_tag:
   - GitHub
 image: 2026-03-29.png
 published_url: https://note.com/keyaki_dev/n/n2b88522ed104
+portfolio_url: 'https://keyaki-dev.com/blog/2026-03-29'
 ---
 
 # Claude Codeを使うなら知っておきたい「Git」と「GitHub」の話

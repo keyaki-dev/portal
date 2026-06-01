@@ -8,6 +8,7 @@ blog_tag:
   - 生成AI
 image: 2026-05-21.png
 published_url:
+portfolio_url: 'https://keyaki-dev.com/blog/2026-05-21'
 ---
 
 # 【速報】Gemini CLI が終了——Antigravity CLI への移行手順まとめ

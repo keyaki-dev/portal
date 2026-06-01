@@ -5,6 +5,7 @@ flags:
   - 2_published
 image: 2026-04-02.png
 published_url: https://note.com/keyaki_dev/n/n68636ff4184f
+portfolio_url: 'https://keyaki-dev.com/blog/2026-04-02'
 updated_at:
 ---
 

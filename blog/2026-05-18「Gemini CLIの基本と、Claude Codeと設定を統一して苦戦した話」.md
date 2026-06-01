@@ -11,6 +11,7 @@ blog_tag:
   - dotfiles
 image: 2026-05-18.png
 published_url:
+portfolio_url: 'https://keyaki-dev.com/blog/2026-05-18'
 ---
 
 # Gemini CLI の基本と、Claude Code と設定を統一して苦戦した話

@@ -9,6 +9,7 @@ blog_tag:
   - タスク管理
 image: 2026-04-22.png
 published_url:
+portfolio_url: 'https://keyaki-dev.com/blog/2026-04-21'
 ---
 
 # もはやObsidianすら開かなくなった話——AIがファイルシステムの前に立つ時代に

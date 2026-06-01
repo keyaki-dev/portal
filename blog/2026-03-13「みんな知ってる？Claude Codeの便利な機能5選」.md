@@ -8,6 +8,7 @@ blog_tag:
   - Claude Code
 image: 2026-03-13.png
 published_url: https://note.com/keyaki_dev/n/nc22337ec15b3
+portfolio_url: 'https://keyaki-dev.com/blog/2026-03-13'
 ---
 # みんな知ってる？Claude Codeの便利な機能5選
 

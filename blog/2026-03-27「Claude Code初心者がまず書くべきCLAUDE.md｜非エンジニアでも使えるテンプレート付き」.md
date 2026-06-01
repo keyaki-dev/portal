@@ -8,6 +8,7 @@ blog_tag:
   - エンジニア
 image: 2026-03-27.png
 published_url: https://note.com/keyaki_dev/n/nf01f56dc02ae
+portfolio_url: 'https://keyaki-dev.com/blog/2026-03-27'
 ---
 # Claude Code初心者がまず書くべきCLAUDE.md｜非エンジニアでも使えるテンプレート付き
 

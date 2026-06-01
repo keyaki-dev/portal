@@ -9,6 +9,7 @@ blog_tag:
   - Gemini
 created: 2026-02-28
 published_url: https://note.com/keyaki_dev/n/nead30a02ada3
+portfolio_url: 'https://keyaki-dev.com/blog/2026-02-28'
 image: 2026-02-28.jpg
 ---
 # GAS + Gemini APIで「自律型リマインドBot」を無料構築する最短ルート

@@ -8,6 +8,7 @@ blog_tag:
   - Claude Code
   - MCP
 published_url: https://note.com/keyaki_dev/n/nce8936cdc568
+portfolio_url: 'https://keyaki-dev.com/blog/2026-02-27'
 image: 2026-02-27.png
 ---
 # Claude CodeでGoogle DriveのMCPを追加する方法

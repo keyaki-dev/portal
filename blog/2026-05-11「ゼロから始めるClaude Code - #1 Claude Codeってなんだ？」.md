@@ -8,6 +8,7 @@ blog_tag:
   - 入門
 image: 2026-05-11.png
 published_url:
+portfolio_url: 'https://keyaki-dev.com/blog/2026-05-11'
 ---
 
 # ゼロから始めるClaude Code - #1 Claude Codeってなんだ？

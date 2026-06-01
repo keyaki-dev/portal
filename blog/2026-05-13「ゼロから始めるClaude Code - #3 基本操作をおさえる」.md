@@ -8,6 +8,7 @@ blog_tag:
   - 入門
 image: 2026-05-13.png
 published_url:
+portfolio_url: 'https://keyaki-dev.com/blog/2026-05-13'
 ---
 
 # ゼロから始めるClaude Code - #3 基本操作をおさえる

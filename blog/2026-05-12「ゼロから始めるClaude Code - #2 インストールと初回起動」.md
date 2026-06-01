@@ -8,6 +8,7 @@ blog_tag:
   - 入門
 image: 2026-05-12.png
 published_url:
+portfolio_url: 'https://keyaki-dev.com/blog/2026-05-12'
 ---
 
 # ゼロから始めるClaude Code - #2 インストールと初回起動

@@ -8,6 +8,7 @@ blog_tag:
   - コスト削減
 image: 2026-04-19.png
 published_url:
+portfolio_url: 'https://keyaki-dev.com/blog/2026-04-19'
 ---
 
 # 上限を気にせずClaude Codeを使い倒すために、私がやっている2つの工夫

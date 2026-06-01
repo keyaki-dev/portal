@@ -9,6 +9,7 @@ blog_tag:
 created: 2026-03-12
 image: 2026-03-12.png
 published_url: https://note.com/keyaki_dev/n/n87fae2d7ceb2
+portfolio_url: 'https://keyaki-dev.com/blog/2026-03-12'
 ---
 # Function Calling入門｜LLMに"手足"を与える技術の全体像
 

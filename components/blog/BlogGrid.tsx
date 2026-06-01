@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { PenLine, CheckCircle2, Clock, LayoutGrid, List, ImageIcon, FileEdit } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { PenLine, CheckCircle2, Clock, LayoutGrid, List, ImageIcon, FileEdit, ExternalLink } from "lucide-react";
 import type { BlogPost } from "@/lib/blog";
 
 type View = "gallery" | "list";
@@ -12,11 +12,26 @@ interface BlogGridProps {
   published: BlogPost[];
 }
 
-function GalleryCard({ post }: { post: BlogPost }) {
+function ExternalBadge({ href, children, className }: { href: string; children: React.ReactNode; className: string }) {
   return (
-    <Link
-      href={`/blog/${post.slug}`}
-      className="card-warm group flex flex-col overflow-hidden transition-all hover:border-accent/30 hover:shadow-sm hover:-translate-y-0.5"
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={(e) => e.stopPropagation()}
+      className={className}
+    >
+      {children}
+    </a>
+  );
+}
+
+function GalleryCard({ post }: { post: BlogPost }) {
+  const router = useRouter();
+  return (
+    <div
+      onClick={() => router.push(`/blog/${post.slug}`)}
+      className="card-warm group flex flex-col overflow-hidden transition-all hover:border-accent/30 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer"
     >
       {/* サムネイル */}
       <div className="relative aspect-video w-full overflow-hidden bg-muted">
@@ -32,17 +47,14 @@ function GalleryCard({ post }: { post: BlogPost }) {
             <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
           </div>
         )}
-        {/* ステータスバッジをオーバーレイ */}
         <div className="absolute top-2 right-2">
           {post.status === "published" ? (
             <span className="flex items-center gap-1 rounded border border-emerald-100 bg-emerald-50/90 px-1.5 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-widest text-emerald-700 backdrop-blur-sm">
-              <CheckCircle2 className="h-2.5 w-2.5" />
-              投稿済み
+              <CheckCircle2 className="h-2.5 w-2.5" />投稿済み
             </span>
           ) : (
             <span className="flex items-center gap-1 rounded border border-amber-100 bg-amber-50/90 px-1.5 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-widest text-amber-700 backdrop-blur-sm">
-              <Clock className="h-2.5 w-2.5" />
-              下書き
+              <Clock className="h-2.5 w-2.5" />下書き
             </span>
           )}
         </div>
@@ -53,51 +65,57 @@ function GalleryCard({ post }: { post: BlogPost }) {
         <p className="font-medium text-foreground leading-snug line-clamp-2 group-hover:text-accent transition-colors">
           {post.title}
         </p>
-        {/* note / portfolio 公開状況 */}
+
+        {/* note / portfolio 公開状況（URLクリッカブル） */}
         <div className="flex items-center gap-1.5 flex-wrap">
-          {post.noteStatus === "published" ? (
-            <span className="flex items-center gap-0.5 rounded bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 text-[9px] font-mono text-emerald-700">
-              <CheckCircle2 className="h-2 w-2" /> note
-            </span>
-          ) : post.noteStatus === "review" ? (
+          {post.noteStatus === "published" && post.publishedUrl ? (
+            <ExternalBadge href={post.publishedUrl} className="flex items-center gap-0.5 rounded bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 text-[9px] font-mono text-emerald-700 hover:bg-emerald-100 transition-colors">
+              <ExternalLink className="h-2 w-2" /> note
+            </ExternalBadge>
+          ) : post.noteStatus === "review" && post.publishedUrl ? (
+            <ExternalBadge href={post.publishedUrl} className="flex items-center gap-0.5 rounded bg-amber-50 border border-amber-100 px-1.5 py-0.5 text-[9px] font-mono text-amber-700 hover:bg-amber-100 transition-colors">
+              <FileEdit className="h-2 w-2" /> note下書き
+            </ExternalBadge>
+          ) : post.noteStatus !== "none" ? (
             <span className="flex items-center gap-0.5 rounded bg-amber-50 border border-amber-100 px-1.5 py-0.5 text-[9px] font-mono text-amber-700">
               <FileEdit className="h-2 w-2" /> note下書き
             </span>
           ) : null}
-          {post.portfolioStatus === "published" && (
-            <span className="flex items-center gap-0.5 rounded bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 text-[9px] font-mono text-emerald-700">
+
+          {post.portfolioStatus === "published" && post.portfolioUrl ? (
+            <ExternalBadge href={post.portfolioUrl} className="flex items-center gap-0.5 rounded bg-sky-50 border border-sky-100 px-1.5 py-0.5 text-[9px] font-mono text-sky-700 hover:bg-sky-100 transition-colors">
+              <ExternalLink className="h-2 w-2" /> portfolio
+            </ExternalBadge>
+          ) : post.portfolioStatus === "published" ? (
+            <span className="flex items-center gap-0.5 rounded bg-sky-50 border border-sky-100 px-1.5 py-0.5 text-[9px] font-mono text-sky-700">
               <CheckCircle2 className="h-2 w-2" /> portfolio
             </span>
-          )}
+          ) : null}
         </div>
+
         <div className="flex items-center gap-2 flex-wrap">
           <span className="mono-label text-[10px]">{post.date}</span>
           {post.tags.slice(0, 3).map((tag) => (
-            <span key={tag} className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
-              {tag}
-            </span>
+            <span key={tag} className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">{tag}</span>
           ))}
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
 
 function ListCard({ post }: { post: BlogPost }) {
+  const router = useRouter();
   return (
-    <Link
-      href={`/blog/${post.slug}`}
-      className="card-warm group flex items-center gap-3 p-4 transition-all hover:border-accent/30 hover:shadow-sm hover:-translate-y-0.5"
+    <div
+      onClick={() => router.push(`/blog/${post.slug}`)}
+      className="card-warm group flex items-center gap-3 p-4 transition-all hover:border-accent/30 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer"
     >
       {/* 小サムネイル */}
       <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-md bg-muted">
         {post.image ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={`/api/blog/images/${post.image}`}
-            alt={post.title}
-            className="h-full w-full object-cover"
-          />
+          <img src={`/api/blog/images/${post.image}`} alt={post.title} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
             <PenLine className="h-4 w-4 text-muted-foreground/40 group-hover:text-accent/50 transition-colors" />
@@ -108,40 +126,42 @@ function ListCard({ post }: { post: BlogPost }) {
       {/* テキスト */}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-medium text-foreground truncate leading-snug">
-            {post.title}
-          </span>
+          <span className="font-medium text-foreground truncate leading-snug">{post.title}</span>
           {post.status === "published" ? (
             <span className="flex items-center gap-1 shrink-0 rounded border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-widest text-emerald-700">
-              <CheckCircle2 className="h-2.5 w-2.5" />
-              投稿済み
+              <CheckCircle2 className="h-2.5 w-2.5" />投稿済み
             </span>
           ) : (
             <span className="flex items-center gap-1 shrink-0 rounded border border-amber-100 bg-amber-50 px-1.5 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-widest text-amber-700">
-              <Clock className="h-2.5 w-2.5" />
-              下書き
+              <Clock className="h-2.5 w-2.5" />下書き
             </span>
           )}
         </div>
         <div className="mt-1 flex items-center gap-2 flex-wrap">
           <p className="text-xs text-muted-foreground">{post.date}</p>
-          {post.noteStatus === "published" && (
-            <span className="flex items-center gap-0.5 rounded bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 text-[9px] font-mono text-emerald-700"><CheckCircle2 className="h-2 w-2" />note</span>
-          )}
-          {post.noteStatus === "review" && (
-            <span className="flex items-center gap-0.5 rounded bg-amber-50 border border-amber-100 px-1.5 py-0.5 text-[9px] font-mono text-amber-700"><FileEdit className="h-2 w-2" />note下書き</span>
-          )}
-          {post.portfolioStatus === "published" && (
-            <span className="flex items-center gap-0.5 rounded bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 text-[9px] font-mono text-emerald-700"><CheckCircle2 className="h-2 w-2" />portfolio</span>
-          )}
+
+          {post.noteStatus === "published" && post.publishedUrl ? (
+            <ExternalBadge href={post.publishedUrl} className="flex items-center gap-0.5 rounded bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 text-[9px] font-mono text-emerald-700 hover:bg-emerald-100 transition-colors">
+              <ExternalLink className="h-2 w-2" /> note
+            </ExternalBadge>
+          ) : post.noteStatus === "review" && post.publishedUrl ? (
+            <ExternalBadge href={post.publishedUrl} className="flex items-center gap-0.5 rounded bg-amber-50 border border-amber-100 px-1.5 py-0.5 text-[9px] font-mono text-amber-700 hover:bg-amber-100 transition-colors">
+              <FileEdit className="h-2 w-2" /> note下書き
+            </ExternalBadge>
+          ) : null}
+
+          {post.portfolioStatus === "published" && post.portfolioUrl ? (
+            <ExternalBadge href={post.portfolioUrl} className="flex items-center gap-0.5 rounded bg-sky-50 border border-sky-100 px-1.5 py-0.5 text-[9px] font-mono text-sky-700 hover:bg-sky-100 transition-colors">
+              <ExternalLink className="h-2 w-2" /> portfolio
+            </ExternalBadge>
+          ) : null}
+
           {post.tags.slice(0, 2).map((tag) => (
-            <span key={tag} className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
-              {tag}
-            </span>
+            <span key={tag} className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">{tag}</span>
           ))}
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
 
@@ -155,30 +175,13 @@ export function BlogGrid({ drafts, published }: BlogGridProps) {
 
   return (
     <div className="space-y-10">
-      {/* ビュー切り替えボタン */}
       <div className="flex justify-end">
         <div className="flex rounded-lg border border-border overflow-hidden">
-          <button
-            onClick={() => setView("gallery")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${
-              view === "gallery"
-                ? "bg-accent/10 text-accent font-medium"
-                : "bg-card text-muted-foreground hover:bg-muted"
-            }`}
-          >
-            <LayoutGrid className="h-3.5 w-3.5" />
-            ギャラリー
+          <button onClick={() => setView("gallery")} className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${view === "gallery" ? "bg-accent/10 text-accent font-medium" : "bg-card text-muted-foreground hover:bg-muted"}`}>
+            <LayoutGrid className="h-3.5 w-3.5" />ギャラリー
           </button>
-          <button
-            onClick={() => setView("list")}
-            className={`flex items-center gap-1.5 border-l border-border px-3 py-1.5 text-xs transition-colors ${
-              view === "list"
-                ? "bg-accent/10 text-accent font-medium"
-                : "bg-card text-muted-foreground hover:bg-muted"
-            }`}
-          >
-            <List className="h-3.5 w-3.5" />
-            リスト
+          <button onClick={() => setView("list")} className={`flex items-center gap-1.5 border-l border-border px-3 py-1.5 text-xs transition-colors ${view === "list" ? "bg-accent/10 text-accent font-medium" : "bg-card text-muted-foreground hover:bg-muted"}`}>
+            <List className="h-3.5 w-3.5" />リスト
           </button>
         </div>
       </div>
