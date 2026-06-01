@@ -1,5 +1,5 @@
 // Note.com へ記事を自動投稿するスクリプト
-// 環境変数: NOTE_EMAIL, NOTE_PASSWORD, BLOG_DIR
+// 環境変数: NOTE_SESSION, BLOG_DIR
 // 引数: filename (blog/ディレクトリ内のファイル名)
 // 出力: GitHub Actions の output として note_url を設定
 
@@ -9,8 +9,7 @@ const fs = require("fs");
 const path = require("path");
 
 const BLOG_DIR = process.env.BLOG_DIR || path.join(__dirname, "../blog");
-const NOTE_EMAIL = process.env.NOTE_EMAIL;
-const NOTE_PASSWORD = process.env.NOTE_PASSWORD;
+const NOTE_SESSION = process.env.NOTE_SESSION;
 const COVER_IMAGE = process.env.COVER_IMAGE || "";
 const SCHEDULED_AT = process.env.SCHEDULED_AT || "";
 
@@ -44,7 +43,7 @@ async function publishToNote(filename) {
   const body = removeH1(content);
 
   if (!title) throw new Error("タイトル (H1) が見つかりません");
-  if (!NOTE_EMAIL || !NOTE_PASSWORD) throw new Error("NOTE_EMAIL / NOTE_PASSWORD が未設定です");
+  if (!NOTE_SESSION) throw new Error("NOTE_SESSION が未設定です");
 
   console.log(`投稿開始: ${title}`);
 
@@ -55,35 +54,22 @@ async function publishToNote(filename) {
     locale: "ja-JP",
     timezoneId: "Asia/Tokyo",
   });
-  const page = await context.newPage();
 
+  // セッションクッキーをセットしてログインページをスキップ
+  await context.addCookies([{
+    name: "_note_session_v5",
+    value: NOTE_SESSION,
+    domain: "note.com",
+    path: "/",
+    httpOnly: true,
+    secure: true,
+  }]);
+  console.log("セッションクッキーをセット");
+
+  const page = await context.newPage();
   const screenshotDir = process.env.GITHUB_WORKSPACE || "/tmp";
 
   try {
-    // ログイン
-    console.log("Note にログイン中...");
-    await page.goto("https://note.com/login", { waitUntil: "networkidle" });
-    await page.waitForTimeout(2000);
-    await page.screenshot({ path: `${screenshotDir}/note-login.png` });
-
-    // メール・パスワードをキー入力でシミュレート（React の onChange を発火させるため）
-    await page.waitForSelector('#email', { timeout: 10000 });
-    await page.locator('#email').pressSequentially(NOTE_EMAIL, { delay: 50 });
-    await page.locator('input[type="password"]').pressSequentially(NOTE_PASSWORD, { delay: 50 });
-    console.log("メール・パスワード入力完了");
-
-    // ボタンが有効になるのを待ってクリック
-    await page.waitForSelector('button:has-text("ログイン"):not([disabled])', { timeout: 10000 });
-    await page.click('button:has-text("ログイン")');
-    console.log("ログインボタンクリック");
-
-    // クリック後の状態を記録
-    await page.waitForTimeout(3000);
-    await page.screenshot({ path: `${screenshotDir}/note-after-login-click.png` });
-    console.log(`クリック後URL: ${page.url()}`);
-
-    await page.waitForURL((url) => !url.href.includes("/login"), { timeout: 15000 });
-    console.log("ログイン完了");
 
     // 新規記事ページへ
     await page.goto("https://note.com/notes/new", { waitUntil: "networkidle" });
