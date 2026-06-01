@@ -3,7 +3,6 @@ import path from "path";
 import matter from "gray-matter";
 
 const DOCS_DIR = path.join(process.cwd(), "documents");
-const CACHE_DIR = path.join(process.cwd(), ".docs-cache");
 
 export type DocType = "md" | "html";
 
@@ -14,6 +13,27 @@ export interface DocMeta {
   folder: string;
   relativePath: string;
   updatedAt: string;
+}
+
+// ビルド時に webpack がバンドルするキャッシュ。
+// NODE_ENV === 'production' の条件により、開発時は dead code として除去される。
+// prebuild スクリプトが next build の前に .docs-cache/all.json を生成する。
+type DocsCache = {
+  index: Array<{
+    relativePath: string;
+    slug: string[];
+    title: string;
+    type: DocType;
+    folder: string;
+    updatedAt: string;
+  }>;
+  content: Record<string, string>;
+};
+
+let docsCache: DocsCache | null = null;
+if (process.env.NODE_ENV === "production") {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  docsCache = require("../.docs-cache/all.json") as DocsCache;
 }
 
 function walkDir(dir: string, base: string = dir): DocMeta[] {
@@ -64,32 +84,9 @@ function walkDir(dir: string, base: string = dir): DocMeta[] {
   return results;
 }
 
-type CacheEntry = {
-  relativePath: string;
-  safeKey: string;
-  slug: string[];
-  title: string;
-  type: DocType;
-  folder: string;
-  updatedAt: string;
-};
-
-function isCacheAvailable(): boolean {
-  return fs.existsSync(path.join(CACHE_DIR, "_index.json"));
-}
-
-function readCacheIndex(): CacheEntry[] {
-  return JSON.parse(fs.readFileSync(path.join(CACHE_DIR, "_index.json"), "utf-8"));
-}
-
-function readCacheContent(safeKey: string): string {
-  const data = JSON.parse(fs.readFileSync(path.join(CACHE_DIR, safeKey + ".json"), "utf-8"));
-  return data.content as string;
-}
-
 export function getAllDocuments(): DocMeta[] {
-  if (isCacheAvailable()) {
-    return readCacheIndex().map((e) => ({
+  if (docsCache) {
+    return docsCache.index.map((e) => ({
       slug: e.slug,
       title: e.title,
       type: e.type,
@@ -107,11 +104,10 @@ export function getAllDocuments(): DocMeta[] {
 export function getDocumentBySlug(slug: string[]): { meta: DocMeta; content: string } | null {
   const relativePath = slug.join("/");
 
-  if (isCacheAvailable()) {
-    const index = readCacheIndex();
-    const entry = index.find((e) => e.relativePath === relativePath);
+  if (docsCache) {
+    const entry = docsCache.index.find((e) => e.relativePath === relativePath);
     if (!entry) return null;
-    const raw = readCacheContent(entry.safeKey);
+    const raw = docsCache.content[relativePath] ?? "";
     let content = raw;
     let title = entry.title;
     if (entry.type === "md") {
@@ -154,4 +150,15 @@ export function groupByFolder(docs: DocMeta[]): Record<string, DocMeta[]> {
     groups[key].push(doc);
   }
   return groups;
+}
+
+export function getRawHtml(relativePath: string): string | null {
+  if (docsCache) {
+    return docsCache.content[relativePath] ?? null;
+  }
+  const fullPath = path.join(DOCS_DIR, relativePath);
+  if (!fs.existsSync(fullPath)) return null;
+  const ext = path.extname(fullPath).toLowerCase();
+  if (ext !== ".html") return null;
+  return fs.readFileSync(fullPath, "utf-8");
 }
