@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>keyaki X運用戦略 — Building in Public | ケ開発</title>
+<style>
+:root {
+  --bg:#F8F5F1;--bg-card:#FDFAF7;--bg-muted:#F2EDE8;
+  --fg:#2C2C2C;--fg-muted:#6B6560;--border:#E5DDD6;
+  --accent:#C45E3E;--accent-soft:#F5E1D6;
+  --green:#4A7C6F;--green-soft:#E6F0EE;
+  --yellow:#8A6A2E;--yellow-soft:#F5EDD6;
+  --blue:#3A5F8A;--blue-soft:#DDE8F5;
+  --font-sans:'Hiragino Kaku Gothic ProN','Yu Gothic','Segoe UI',system-ui,sans-serif;
+  --font-serif:'Hiragino Mincho ProN','Yu Mincho',Georgia,serif;
+  --font-mono:'Fira Code','Geist Mono',monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:var(--font-sans);background:var(--bg);color:var(--fg);overflow:hidden;-webkit-font-smoothing:antialiased;}
+.deck{width:100%;height:100vh;position:relative;}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;align-items:center;padding:52px 68px;overflow:hidden;}
+.slide.active{display:flex;}
+.slide::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.025;pointer-events:none;}
+#nav{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;z-index:200;background:var(--bg-card);border:1px solid var(--border);border-radius:40px;padding:9px 20px;box-shadow:0 4px 24px rgba(196,94,62,0.06);}
+#nav button{background:none;border:none;color:var(--fg-muted);cursor:pointer;font-size:16px;padding:4px 10px;border-radius:20px;transition:all 0.15s;}
+#nav button:hover{background:var(--bg-muted);color:var(--fg);}
+#counter{color:var(--fg-muted);font-size:12px;min-width:44px;text-align:center;font-family:var(--font-mono);}
+.dot-row{display:flex;gap:5px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border);cursor:pointer;transition:all 0.2s;}
+.dot.active{background:var(--accent);transform:scale(1.4);}
+.mono-label{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+h1{font-family:var(--font-serif);font-size:clamp(34px,5vw,62px);font-weight:500;line-height:1.1;letter-spacing:-0.02em;}
+h2{font-family:var(--font-serif);font-size:clamp(24px,3.6vw,44px);font-weight:500;line-height:1.15;letter-spacing:-0.02em;}
+h3{font-size:17px;font-weight:600;line-height:1.3;}
+.sub{font-size:clamp(13px,1.5vw,16px);color:var(--fg-muted);line-height:1.75;margin-top:14px;}
+.at{color:var(--accent);}
+.full{width:100%;}
+.center{text-align:center;}
+.row{display:flex;gap:22px;width:100%;}
+.col{flex:1;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;width:100%;}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px;}
+.card-sm{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;}
+.tag{display:inline-block;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;background:var(--accent-soft);color:var(--accent);border:1px solid var(--border);}
+.tag.green{background:var(--green-soft);color:var(--green);}
+.tag.yellow{background:var(--yellow-soft);color:var(--yellow);}
+.tag.blue{background:var(--blue-soft);color:var(--blue);}
+.fl{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.fl li{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--fg-muted);line-height:1.6;}
+.fl li::before{content:'—';color:var(--accent);font-weight:700;flex-shrink:0;}
+.divider{width:36px;height:2px;background:var(--accent);border-radius:1px;margin:14px 0;}
+
+/* Tweet mockup */
+.tweet-mock {
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:14px;padding:16px 18px;
+  font-size:13px;line-height:1.7;
+  position:relative;
+}
+.tweet-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.tweet-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.tweet-name{font-weight:700;font-size:13px;}
+.tweet-handle{font-size:12px;color:var(--fg-muted);}
+.tweet-body{color:var(--fg);margin-bottom:10px;}
+.tweet-body .hashtag{color:var(--blue);}
+.tweet-image{background:var(--bg-muted);border:1px solid var(--border);border-radius:10px;height:80px;display:flex;align-items:center;justify-content:center;color:var(--fg-muted);font-size:11px;margin-bottom:10px;}
+.tweet-actions{display:flex;gap:20px;color:var(--fg-muted);font-size:11px;}
+.tweet-tag{font-size:10px;font-family:var(--font-mono);color:var(--accent);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;}
+
+/* Content type badge */
+.content-type{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;font-family:var(--font-mono);}
+.ct-mockup{background:var(--blue-soft);color:var(--blue);}
+.ct-poll{background:var(--green-soft);color:var(--green);}
+.ct-diary{background:var(--accent-soft);color:var(--accent);}
+.ct-tips{background:var(--yellow-soft);color:var(--yellow);}
+
+/* Week calendar */
+.week-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;width:100%;}
+.day-cell{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;}
+.day-name{font-size:10px;color:var(--fg-muted);font-family:var(--font-mono);margin-bottom:6px;}
+.day-post{font-size:11px;line-height:1.4;color:var(--fg-muted);}
+.day-cell.active-day{border-color:var(--accent);background:var(--accent-soft);}
+.day-cell.active-day .day-name{color:var(--accent);}
+.day-cell.active-day .day-post{color:var(--fg);}
+
+.slide.active .anim{animation:fadeUp 0.42s cubic-bezier(0.2,0.8,0.2,1) both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.d1{animation-delay:0.05s!important}.d2{animation-delay:0.10s!important}
+.d3{animation-delay:0.15s!important}.d4{animation-delay:0.20s!important}
+.d5{animation-delay:0.25s!important}
+#s0::before{content:'';position:absolute;top:-100px;right:-100px;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(196,94,62,0.08) 0%,transparent 70%);pointer-events:none;}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- ── 0: Title ── -->
+<div class="slide" id="s0">
+  <div class="center" style="max-width:680px;">
+    <div class="mono-label anim">keyaki X運用戦略 — 2026年6月</div>
+    <h1 class="anim d1"><span class="at">Building in Public</span><br>一緒に作る体験の設計</h1>
+    <p class="sub anim d2">
+      完成品を「告知」するのではなく、<br>
+      作る過程をリアルタイムで共有し、フォロワーを共同制作者にする。
+    </p>
+    <div style="margin-top:28px;display:flex;gap:9px;justify-content:center;flex-wrap:wrap;" class="anim d3">
+      <span class="tag">keyaki @keyaki_dev</span>
+      <span class="tag blue">川上が自律運用</span>
+      <span class="tag green">山下さん ノータッチ</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── 1: アカウント設計 ── -->
+<div class="slide">
+  <div class="full" style="max-width:860px;">
+    <div class="mono-label anim">Account</div>
+    <h2 class="anim d1">アカウントの<span class="at">設計</span></h2>
+    <div class="grid-2" style="margin-top:22px;">
+      <div class="card anim d2">
+        <h3 style="margin-bottom:14px;">📋 プロフィール設計</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <div style="font-size:11px;color:var(--fg-muted);font-family:var(--font-mono);margin-bottom:3px;">ハンドル</div>
+            <div style="font-size:15px;font-weight:700;">@keyaki_dev</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--fg-muted);font-family:var(--font-mono);margin-bottom:3px;">表示名</div>
+            <div style="font-size:14px;font-weight:600;">keyaki ⚡</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--fg-muted);font-family:var(--font-mono);margin-bottom:3px;">Bio</div>
+            <div style="font-size:13px;color:var(--fg);line-height:1.6;background:var(--bg-muted);padding:8px 10px;border-radius:8px;">ADHDの人のための集中アプリを開発中 ⚡<br>作る過程をそのまま公開します<br>🛠 Building in public<br>#ADHD #個人開発 #集中</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--fg-muted);font-family:var(--font-mono);margin-bottom:3px;">ヘッダー画像</div>
+            <div style="font-size:13px;color:var(--fg-muted);">「集中できなくて困ってるあなたへ」のコピー入り画像</div>
+          </div>
+        </div>
+      </div>
+      <div class="col anim d3" style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card">
+          <h3 style="margin-bottom:12px;">🎯 アカウントのポジション</h3>
+          <ul class="fl">
+            <li>「ADHDのための集中アプリを作っているチーム」として一貫する</li>
+            <li>宣伝アカウントではなく<strong style="color:var(--fg);">開発ドキュメント</strong>のような位置づけ</li>
+            <li>「なぜこの機能を作るか」という意思決定の背景まで共有する</li>
+            <li>フォロワーのコメント・意見を実際に機能に反映して報告する</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:12px;">🤖 川上の運用方針</h3>
+          <ul class="fl">
+            <li>週3〜4本投稿を基本ペースに維持</li>
+            <li>開発の節目（画面完成・機能実装・リリース等）で臨時投稿</li>
+            <li>コメント・引用には48時間以内に返信</li>
+            <li>山下さんへの確認が必要な判断（炎上対応等）は Slack で報告</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 2: コンテンツの4類型 ── -->
+<div class="slide">
+  <div class="full" style="max-width:920px;">
+    <div class="mono-label anim">Content Types</div>
+    <h2 class="anim d1">投稿の<span class="at">4パターン</span></h2>
+    <div class="grid-2" style="margin-top:22px;">
+
+      <div class="card anim d2">
+        <div class="content-type ct-mockup" style="margin-bottom:10px;">🖼️ 画面モック公開</div>
+        <div style="font-size:13px;color:var(--fg-muted);margin-bottom:10px;line-height:1.6;">設計中の画面を見せて「これどう？」と意見をもらう。最も拡散されやすく、共同制作感が生まれる。</div>
+        <div class="tweet-mock">
+          <div class="tweet-tag">投稿例</div>
+          <div class="tweet-body">
+            集中モードの画面、こんな感じにしようとしてます⚡<br><br>
+            ADHDの方に聞きたいんですが、タイマーを「数字」で見るより「残り%」で見る方が焦らなくていいですか？<br><br>
+            <span class="hashtag">#ADHD #個人開発 #UIデザイン</span>
+          </div>
+          <div class="tweet-image">📱 画面モックのスクショ</div>
+          <div class="tweet-actions"><span>💬 返信</span><span>🔁 RT</span><span>❤️ いいね</span></div>
+        </div>
+      </div>
+
+      <div class="card anim d3">
+        <div class="content-type ct-poll" style="margin-bottom:10px;">📊 機能投票</div>
+        <div style="font-size:13px;color:var(--fg-muted);margin-bottom:10px;line-height:1.6;">どちらの機能を実装するかXのポールで決める。フォロワーが「自分が決めた」と感じる体験を作る。</div>
+        <div class="tweet-mock">
+          <div class="tweet-tag">投稿例</div>
+          <div class="tweet-body">
+            次に作る機能、どっちが先がいいですか？<br><br>
+            ADHDの人に本当に必要なものを作りたいので、正直に教えてください 🙏<br><br>
+            <span class="hashtag">#ADHD #開発中</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;">
+            <div style="background:var(--green-soft);border-radius:6px;padding:7px 10px;font-size:12px;border:1px solid var(--border);">⚡ 超短ポモドーロ（5〜10分）</div>
+            <div style="background:var(--bg-muted);border-radius:6px;padding:7px 10px;font-size:12px;border:1px solid var(--border);">🤝 AIバディ（作業中に話しかけてくれる）</div>
+          </div>
+          <div class="tweet-actions"><span>💬 返信</span><span>🔁 RT</span><span>❤️ いいね</span></div>
+        </div>
+      </div>
+
+      <div class="card anim d3">
+        <div class="content-type ct-diary" style="margin-bottom:10px;">📔 開発日記</div>
+        <div style="font-size:13px;color:var(--fg-muted);margin-bottom:10px;line-height:1.6;">「なぜこう設計したか」「今日詰まったこと」を正直に書く。完璧じゃない人間らしさが信頼を生む。</div>
+        <div class="tweet-mock">
+          <div class="tweet-tag">投稿例</div>
+          <div class="tweet-body">
+            今日の開発メモ 📝<br><br>
+            タイマーの「残り時間の見せ方」で2時間悩んだ。<br><br>
+            数字で表示すると「まだ8分もある…」と感じてしまう。でも%だと「もう7割終わった！」になる。<br><br>
+            ADHDの脳に合わせるって奥が深い。<br><br>
+            <span class="hashtag">#個人開発 #ADHD #UX</span>
+          </div>
+          <div class="tweet-actions"><span>💬 返信</span><span>🔁 RT</span><span>❤️ いいね</span></div>
+        </div>
+      </div>
+
+      <div class="card anim d4">
+        <div class="content-type ct-tips" style="margin-bottom:10px;">💡 ADHDティップス</div>
+        <div style="font-size:13px;color:var(--fg-muted);margin-bottom:10px;line-height:1.6;">アプリの宣伝をせず「役に立つ情報」を届ける。フォローする理由を作り、潜在ユーザーを集める。</div>
+        <div class="tweet-mock">
+          <div class="tweet-tag">投稿例</div>
+          <div class="tweet-body">
+            ADHDの「先延ばし」を減らす小技 🧠<br><br>
+            「仕事する」じゃなくて「ファイルを開くだけ」にする。<br><br>
+            脳は「始めること」が一番エネルギーを使う。ハードルを下げすぎるくらい下げるのがコツ。<br><br>
+            （これ、アプリにも実装します）<br><br>
+            <span class="hashtag">#ADHD #集中 #仕事術</span>
+          </div>
+          <div class="tweet-actions"><span>💬 返信</span><span>🔁 RT</span><span>❤️ いいね</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── 3: 週次スケジュール ── -->
+<div class="slide">
+  <div class="full" style="max-width:900px;">
+    <div class="mono-label anim">Schedule</div>
+    <h2 class="anim d1">週次<span class="at">投稿スケジュール</span></h2>
+    <div class="week-cal anim d2" style="margin-top:22px;">
+      <div class="day-cell">
+        <div class="day-name">月</div>
+        <div class="day-post" style="font-size:10px;">休み<br>or<br>返信のみ</div>
+      </div>
+      <div class="day-cell active-day">
+        <div class="day-name">火</div>
+        <div class="day-post" style="font-size:10px;">📔<br>開発日記<br>（今週の進捗）</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">水</div>
+        <div class="day-post" style="font-size:10px;">返信・<br>エンゲージ<br>のみ</div>
+      </div>
+      <div class="day-cell active-day">
+        <div class="day-name">木</div>
+        <div class="day-post" style="font-size:10px;">🖼️ or 📊<br>モック公開<br>or 投票</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">金</div>
+        <div class="day-post" style="font-size:10px;">返信・<br>エンゲージ<br>のみ</div>
+      </div>
+      <div class="day-cell active-day">
+        <div class="day-name">土</div>
+        <div class="day-post" style="font-size:10px;">💡<br>ADHD<br>ティップス</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">日</div>
+        <div class="day-post" style="font-size:10px;">休み<br>or<br>返信のみ</div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:16px;">
+      <div class="card anim d3">
+        <h3 style="margin-bottom:10px;">🕐 投稿時間帯</h3>
+        <ul class="fl">
+          <li><strong style="color:var(--fg);">朝 7〜9時</strong>：ADHDの人が「今日こそ」と思う時間帯に届ける</li>
+          <li><strong style="color:var(--fg);">昼 12〜13時</strong>：スキマ時間でXを見ているタイミング</li>
+          <li>夜の投稿は翌朝に持ち越し（反応が分散するため）</li>
+        </ul>
+      </div>
+      <div class="card anim d4">
+        <h3 style="margin-bottom:10px;">📌 臨時投稿のタイミング</h3>
+        <ul class="fl">
+          <li>機能の画面が完成したとき（進捗報告）</li>
+          <li>設計上の重要な判断をしたとき（意思決定の共有）</li>
+          <li>β版公開・事前登録開始・正式リリース</li>
+          <li>フォロワーの意見を機能に反映したとき（お礼 + 報告）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 4: フェーズ別コンテンツ計画 ── -->
+<div class="slide">
+  <div class="full" style="max-width:920px;">
+    <div class="mono-label anim">Phase Plan</div>
+    <h2 class="anim d1">開発フェーズ別<span class="at">投稿内容</span></h2>
+    <div class="row" style="margin-top:22px;align-items:flex-start;gap:16px;">
+
+      <div class="col anim d2">
+        <div class="card-sm" style="border-color:var(--accent-soft);margin-bottom:10px;padding:10px 14px;">
+          <div style="font-size:10px;color:var(--accent);font-family:var(--font-mono);font-weight:600;">Month 1-2 / 仕込み期</div>
+        </div>
+        <div class="card" style="height:calc(100% - 48px);">
+          <ul class="fl">
+            <li>「ADHDのアプリを作ることにした理由」— 最初の1本。ストーリーで共感を集める</li>
+            <li>競合アプリを使ってみた感想（正直に）— 「なぜ既存アプリでは足りないか」</li>
+            <li>コアターゲットへの質問：「ポモドーロで挫折した理由は？」ポール</li>
+            <li>最初のラフスケッチを公開：「こんなUIどう思いますか？」</li>
+            <li>ADHDの人の「集中あるある」を募集するポスト</li>
+          </ul>
+          <div style="margin-top:12px;">
+            <span class="tag">目標: 100フォロワー</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col anim d3">
+        <div class="card-sm" style="border-color:var(--green-soft);margin-bottom:10px;padding:10px 14px;">
+          <div style="font-size:10px;color:var(--green);font-family:var(--font-mono);font-weight:600;">Month 2-3 / MVP開発期</div>
+        </div>
+        <div class="card" style="height:calc(100% - 48px);">
+          <ul class="fl">
+            <li>画面モックを週1枚公開 → コメント欄で意見を収集</li>
+            <li>「この機能はAとBどっちがいい？」投票を週1回実施</li>
+            <li>実装した機能のGIF動画を投稿（動きが見えると反応が高い）</li>
+            <li>「フォロワーの意見を採用しました」報告で参加感を強化</li>
+            <li>β版テスターを募集（DM or フォームで）</li>
+          </ul>
+          <div style="margin-top:12px;">
+            <span class="tag green">目標: 300フォロワー / 事前登録100人</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col anim d4">
+        <div class="card-sm" style="border-color:var(--blue-soft);margin-bottom:10px;padding:10px 14px;">
+          <div style="font-size:10px;color:var(--blue);font-family:var(--font-mono);font-weight:600;">Month 3-6 / β〜正式リリース</div>
+        </div>
+        <div class="card" style="height:calc(100% - 48px);">
+          <ul class="fl">
+            <li>β版ユーザーの「使ってみた感想」をRTして社会的証明を作る</li>
+            <li>「改善しました」投稿 — ユーザー意見 → 修正 → 報告の循環を見せる</li>
+            <li>正式リリース告知 — 「一緒に作ってくれた方々へ」の感謝投稿</li>
+            <li>月次の「使ってくれてる人の声」まとめ投稿</li>
+            <li>課金ユーザーのマイルストーン報告（10人達成！等）</li>
+          </ul>
+          <div style="margin-top:12px;">
+            <span class="tag blue">目標: 800フォロワー / MRR ¥30,000+</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── 5: セットアップ手順 ── -->
+<div class="slide">
+  <div class="full" style="max-width:860px;">
+    <div class="mono-label anim">Setup</div>
+    <h2 class="anim d1">川上が自律運用するための<span class="at">セットアップ</span></h2>
+    <div class="grid-2" style="margin-top:22px;">
+      <div class="col anim d2" style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card">
+          <h3 style="color:var(--accent);margin-bottom:12px;">① 山下さんにお願いすること</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="width:22px;height:22px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;font-family:var(--font-mono);">1</div>
+              <div style="font-size:13px;color:var(--fg-muted);">X アカウント <strong style="color:var(--fg);">@keyaki_dev</strong> をブラウザで作成（メアド・パスワード設定）</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="width:22px;height:22px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;font-family:var(--font-mono);">2</div>
+              <div style="font-size:13px;color:var(--fg-muted);"><strong style="color:var(--fg);">developer.x.com</strong> で Developer App を作成（無料）。Read+Write 権限を付与</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="width:22px;height:22px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;font-family:var(--font-mono);">3</div>
+              <div style="font-size:13px;color:var(--fg-muted);">API Key / Secret / Access Token / Secret の 4つを VM の環境変数に設定してもらう</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="color:var(--green);margin-bottom:12px;">② 川上が対応すること（セットアップ後）</h3>
+          <ul class="fl">
+            <li>投稿スクリプト（Python + tweepy）を VM に整備</li>
+            <li>プロフィール画像・ヘッダーをWarm Minimalistデザインで作成</li>
+            <li>初投稿「なぜADHDアプリを作るか」を執筆・投稿</li>
+            <li>週次の投稿を自動スケジュール管理</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col anim d3">
+        <div class="card" style="height:100%;">
+          <h3 style="margin-bottom:14px;">🔧 技術構成</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="card-sm">
+              <div style="font-size:11px;color:var(--accent);font-family:var(--font-mono);font-weight:600;margin-bottom:4px;">投稿ツール</div>
+              <div style="font-size:13px;color:var(--fg-muted);">Python + tweepy（X API v2）<br>VMから直接APIを叩いて投稿</div>
+            </div>
+            <div class="card-sm">
+              <div style="font-size:11px;color:var(--accent);font-family:var(--font-mono);font-weight:600;margin-bottom:4px;">画像生成</div>
+              <div style="font-size:13px;color:var(--fg-muted);">開発スクショ + テキストオーバーレイ<br>Pillow（Python）で自動生成</div>
+            </div>
+            <div class="card-sm">
+              <div style="font-size:11px;color:var(--accent);font-family:var(--font-mono);font-weight:600;margin-bottom:4px;">投稿判断</div>
+              <div style="font-size:13px;color:var(--fg-muted);">川上が内容を考えてAPIで投稿<br>炎上・問題のある場合はSlackで報告</div>
+            </div>
+            <div class="card-sm">
+              <div style="font-size:11px;color:var(--accent);font-family:var(--font-mono);font-weight:600;margin-bottom:4px;">APIプラン</div>
+              <div style="font-size:13px;color:var(--fg-muted);">X API 無料プランで十分<br>（50投稿/日 → 週3-4本なら余裕）</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 6: 最初の10投稿 ── -->
+<div class="slide">
+  <div class="full" style="max-width:900px;">
+    <div class="mono-label anim">First Posts</div>
+    <h2 class="anim d1">最初の<span class="at">10投稿</span>計画</h2>
+    <div class="card anim d2" style="margin-top:22px;padding:0;overflow:hidden;">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>タイプ</th>
+            <th>内容</th>
+            <th>ねらい</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-family:var(--font-mono);color:var(--accent);">01</td>
+            <td><span class="content-type ct-diary" style="padding:2px 7px;font-size:10px;">開発日記</span></td>
+            <td>「ADHDのアプリを作ることにした理由」</td>
+            <td>ストーリーで共感 / アカウントの顔を作る</td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--font-mono);color:var(--accent);">02</td>
+            <td><span class="content-type ct-poll" style="padding:2px 7px;font-size:10px;">投票</span></td>
+            <td>「ポモドーロタイマーが続かなかった理由は？」</td>
+            <td>ニーズ調査 + エンゲージ獲得</td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--font-mono);color:var(--accent);">03</td>
+            <td><span class="content-type ct-tips" style="padding:2px 7px;font-size:10px;">ティップス</span></td>
+            <td>「タスクに取りかかれないときの5秒ルール」</td>
+            <td>フォローする理由を作る</td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--font-mono);color:var(--accent);">04</td>
+            <td><span class="content-type ct-mockup" style="padding:2px 7px;font-size:10px;">モック</span></td>
+            <td>「タイマー画面の最初のラフ、どう思いますか？」</td>
+            <td>共同制作感 / 意見収集</td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--font-mono);color:var(--accent);">05</td>
+            <td><span class="content-type ct-diary" style="padding:2px 7px;font-size:10px;">開発日記</span></td>
+            <td>「既存の集中アプリを全部試してみた感想」</td>
+            <td>競合比較でポジション確立</td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--font-mono);color:var(--accent);">06</td>
+            <td><span class="content-type ct-poll" style="padding:2px 7px;font-size:10px;">投票</span></td>
+            <td>「最初に作る機能、AとBどっちが欲しい？」</td>
+            <td>機能決定に参加させる体験</td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--font-mono);color:var(--accent);">07</td>
+            <td><span class="content-type ct-tips" style="padding:2px 7px;font-size:10px;">ティップス</span></td>
+            <td>「ADHDの人が会議で集中し続ける方法3選」</td>
+            <td>有用コンテンツで新規フォロワー</td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--font-mono);color:var(--accent);">08</td>
+            <td><span class="content-type ct-mockup" style="padding:2px 7px;font-size:10px;">モック</span></td>
+            <td>「投票の結果を反映した新しい画面できました」</td>
+            <td>「意見が通った」体験の提供</td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--font-mono);color:var(--accent);">09</td>
+            <td><span class="content-type ct-diary" style="padding:2px 7px;font-size:10px;">開発日記</span></td>
+            <td>「β版テスター募集。正直な意見が欲しい」</td>
+            <td>初期ユーザー獲得</td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--font-mono);color:var(--accent);">10</td>
+            <td><span class="content-type ct-tips" style="padding:2px 7px;font-size:10px;">ティップス</span></td>
+            <td>「ADHD診断を受けてから仕事が変わった話」</td>
+            <td>当事者との深い共感</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div>
+<div id="nav">
+  <button onclick="prev()">←</button>
+  <div class="dot-row" id="dots"></div>
+  <span id="counter">1 / 1</span>
+  <button onclick="next()">→</button>
+</div>
+<script>
+  const slides=document.querySelectorAll('.slide');let cur=0;
+  const dotsEl=document.getElementById('dots');const counterEl=document.getElementById('counter');
+  slides.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>go(i);dotsEl.appendChild(d);});
+  counterEl.textContent='1 / '+slides.length;slides[0].classList.add('active');
+  function go(n){slides[cur].classList.remove('active');dotsEl.children[cur].classList.remove('active');cur=(n+slides.length)%slides.length;slides[cur].classList.add('active');dotsEl.children[cur].classList.add('active');counterEl.textContent=(cur+1)+' / '+slides.length;}
+  function next(){go(cur+1);}function prev(){go(cur-1);}
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}if(e.key==='ArrowLeft'){e.preventDefault();prev();}});
+  let ts=0;document.addEventListener('touchstart',e=>{ts=e.touches[0].clientX;});
+  document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-ts;if(Math.abs(dx)>50)dx<0?next():prev();});
+</script>
+</body>
+</html>
