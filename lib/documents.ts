@@ -3,6 +3,7 @@ import path from "path";
 import matter from "gray-matter";
 
 const DOCS_DIR = path.join(process.cwd(), "documents");
+const CACHE_DIR = path.join(process.cwd(), ".docs-cache");
 
 export type DocType = "md" | "html";
 
@@ -63,7 +64,40 @@ function walkDir(dir: string, base: string = dir): DocMeta[] {
   return results;
 }
 
+type CacheEntry = {
+  relativePath: string;
+  safeKey: string;
+  slug: string[];
+  title: string;
+  type: DocType;
+  folder: string;
+  updatedAt: string;
+};
+
+function isCacheAvailable(): boolean {
+  return fs.existsSync(path.join(CACHE_DIR, "_index.json"));
+}
+
+function readCacheIndex(): CacheEntry[] {
+  return JSON.parse(fs.readFileSync(path.join(CACHE_DIR, "_index.json"), "utf-8"));
+}
+
+function readCacheContent(safeKey: string): string {
+  const data = JSON.parse(fs.readFileSync(path.join(CACHE_DIR, safeKey + ".json"), "utf-8"));
+  return data.content as string;
+}
+
 export function getAllDocuments(): DocMeta[] {
+  if (isCacheAvailable()) {
+    return readCacheIndex().map((e) => ({
+      slug: e.slug,
+      title: e.title,
+      type: e.type,
+      folder: e.folder,
+      relativePath: e.relativePath,
+      updatedAt: e.updatedAt,
+    }));
+  }
   return walkDir(DOCS_DIR).sort((a, b) => {
     if (a.folder !== b.folder) return a.folder.localeCompare(b.folder, "ja");
     return a.title.localeCompare(b.title, "ja");
@@ -72,36 +106,42 @@ export function getAllDocuments(): DocMeta[] {
 
 export function getDocumentBySlug(slug: string[]): { meta: DocMeta; content: string } | null {
   const relativePath = slug.join("/");
+
+  if (isCacheAvailable()) {
+    const index = readCacheIndex();
+    const entry = index.find((e) => e.relativePath === relativePath);
+    if (!entry) return null;
+    const raw = readCacheContent(entry.safeKey);
+    let content = raw;
+    let title = entry.title;
+    if (entry.type === "md") {
+      const parsed = matter(raw);
+      if (parsed.data.title) title = parsed.data.title;
+      content = parsed.content;
+    }
+    return {
+      meta: { slug, title, type: entry.type, folder: entry.folder, relativePath, updatedAt: entry.updatedAt },
+      content,
+    };
+  }
+
   const fullPath = path.join(DOCS_DIR, relativePath);
-
   if (!fs.existsSync(fullPath)) return null;
-
   const ext = path.extname(fullPath).toLowerCase() as ".md" | ".html";
   if (ext !== ".md" && ext !== ".html") return null;
-
   const stat = fs.statSync(fullPath);
   const raw = fs.readFileSync(fullPath, "utf-8");
   const type: DocType = ext === ".html" ? "html" : "md";
   const folder = slug.length > 1 ? slug.slice(0, -1).join("/") : "";
-
   let title = path.basename(relativePath, ext);
   let content = raw;
-
   if (type === "md") {
     const parsed = matter(raw);
     if (parsed.data.title) title = parsed.data.title;
     content = parsed.content;
   }
-
   return {
-    meta: {
-      slug,
-      title,
-      type,
-      folder,
-      relativePath,
-      updatedAt: stat.mtime.toISOString().slice(0, 10),
-    },
+    meta: { slug, title, type, folder, relativePath, updatedAt: stat.mtime.toISOString().slice(0, 10) },
     content,
   };
 }

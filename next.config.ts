@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/blog/**": ["./blog/**"],
     "/api/publish/**": ["./blog/**"],
-    "/documents/**": ["./documents/**"],
-    "/api/raw/**": ["./documents/**"],
+    "/documents/**": ["./.docs-cache/**"],
+    "/api/raw/**": ["./.docs-cache/**"],
   },
 };
 
