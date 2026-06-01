@@ -1,0 +1,63 @@
+name: Note に記事を投稿
+
+on:
+  workflow_dispatch:
+    inputs:
+      filename:
+        description: "ブログファイル名 (例: 2026-05-26「タイトル」.md)"
+        required: true
+        type: string
+      title:
+        description: "記事タイトル"
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout portal
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: publisher/package-lock.json
+
+      - name: Install publisher dependencies
+        run: npm ci
+        working-directory: publisher
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+        working-directory: publisher
+
+      - name: Publish to Note
+        id: publish
+        run: node publish-note.js "${{ inputs.filename }}"
+        working-directory: publisher
+        env:
+          NOTE_EMAIL: ${{ secrets.NOTE_EMAIL }}
+          NOTE_PASSWORD: ${{ secrets.NOTE_PASSWORD }}
+          BLOG_DIR: ${{ github.workspace }}/blog
+
+      - name: Update blog frontmatter
+        if: steps.publish.outputs.note_url != ''
+        run: |
+          node update-frontmatter.js "${{ inputs.filename }}" "${{ steps.publish.outputs.note_url }}"
+        working-directory: publisher
+        env:
+          BLOG_DIR: ${{ github.workspace }}/blog
+
+      - name: Commit frontmatter update
+        if: steps.publish.outputs.note_url != ''
+        run: |
+          git config user.name "川上"
+          git config user.email "contact@keyaki-dev.com"
+          git add "blog/${{ inputs.filename }}"
+          git commit -m "content: ${{ inputs.title }} を Note に投稿"
+          git push

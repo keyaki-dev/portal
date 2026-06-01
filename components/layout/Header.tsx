@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home } from "lucide-react";
+import { Home, PenLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Header() {
@@ -28,6 +28,18 @@ export function Header() {
           >
             <Home className="h-3.5 w-3.5" />
             ドキュメント
+          </Link>
+          <Link
+            href="/blog"
+            className={cn(
+              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors",
+              pathname.startsWith("/blog")
+                ? "bg-muted text-foreground font-medium"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            )}
+          >
+            <PenLine className="h-3.5 w-3.5" />
+            ブログ
           </Link>
         </nav>
       </div>

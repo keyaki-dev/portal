@@ -1,0 +1,10 @@
+{
+  "name": "portal-publisher",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "playwright": "^1.50.0"
+  }
+}
