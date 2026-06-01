@@ -141,8 +141,12 @@ h2 { font-size: 36px; font-weight: 700; }
     ├── <span class="d">agent/</span><br>
     │&nbsp;&nbsp;&nbsp;├── <span class="f">AGENTS.md</span> <span class="c">← 川上の行動定義</span><br>
     │&nbsp;&nbsp;&nbsp;└── <span class="f">DOCS.md</span> <span class="c">← 外部記憶・作業ログ</span><br>
-    ├── <span class="d">keyaki/</span> <span class="c">← 作業リポジトリ置き場</span><br>
+    ├── <span class="d">keyaki/</span> <span class="c">← keyaki 作業リポジトリ置き場</span><br>
     │&nbsp;&nbsp;&nbsp;└── <span class="d">portal/</span><br>
+    ├── <span class="d">reatex/</span> <span class="c">← reatex 業務（兼務・オンデマンド）</span><br>
+    │&nbsp;&nbsp;&nbsp;├── <span class="f">AGENTS.md</span> <span class="c">← reatex 用の行動定義</span><br>
+    │&nbsp;&nbsp;&nbsp;├── <span class="f">DOCS.md</span> <span class="c">← reatex の記憶</span><br>
+    │&nbsp;&nbsp;&nbsp;└── <span class="d">loan-member-site / ax-dashboard / …</span> <span class="c">← rtx リポジトリ</span><br>
     └── <span class="d">.claude/</span><br>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="f">CLAUDE.md</span> <span class="c">← @~/agent/AGENTS.md を import</span>
   </div>
@@ -201,7 +205,8 @@ h2 { font-size: 36px; font-weight: 700; }
     <div class="manual-card">
       <h3>🤝 川上と接続</h3>
       <div class="cmd-list">
-        <div class="cmd-row"><div class="cmd-code">make cli</div><div class="cmd-desc">SSH + tmux セッション起動（再接続も同じコマンド）</div></div>
+        <div class="cmd-row"><div class="cmd-code">make cli</div><div class="cmd-desc">keyaki セッション起動（再接続も同じコマンド）</div></div>
+        <div class="cmd-row"><div class="cmd-code">make cli-reatex</div><div class="cmd-desc">reatex セッション起動（兼務・オンデマンド）</div></div>
         <div class="cmd-row"><div class="cmd-code">make ssh</div><div class="cmd-desc">SSH のみ（生接続）</div></div>
         <div class="cmd-row"><div class="cmd-code">make deploy</div><div class="cmd-desc">AGENTS.md / DOCS.md / CLAUDE.md を VM に反映</div></div>
       </div>
@@ -274,10 +279,40 @@ h2 { font-size: 36px; font-weight: 700; }
   </div>
 </div>
 
+<!-- S7: reatex 兼務 -->
+<div class="slide" id="s7">
+  <div class="slide-title">業務の兼務</div>
+  <h2 style="margin-bottom:24px">川上は <span class="accent">reatex 業務</span> も兼務する</h2>
+  <div class="manual" style="max-width:900px">
+    <div class="manual-card">
+      <h3>🟦 keyaki 業務 — <code style="color:var(--accent)">~/agent</code></h3>
+      <div class="cmd-list">
+        <div class="cmd-row"><div class="cmd-desc">起動: <code>make cli</code></div></div>
+        <div class="cmd-row"><div class="cmd-desc">報告先: <span class="accent">Slack</span></div></div>
+        <div class="cmd-row"><div class="cmd-desc">GitHub: keyaki-dev アカウント</div></div>
+        <div class="cmd-row"><div class="cmd-desc">作業: ~/keyaki 配下のリポジトリ</div></div>
+      </div>
+    </div>
+    <div class="manual-card">
+      <h3>🟨 reatex 業務 — <code style="color:var(--yellow)">~/reatex</code></h3>
+      <div class="cmd-list">
+        <div class="cmd-row"><div class="cmd-desc">起動: <code>make cli-reatex</code>（オンデマンド）</div></div>
+        <div class="cmd-row"><div class="cmd-desc">報告先: <span class="yellow">LINE WORKS</span>（useai-studio MCP）</div></div>
+        <div class="cmd-row"><div class="cmd-desc">GitHub: rtx-yamashita アカウント</div></div>
+        <div class="cmd-row"><div class="cmd-desc">作業: ~/reatex 配下の rtx リポジトリ</div></div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:13px;color:var(--muted);margin-top:20px;max-width:820px;text-align:center">
+    ディレクトリで人格を切り替える方式。<code style="background:var(--surface);padding:2px 6px;border-radius:4px;font-family:monospace">~/reatex/AGENTS.md</code> が reatex 用の行動を定義し、GitHub アカウント・報告先・MCP（useai-studio / google-drive）を keyaki と混ぜない。
+    脳の更新は <code style="background:var(--surface);padding:2px 6px;border-radius:4px;font-family:monospace">make deploy-reatex</code>、認証情報の転送は <code style="background:var(--surface);padding:2px 6px;border-radius:4px;font-family:monospace">make push-secrets-reatex</code>。
+  </p>
+</div>
+
 </div>
 <div id="nav">
   <button id="prev">←</button>
-  <span id="page-indicator">1 / 6</span>
+  <span id="page-indicator">1 / 7</span>
   <button id="next">→</button>
 </div>
 <script>
