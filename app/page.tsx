@@ -14,7 +14,7 @@ function DocCard({ doc }: { doc: DocMeta }) {
   return (
     <Link
       href={href}
-      className="card-warm group flex items-start gap-4 p-5 transition-all hover:border-accent/30 hover:shadow-sm hover:-translate-y-0.5"
+      className="card-warm group flex items-start gap-3 sm:gap-4 p-4 sm:p-5 transition-all hover:border-accent/30 hover:shadow-sm hover:-translate-y-0.5"
     >
       <div className="mt-0.5 flex-shrink-0 rounded-lg bg-muted p-2">
         <Icon className="h-4 w-4 text-muted-foreground group-hover:text-accent transition-colors" />
