@@ -92,6 +92,29 @@ h2 { font-size: 36px; font-weight: 700; }
 .rm-body ul { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
 .rm-body li { font-size: 14px; color: var(--muted); display: flex; align-items: flex-start; gap: 8px; }
 .rm-body li::before { content: '—'; color: var(--border); flex-shrink: 0; }
+
+/* ──────────────────────────────────────────────────────
+   Mobile Responsive
+────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .slide { padding: 32px 20px 72px; }
+  .grid-3 { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row { flex-direction: column; gap: 14px; }
+  h3 { font-size: 15px; }
+  #nav { padding: 7px 14px; gap: 10px; bottom: 16px; }
+  .card { padding: 16px; }
+  .card-sm { padding: 10px 14px; }
+  .feature-list li { font-size: 13px; }
+  table { font-size: 12px; }
+  th, td { padding: 8px 10px; }
+}
+@media (max-width: 400px) {
+  .slide { padding: 24px 16px 72px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide.active .anim { animation: none; }
+}
 </style>
 </head>
 <body>
