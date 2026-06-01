@@ -9,7 +9,7 @@ blog_tag:
   - 生成AI
   - 開発ツール
 image: 2026-06-01.png
-published_url: 'https://editor.note.com/notes/n36a929a804e6/edit/'
+published_url: 'https://editor.note.com/notes/n664c68f26479/edit/'
 ---
 
 # Claude Codeが好きだからこそ、依存しない体制を整えた——OpenCodeという選択肢
