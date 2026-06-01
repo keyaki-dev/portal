@@ -212,6 +212,15 @@ h2 { font-size: 36px; font-weight: 700; }
       </div>
     </div>
     <div class="manual-card">
+      <h3>💻 ローカルで作業（混雑時）</h3>
+      <div class="cmd-list">
+        <div class="cmd-row"><div class="cmd-code">make pull</div><div class="cmd-desc">サーバーの作業ディレクトリをローカルへ引き取る</div></div>
+        <div class="cmd-row"><div class="cmd-code">make push</div><div class="cmd-desc">ローカルの作業をサーバーへ戻す（DOCS.md 除外）</div></div>
+        <div class="cmd-row"><div class="cmd-code">make pull-dry / push-dry</div><div class="cmd-desc">転送差分のプレビュー（--dry-run）</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px">VM が混んだら <code style="background:var(--surface);padding:2px 6px;border-radius:4px;font-family:monospace">~/Documents/repos/keyaki/server-share/</code> へ引き取って作業 → 戻す方式。node_modules は除外転送なので pull 後に <code style="background:var(--surface);padding:2px 6px;border-radius:4px;font-family:monospace">npm install</code> で復元。同一 repo をサーバーと同時編集しない。</p>
+    </div>
+    <div class="manual-card">
       <h3>📺 tmux 操作</h3>
       <div class="cmd-list">
         <div class="cmd-row"><div class="cmd-code">Ctrl+B → D</div><div class="cmd-desc">セッションから切り離す（VM は動き続ける）</div></div>
