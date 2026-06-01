@@ -6,7 +6,9 @@
       "Bash(git push*)",
       "Bash(git checkout*)",
       "Bash(git merge*)",
-      "Bash(git pull*)"
+      "Bash(git pull*)",
+      "Bash(node publisher/publish-note.js*)",
+      "Bash(NOTE_SESSION=* node*)"
     ]
   }
 }
