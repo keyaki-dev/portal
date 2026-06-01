@@ -7,6 +7,7 @@ const DOCS_DIR = path.join(process.cwd(), "documents");
 export type DocType = "md" | "html";
 
 export interface DocMeta {
+  safeKey: string;
   slug: string[];
   title: string;
   type: DocType;
@@ -16,10 +17,11 @@ export interface DocMeta {
 }
 
 // ビルド時に webpack がバンドルするキャッシュ。
-// prebuild スクリプトが next build の前に .docs-cache/all.json を生成・更新する。
-// この JSON はリポジトリにコミットされているため webpack が常に参照できる。
+// prebuild スクリプトが next build の前に .docs-cache/all.json を生成する。
+// コンテンツは safeKey（base64url）で索引付けし、URL にも使用する。
 type DocsCache = {
   index: Array<{
+    safeKey: string;
     relativePath: string;
     slug: string[];
     title: string;
@@ -27,12 +29,16 @@ type DocsCache = {
     folder: string;
     updatedAt: string;
   }>;
-  content: Record<string, string>;
+  content: Record<string, string>; // keyed by safeKey
 };
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const docsCache = require("../.docs-cache/all.json") as DocsCache;
 const useCache = docsCache.index.length > 0;
+
+function makeSafeKey(relativePath: string): string {
+  return Buffer.from(relativePath).toString("base64url");
+}
 
 function walkDir(dir: string, base: string = dir): DocMeta[] {
   const results: DocMeta[] = [];
@@ -52,8 +58,8 @@ function walkDir(dir: string, base: string = dir): DocMeta[] {
       const ext = path.extname(entry.name).toLowerCase();
       if (ext !== ".md" && ext !== ".html") continue;
 
-      const relativePath = path.relative(base, fullPath);
-      const slug = relativePath.replace(/\\/g, "/").split("/");
+      const relativePath = path.relative(base, fullPath).replace(/\\/g, "/");
+      const slug = relativePath.split("/");
       const type: DocType = ext === ".html" ? "html" : "md";
       const folder = path.dirname(relativePath) === "." ? "" : path.dirname(relativePath).replace(/\\/g, "/");
 
@@ -69,6 +75,7 @@ function walkDir(dir: string, base: string = dir): DocMeta[] {
       }
 
       results.push({
+        safeKey: makeSafeKey(relativePath),
         slug,
         title,
         type,
@@ -85,6 +92,7 @@ function walkDir(dir: string, base: string = dir): DocMeta[] {
 export function getAllDocuments(): DocMeta[] {
   if (useCache) {
     return docsCache.index.map((e) => ({
+      safeKey: e.safeKey,
       slug: e.slug,
       title: e.title,
       type: e.type,
@@ -99,13 +107,11 @@ export function getAllDocuments(): DocMeta[] {
   });
 }
 
-export function getDocumentBySlug(slug: string[]): { meta: DocMeta; content: string } | null {
-  const relativePath = slug.join("/");
-
+export function getDocumentBySafeKey(safeKey: string): { meta: DocMeta; content: string } | null {
   if (useCache) {
-    const entry = docsCache.index.find((e) => e.relativePath === relativePath);
+    const entry = docsCache.index.find((e) => e.safeKey === safeKey);
     if (!entry) return null;
-    const raw = docsCache.content[relativePath] ?? "";
+    const raw = docsCache.content[safeKey] ?? "";
     let content = raw;
     let title = entry.title;
     if (entry.type === "md") {
@@ -114,30 +120,40 @@ export function getDocumentBySlug(slug: string[]): { meta: DocMeta; content: str
       content = parsed.content;
     }
     return {
-      meta: { slug, title, type: entry.type, folder: entry.folder, relativePath, updatedAt: entry.updatedAt },
+      meta: { safeKey, slug: entry.slug, title, type: entry.type, folder: entry.folder, relativePath: entry.relativePath, updatedAt: entry.updatedAt },
       content,
     };
   }
 
-  const fullPath = path.join(DOCS_DIR, relativePath);
+  // 開発環境フォールバック：ファイルシステムから読む
+  const docs = getAllDocuments();
+  const doc = docs.find((d) => d.safeKey === safeKey);
+  if (!doc) return null;
+  const fullPath = path.join(DOCS_DIR, doc.relativePath);
   if (!fs.existsSync(fullPath)) return null;
-  const ext = path.extname(fullPath).toLowerCase() as ".md" | ".html";
-  if (ext !== ".md" && ext !== ".html") return null;
-  const stat = fs.statSync(fullPath);
   const raw = fs.readFileSync(fullPath, "utf-8");
-  const type: DocType = ext === ".html" ? "html" : "md";
-  const folder = slug.length > 1 ? slug.slice(0, -1).join("/") : "";
-  let title = path.basename(relativePath, ext);
   let content = raw;
-  if (type === "md") {
+  let title = doc.title;
+  if (doc.type === "md") {
     const parsed = matter(raw);
     if (parsed.data.title) title = parsed.data.title;
     content = parsed.content;
   }
-  return {
-    meta: { slug, title, type, folder, relativePath, updatedAt: stat.mtime.toISOString().slice(0, 10) },
-    content,
-  };
+  return { meta: { ...doc, title }, content };
+}
+
+export function getRawHtmlBySafeKey(safeKey: string): string | null {
+  if (useCache) {
+    const entry = docsCache.index.find((e) => e.safeKey === safeKey);
+    if (!entry || entry.type !== "html") return null;
+    return docsCache.content[safeKey] ?? null;
+  }
+  const docs = getAllDocuments();
+  const doc = docs.find((d) => d.safeKey === safeKey);
+  if (!doc || doc.type !== "html") return null;
+  const fullPath = path.join(DOCS_DIR, doc.relativePath);
+  if (!fs.existsSync(fullPath)) return null;
+  return fs.readFileSync(fullPath, "utf-8");
 }
 
 export function groupByFolder(docs: DocMeta[]): Record<string, DocMeta[]> {
@@ -148,15 +164,4 @@ export function groupByFolder(docs: DocMeta[]): Record<string, DocMeta[]> {
     groups[key].push(doc);
   }
   return groups;
-}
-
-export function getRawHtml(relativePath: string): string | null {
-  if (useCache) {
-    return docsCache.content[relativePath] ?? null;
-  }
-  const fullPath = path.join(DOCS_DIR, relativePath);
-  if (!fs.existsSync(fullPath)) return null;
-  const ext = path.extname(fullPath).toLowerCase();
-  if (ext !== ".html") return null;
-  return fs.readFileSync(fullPath, "utf-8");
 }

@@ -4,7 +4,7 @@ import { getAllDocuments, groupByFolder } from "@/lib/documents";
 import type { DocMeta } from "@/lib/documents";
 
 function DocCard({ doc }: { doc: DocMeta }) {
-  const href = `/documents/${doc.slug.join("/")}`;
+  const href = `/documents/${doc.safeKey}`;
   const Icon = doc.type === "html" ? FileCode2 : FileText;
   const typeBadge = doc.type === "html" ? "HTML" : "MD";
   const typeColor = doc.type === "html"

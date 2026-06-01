@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight, FileText, Home } from "lucide-react";
-import { getDocumentBySlug } from "@/lib/documents";
+import { ChevronRight, FileCode2, FileText, Home } from "lucide-react";
+import { getDocumentBySafeKey } from "@/lib/documents";
 import { MarkdownViewer } from "@/components/document/MarkdownViewer";
-import { SlideViewer } from "@/components/document/SlideViewer";
 import type { Metadata } from "next";
 
 interface Props {
@@ -12,14 +11,14 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const doc = getDocumentBySlug(slug);
+  const doc = getDocumentBySafeKey(slug[0]);
   if (!doc) return {};
   return { title: doc.meta.title };
 }
 
 export default async function DocumentPage({ params }: Props) {
   const { slug } = await params;
-  const doc = getDocumentBySlug(slug);
+  const doc = getDocumentBySafeKey(slug[0]);
   if (!doc) notFound();
 
   const { meta, content } = doc;
@@ -34,24 +33,13 @@ export default async function DocumentPage({ params }: Props) {
     { label: meta.title, href: null },
   ];
 
-  // HTML スライドは専用の全高ビューアで表示
-  if (meta.type === "html") {
-    return (
-      <SlideViewer
-        src={`/api/raw/${slug.map(encodeURIComponent).join("/")}`}
-        title={meta.title}
-        breadcrumbs={breadcrumbs}
-        updatedAt={meta.updatedAt}
-      />
-    );
-  }
+  const Icon = meta.type === "html" ? FileCode2 : FileText;
 
-  // Markdown ドキュメントは通常レイアウト
   return (
-    <div className="mx-auto max-w-5xl animate-in">
+    <div className="animate-in">
       {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground flex-wrap">
-        <Link href="/" className="hover:text-foreground transition-colors flex-shrink-0">
+      <nav className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground">
+        <Link href="/" className="hover:text-foreground transition-colors">
           <Home className="h-3.5 w-3.5" />
         </Link>
         {breadcrumbs.slice(1).map((crumb, i) => (
@@ -71,19 +59,29 @@ export default async function DocumentPage({ params }: Props) {
       </nav>
 
       {/* Header */}
-      <div className="mb-6 sm:mb-8 border-b border-border pb-5 sm:pb-6">
+      <div className="mb-8 border-b border-border pb-6">
         <div className="flex items-center gap-2 mb-3">
-          <FileText className="h-5 w-5 text-accent/70 flex-shrink-0" />
+          <Icon className="h-5 w-5 text-accent/70" />
           {meta.folder && <span className="mono-label">{meta.folder}</span>}
         </div>
-        <h1 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight leading-tight">
+        <h1 className="font-serif text-3xl font-medium tracking-tight leading-tight">
           {meta.title}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">最終更新: {meta.updatedAt}</p>
       </div>
 
       {/* Content */}
-      <MarkdownViewer content={content} />
+      {meta.type === "md" ? (
+        <MarkdownViewer content={content} />
+      ) : (
+        <div className="card-warm overflow-hidden rounded-xl" style={{ height: "75vh" }}>
+          <iframe
+            src={`/api/raw/${slug[0]}`}
+            className="h-full w-full border-0"
+            title={meta.title}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -1,7 +1,8 @@
 /**
  * ビルド前にドキュメントキャッシュを生成するスクリプト。
- * documents/ 配下を全スキャンしてコンテンツを .docs-cache/all.json に書き出す。
- * webpack がビルド時に JSON をバンドルするため、Vercel の Unicode glob 問題を回避できる。
+ * documents/ 配下を全スキャンして .docs-cache/all.json に書き出す。
+ * webpack がビルド時に JSON をバンドルするため、Vercel の Unicode 問題を回避できる。
+ * コンテンツは base64url の safeKey で索引付けする（URL にも使用）。
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -45,6 +46,7 @@ const index = [];
 const content = {};
 
 for (const { relativePath, fullPath, ext } of files) {
+  const safeKey = Buffer.from(relativePath).toString('base64url');
   const raw = fs.readFileSync(fullPath, 'utf-8');
   const stat = fs.statSync(fullPath);
   const type = ext === '.html' ? 'html' : 'md';
@@ -58,15 +60,9 @@ for (const { relativePath, fullPath, ext } of files) {
     if (frontmatterTitle) title = frontmatterTitle;
   }
 
-  content[relativePath] = raw;
-  index.push({
-    relativePath,
-    slug,
-    title,
-    type,
-    folder,
-    updatedAt: stat.mtime.toISOString().slice(0, 10),
-  });
+  // コンテンツは safeKey で索引付け（ASCII キーなので比較が確実）
+  content[safeKey] = raw;
+  index.push({ safeKey, relativePath, slug, title, type, folder, updatedAt: stat.mtime.toISOString().slice(0, 10) });
 }
 
 index.sort((a, b) => {
