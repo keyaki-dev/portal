@@ -42,61 +42,74 @@ export function SlideViewer({ src, title, breadcrumbs, updatedAt }: Props) {
   return (
     <div
       ref={containerRef}
-      className="-mx-4 sm:-mx-6 -mt-6 sm:-mt-10 -mb-6 sm:-mb-10 flex flex-col bg-background"
+      className="-mx-4 sm:-mx-6 -mt-6 sm:-mt-10 -mb-6 sm:-mb-10 flex flex-col bg-background relative"
       style={{ height: "calc(100svh - 56px)" }}
     >
-      {/* Top bar */}
-      <div className="flex items-center gap-2 px-3 sm:px-4 py-2 border-b border-border bg-card flex-shrink-0">
-        {/* Mobile: home button + title */}
-        <div className="flex items-center gap-1.5 flex-1 min-w-0 sm:hidden">
-          <Link href="/" className="flex-shrink-0 rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="ホームに戻る">
-            <Home className="h-4 w-4" />
-          </Link>
-          <p className="text-sm font-medium truncate text-foreground">{title}</p>
-        </div>
-
-        {/* Desktop: breadcrumb nav */}
-        <nav className="hidden sm:flex items-center gap-1.5 flex-1 min-w-0 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-foreground transition-colors flex-shrink-0">
-            <Home className="h-3.5 w-3.5" />
-          </Link>
-          {breadcrumbs.slice(1).map((crumb, i) => (
-            <span key={i} className="flex items-center gap-1.5 min-w-0">
-              <ChevronRight className="h-3.5 w-3.5 opacity-40 flex-shrink-0" />
-              {crumb.href ? (
-                <Link href={crumb.href} className="hover:text-foreground transition-colors truncate">
-                  {crumb.label}
-                </Link>
-              ) : (
-                <span className={`truncate ${i === breadcrumbs.length - 2 ? "text-foreground font-medium" : ""}`}>
-                  {crumb.label}
-                </span>
-              )}
-            </span>
-          ))}
-        </nav>
-
-        {/* Info toggle (mobile only) */}
-        <button
-          onClick={() => setInfoOpen((v) => !v)}
-          className="sm:hidden flex-shrink-0 rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-          aria-label="ドキュメント情報"
-        >
-          <span className="text-xs font-mono">{updatedAt}</span>
-        </button>
-
-        {/* Fullscreen button */}
+      {/* フルスクリーン時: 右上に終了ボタンのみ表示 */}
+      {isFullscreen && (
         <button
           onClick={toggleFullscreen}
-          className="flex-shrink-0 rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-          aria-label={isFullscreen ? "全画面を終了" : "全画面表示"}
+          className="absolute top-3 right-3 z-10 rounded-lg bg-black/40 p-2 text-white backdrop-blur-sm hover:bg-black/60 transition-colors"
+          aria-label="全画面を終了"
         >
-          {isFullscreen ? <X className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+          <X className="h-5 w-5" />
         </button>
-      </div>
+      )}
 
-      {/* Info panel (mobile expandable) */}
-      {infoOpen && (
+      {/* Top bar（非全画面時のみ） */}
+      {!isFullscreen && (
+        <div className="flex items-center gap-2 px-3 sm:px-4 py-2 border-b border-border bg-card flex-shrink-0">
+          {/* Mobile: home button + title */}
+          <div className="flex items-center gap-1.5 flex-1 min-w-0 sm:hidden">
+            <Link href="/" className="flex-shrink-0 rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="ホームに戻る">
+              <Home className="h-4 w-4" />
+            </Link>
+            <p className="text-sm font-medium truncate text-foreground">{title}</p>
+          </div>
+
+          {/* Desktop: breadcrumb nav */}
+          <nav className="hidden sm:flex items-center gap-1.5 flex-1 min-w-0 text-sm text-muted-foreground">
+            <Link href="/" className="hover:text-foreground transition-colors flex-shrink-0">
+              <Home className="h-3.5 w-3.5" />
+            </Link>
+            {breadcrumbs.slice(1).map((crumb, i) => (
+              <span key={i} className="flex items-center gap-1.5 min-w-0">
+                <ChevronRight className="h-3.5 w-3.5 opacity-40 flex-shrink-0" />
+                {crumb.href ? (
+                  <Link href={crumb.href} className="hover:text-foreground transition-colors truncate">
+                    {crumb.label}
+                  </Link>
+                ) : (
+                  <span className={`truncate ${i === breadcrumbs.length - 2 ? "text-foreground font-medium" : ""}`}>
+                    {crumb.label}
+                  </span>
+                )}
+              </span>
+            ))}
+          </nav>
+
+          {/* Info toggle (mobile only) */}
+          <button
+            onClick={() => setInfoOpen((v) => !v)}
+            className="sm:hidden flex-shrink-0 rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label="ドキュメント情報"
+          >
+            <span className="text-xs font-mono">{updatedAt}</span>
+          </button>
+
+          {/* Fullscreen button */}
+          <button
+            onClick={toggleFullscreen}
+            className="flex-shrink-0 rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label="全画面表示"
+          >
+            <Maximize2 className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Info panel (mobile expandable, 非全画面時のみ) */}
+      {!isFullscreen && infoOpen && (
         <div className="sm:hidden px-4 py-3 border-b border-border bg-muted/50 flex-shrink-0">
           <p className="text-sm font-medium text-foreground">{title}</p>
           <p className="text-xs text-muted-foreground mt-0.5">最終更新: {updatedAt}</p>

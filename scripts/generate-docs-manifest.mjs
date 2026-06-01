@@ -1,8 +1,7 @@
 /**
  * ビルド前にドキュメントキャッシュを生成するスクリプト。
- * Unicode ファイル名を base64url エンコードされた ASCII 名に変換して
- * .docs-cache/ に保存する。Vercel の outputFileTracingIncludes の
- * glob が Unicode ファイル名を正しく扱えない問題を回避する。
+ * documents/ 配下を全スキャンしてコンテンツを .docs-cache/all.json に書き出す。
+ * webpack がビルド時に JSON をバンドルするため、Vercel の Unicode glob 問題を回避できる。
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -11,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const DOCS_DIR = path.join(ROOT, 'documents');
-const CACHE_DIR = path.join(ROOT, '.docs-cache');
+const CACHE_FILE = path.join(ROOT, '.docs-cache', 'all.json');
 
 function walkDir(dir, base = dir) {
   const results = [];
@@ -39,14 +38,14 @@ function parseFrontmatterTitle(content) {
   return t ? t[1].trim().replace(/^['"]|['"]$/g, '') : null;
 }
 
-fs.mkdirSync(CACHE_DIR, { recursive: true });
+fs.mkdirSync(path.dirname(CACHE_FILE), { recursive: true });
 
 const files = walkDir(DOCS_DIR);
 const index = [];
+const content = {};
 
 for (const { relativePath, fullPath, ext } of files) {
-  const safeKey = Buffer.from(relativePath).toString('base64url');
-  const content = fs.readFileSync(fullPath, 'utf-8');
+  const raw = fs.readFileSync(fullPath, 'utf-8');
   const stat = fs.statSync(fullPath);
   const type = ext === '.html' ? 'html' : 'md';
   const slug = relativePath.split('/');
@@ -55,19 +54,13 @@ for (const { relativePath, fullPath, ext } of files) {
 
   let title = basename;
   if (type === 'md') {
-    const frontmatterTitle = parseFrontmatterTitle(content);
+    const frontmatterTitle = parseFrontmatterTitle(raw);
     if (frontmatterTitle) title = frontmatterTitle;
   }
 
-  // ドキュメントコンテンツを ASCII 名のファイルに保存
-  fs.writeFileSync(
-    path.join(CACHE_DIR, safeKey + '.json'),
-    JSON.stringify({ content })
-  );
-
+  content[relativePath] = raw;
   index.push({
     relativePath,
-    safeKey,
     slug,
     title,
     type,
@@ -76,11 +69,10 @@ for (const { relativePath, fullPath, ext } of files) {
   });
 }
 
-// getAllDocuments() と同じソート順
 index.sort((a, b) => {
   if (a.folder !== b.folder) return a.folder.localeCompare(b.folder, 'ja');
   return a.title.localeCompare(b.title, 'ja');
 });
 
-fs.writeFileSync(path.join(CACHE_DIR, '_index.json'), JSON.stringify(index));
-console.log(`✓ docs manifest: ${files.length} documents`);
+fs.writeFileSync(CACHE_FILE, JSON.stringify({ index, content }));
+console.log(`✓ docs manifest: ${files.length} documents → .docs-cache/all.json`);
