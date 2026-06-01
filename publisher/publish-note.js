@@ -64,18 +64,21 @@ async function publishToNote(filename) {
     httpOnly: true,
     secure: true,
   }]);
-  // クリップボード権限を付与（contenteditable エディタへのペーストに必要）
-  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   console.log("セッションクッキーをセット");
 
   const page = await context.newPage();
   const screenshotDir = process.env.GITHUB_WORKSPACE || "/tmp";
 
-  // クリップボード経由でテキストをペーストする（React系エディタのState更新に対応）
-  async function pasteText(text) {
-    await page.evaluate((t) => navigator.clipboard.writeText(t), text);
+  // execCommand('insertText') でテキストを入力する
+  // keyboard.type / clipboard paste はReactのcontenteditable StateをUpdateしないケースがあるため
+  async function insertText(locator, text) {
+    await locator.click();
     await page.keyboard.press("Control+a");
-    await page.keyboard.press("Control+v");
+    await locator.evaluate((el, t) => {
+      el.focus();
+      document.execCommand("selectAll", false, null);
+      document.execCommand("insertText", false, t);
+    }, text);
   }
 
   try {
@@ -84,15 +87,14 @@ async function publishToNote(filename) {
     await page.goto("https://note.com/notes/new", { waitUntil: "networkidle" });
     await page.waitForTimeout(2000);
 
-    // タイトル入力（クリップボードペースト）
-    const titleEl = await page.waitForSelector("div[role='textbox']:first-of-type", { timeout: 10000 });
-    await titleEl.click();
-    await pasteText(title);
+    // タイトル入力
+    const titleLocator = page.locator("div[role='textbox']").first();
+    await titleLocator.waitFor({ timeout: 10000 });
+    await insertText(titleLocator, title);
     console.log("タイトル入力完了");
     await page.waitForTimeout(500);
 
-    // 本文入力（クリップボードペースト）
-    // Tab で本文エリアへ移動
+    // 本文入力
     await page.keyboard.press("Tab");
     await page.waitForTimeout(500);
 
@@ -103,14 +105,13 @@ async function publishToNote(filename) {
       "div[role='textbox']:nth-of-type(2)",
     ];
 
-    // 本文エリアにクリップボードペースト
+    // 本文エリアに insertText
     let bodyFilled = false;
     for (const sel of bodySelectors) {
       try {
         const el = await page.$(sel);
         if (el) {
-          await el.click();
-          await pasteText(body);
+          await insertText(page.locator(sel).first(), body);
           bodyFilled = true;
           console.log(`本文入力完了 (selector: ${sel})`);
           break;
@@ -119,9 +120,12 @@ async function publishToNote(filename) {
     }
 
     if (!bodyFilled) {
-      // Tab 後のフォーカス位置にペースト
-      await pasteText(body);
-      console.log("本文入力完了（フォーカス位置にペースト）");
+      // フォーカス位置に直接 insertText
+      await page.evaluate((t) => {
+        document.execCommand("selectAll", false, null);
+        document.execCommand("insertText", false, t);
+      }, body);
+      console.log("本文入力完了（フォーカス位置）");
     }
 
     await page.waitForTimeout(1000);
