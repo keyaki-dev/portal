@@ -42,19 +42,19 @@ export default function HomePage() {
   });
 
   return (
-    <div className="animate-in">
-      <div className="mb-10">
+    <div className="mx-auto max-w-5xl animate-in">
+      <div className="mb-8 sm:mb-10">
         <span className="mono-label">Team Portal</span>
-        <h1 className="mt-3 font-serif text-4xl font-medium tracking-tight">
+        <h1 className="mt-3 font-serif text-3xl sm:text-4xl font-medium tracking-tight">
           ドキュメント
         </h1>
-        <p className="mt-3 text-muted-foreground">
+        <p className="mt-3 text-sm sm:text-base text-muted-foreground">
           チームの資料・仕様書・議事録を一覧できます。
         </p>
       </div>
 
       {docs.length === 0 ? (
-        <div className="card-warm flex flex-col items-center justify-center py-24 text-center">
+        <div className="card-warm flex flex-col items-center justify-center py-16 sm:py-24 text-center">
           <FolderOpen className="mb-4 h-10 w-10 text-muted-foreground/40" />
           <p className="font-medium text-muted-foreground">ドキュメントがありません</p>
           <p className="mt-1 text-sm text-muted-foreground/70">

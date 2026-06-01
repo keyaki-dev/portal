@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight, FileCode2, FileText, Home } from "lucide-react";
+import { ChevronRight, FileText, Home } from "lucide-react";
 import { getDocumentBySlug } from "@/lib/documents";
 import { MarkdownViewer } from "@/components/document/MarkdownViewer";
+import { SlideViewer } from "@/components/document/SlideViewer";
 import type { Metadata } from "next";
 
 interface Props {
@@ -33,13 +34,24 @@ export default async function DocumentPage({ params }: Props) {
     { label: meta.title, href: null },
   ];
 
-  const Icon = meta.type === "html" ? FileCode2 : FileText;
+  // HTML スライドは専用の全高ビューアで表示
+  if (meta.type === "html") {
+    return (
+      <SlideViewer
+        src={`/api/raw/${slug.map(encodeURIComponent).join("/")}`}
+        title={meta.title}
+        breadcrumbs={breadcrumbs}
+        updatedAt={meta.updatedAt}
+      />
+    );
+  }
 
+  // Markdown ドキュメントは通常レイアウト
   return (
-    <div className="animate-in">
+    <div className="mx-auto max-w-5xl animate-in">
       {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground transition-colors">
+      <nav className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground flex-wrap">
+        <Link href="/" className="hover:text-foreground transition-colors flex-shrink-0">
           <Home className="h-3.5 w-3.5" />
         </Link>
         {breadcrumbs.slice(1).map((crumb, i) => (
@@ -59,29 +71,19 @@ export default async function DocumentPage({ params }: Props) {
       </nav>
 
       {/* Header */}
-      <div className="mb-8 border-b border-border pb-6">
+      <div className="mb-6 sm:mb-8 border-b border-border pb-5 sm:pb-6">
         <div className="flex items-center gap-2 mb-3">
-          <Icon className="h-5 w-5 text-accent/70" />
+          <FileText className="h-5 w-5 text-accent/70 flex-shrink-0" />
           {meta.folder && <span className="mono-label">{meta.folder}</span>}
         </div>
-        <h1 className="font-serif text-3xl font-medium tracking-tight leading-tight">
+        <h1 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight leading-tight">
           {meta.title}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">最終更新: {meta.updatedAt}</p>
       </div>
 
       {/* Content */}
-      {meta.type === "md" ? (
-        <MarkdownViewer content={content} />
-      ) : (
-        <div className="card-warm overflow-hidden rounded-xl" style={{ height: "75vh" }}>
-          <iframe
-            src={`/api/raw/${slug.map(encodeURIComponent).join("/")}`}
-            className="h-full w-full border-0"
-            title={meta.title}
-          />
-        </div>
-      )}
+      <MarkdownViewer content={content} />
     </div>
   );
 }

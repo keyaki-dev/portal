@@ -33,8 +33,8 @@ export default async function BlogPostPage({ params }: Props) {
   const readingMinutes = Math.max(1, Math.round(charCount / 400));
 
   return (
-    <div className="animate-in">
-      <div className="mb-8">
+    <div className="mx-auto max-w-5xl animate-in">
+      <div className="mb-6 sm:mb-8">
         <Link
           href="/blog"
           className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -44,7 +44,7 @@ export default async function BlogPostPage({ params }: Props) {
         </Link>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+      <div className="grid gap-6 sm:gap-8 lg:grid-cols-[1fr_300px]">
         {/* Article Preview */}
         <div className="min-w-0">
           <div className="mb-6">
@@ -60,7 +60,7 @@ export default async function BlogPostPage({ params }: Props) {
                 </span>
               )}
             </div>
-            <h1 className="font-serif text-3xl font-medium tracking-tight leading-tight">
+            <h1 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight leading-tight">
               {post.title}
             </h1>
             {post.tags.length > 0 && (
