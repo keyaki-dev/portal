@@ -66,74 +66,16 @@ async function publishToNote(filename) {
     await page.waitForTimeout(2000);
     await page.screenshot({ path: `${screenshotDir}/note-login.png` });
 
-    // メールアドレス入力（複数セレクタを順に試す）
-    const emailSelectors = [
-      'input[name="email"]',
-      'input[type="email"]',
-      'input[placeholder*="メール"]',
-      'input[placeholder*="email"]',
-      '#email',
-      '[data-testid="email"]',
-      'form input:first-of-type',
-    ];
-    let emailFilled = false;
-    for (const sel of emailSelectors) {
-      try {
-        await page.waitForSelector(sel, { timeout: 5000 });
-        await page.fill(sel, NOTE_EMAIL);
-        emailFilled = true;
-        console.log(`メール入力完了 (${sel})`);
-        break;
-      } catch {}
-    }
-    if (!emailFilled) {
-      await page.screenshot({ path: `${screenshotDir}/note-login-failed.png` });
-      throw new Error("メール入力欄が見つかりません。note-login-failed.png を確認してください");
-    }
+    // メール・パスワードをキー入力でシミュレート（React の onChange を発火させるため）
+    await page.waitForSelector('#email', { timeout: 10000 });
+    await page.locator('#email').pressSequentially(NOTE_EMAIL, { delay: 50 });
+    await page.locator('input[type="password"]').pressSequentially(NOTE_PASSWORD, { delay: 50 });
+    console.log("メール・パスワード入力完了");
 
-    // パスワード入力
-    const passwordSelectors = [
-      'input[name="password"]',
-      'input[type="password"]',
-      '[data-testid="password"]',
-    ];
-    let passwordFilled = false;
-    for (const sel of passwordSelectors) {
-      try {
-        await page.waitForSelector(sel, { timeout: 5000 });
-        await page.fill(sel, NOTE_PASSWORD);
-        passwordFilled = true;
-        console.log(`パスワード入力完了 (${sel})`);
-        break;
-      } catch {}
-    }
-    if (!passwordFilled) {
-      await page.screenshot({ path: `${screenshotDir}/note-login-failed.png` });
-      throw new Error("パスワード入力欄が見つかりません");
-    }
-
-    // ログインボタンをクリック
-    const submitSelectors = [
-      'button[type="submit"]',
-      'button:has-text("ログイン")',
-      'input[type="submit"]',
-      '[data-testid="login-button"]',
-      'form button',
-    ];
-    let submitClicked = false;
-    for (const sel of submitSelectors) {
-      try {
-        await page.waitForSelector(sel, { timeout: 5000 });
-        await page.click(sel);
-        submitClicked = true;
-        console.log(`ログインボタンクリック (${sel})`);
-        break;
-      } catch {}
-    }
-    if (!submitClicked) {
-      await page.screenshot({ path: `${screenshotDir}/note-login-failed.png` });
-      throw new Error("ログインボタンが見つかりません");
-    }
+    // ボタンが有効になるのを待ってクリック
+    await page.waitForSelector('button:has-text("ログイン"):not([disabled])', { timeout: 10000 });
+    await page.click('button:has-text("ログイン")');
+    console.log("ログインボタンクリック");
 
     await page.waitForURL((url) => !url.href.includes("/login"), { timeout: 15000 });
     console.log("ログイン完了");
