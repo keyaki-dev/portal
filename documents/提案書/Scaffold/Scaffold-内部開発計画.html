@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>keyaki AI組織 内部開発計画 — keyaki development</title>
+<style>
+:root {
+  --bg:          #F8F5F1;
+  --bg-card:     #FDFAF7;
+  --bg-muted:    #F2EDE8;
+  --fg:          #2C2C2C;
+  --fg-muted:    #6B6560;
+  --border:      #E5DDD6;
+  --accent:      #C45E3E;
+  --accent-soft: #F5E1D6;
+  --green:       #4A7C6F;
+  --green-soft:  #E6F0EE;
+  --yellow:      #8A6A2E;
+  --yellow-soft: #F5EDD6;
+  --blue:        #3A5F8A;
+  --blue-soft:   #DDE8F5;
+  --font-sans:   'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Segoe UI', system-ui, sans-serif;
+  --font-serif:  'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --font-mono:   'Fira Code', 'Geist Mono', monospace;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.deck { width: 100%; height: 100vh; position: relative; }
+.slide {
+  position: absolute; inset: 0;
+  display: none; flex-direction: column;
+  justify-content: center; align-items: center;
+  padding: 56px 72px; overflow: hidden;
+}
+.slide.active { display: flex; }
+.slide::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.025; pointer-events: none;
+}
+
+#nav {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 14px; z-index: 200;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 40px; padding: 9px 20px;
+  box-shadow: 0 4px 24px rgba(196,94,62,0.06);
+}
+#nav button {
+  background: none; border: none; color: var(--fg-muted);
+  cursor: pointer; font-size: 16px; padding: 4px 10px;
+  border-radius: 20px; transition: all 0.15s; font-family: var(--font-sans);
+}
+#nav button:hover { background: var(--bg-muted); color: var(--fg); }
+#counter { color: var(--fg-muted); font-size: 12px; min-width: 44px; text-align: center; font-family: var(--font-mono); }
+.dot-row { display: flex; gap: 5px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); cursor: pointer; transition: all 0.2s; }
+.dot.active { background: var(--accent); transform: scale(1.4); }
+
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 14px;
+}
+h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(36px, 5.5vw, 68px);
+  font-weight: 500; line-height: 1.1; letter-spacing: -0.02em;
+}
+h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 3.8vw, 48px);
+  font-weight: 500; line-height: 1.15; letter-spacing: -0.02em;
+}
+h3 { font-size: 18px; font-weight: 600; line-height: 1.3; }
+.sub { font-size: clamp(14px, 1.6vw, 17px); color: var(--fg-muted); line-height: 1.75; margin-top: 14px; }
+.accent-text { color: var(--accent); }
+.muted { color: var(--fg-muted); }
+.center { text-align: center; }
+.full { width: 100%; }
+
+.row { display: flex; gap: 24px; width: 100%; }
+.col { flex: 1; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; width: 100%; }
+
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+.card-sm { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; }
+
+.tag {
+  display: inline-block; padding: 3px 11px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+  background: var(--accent-soft); color: var(--accent); border: 1px solid var(--border);
+}
+.tag.green  { background: var(--green-soft);  color: var(--green);  }
+.tag.yellow { background: var(--yellow-soft); color: var(--yellow); }
+.tag.blue   { background: var(--blue-soft);   color: var(--blue);   }
+
+.feature-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.feature-list li {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14px; color: var(--fg-muted); line-height: 1.6;
+}
+.feature-list li::before { content: '—'; color: var(--accent); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+.divider { width: 40px; height: 2px; background: var(--accent); border-radius: 1px; margin: 18px 0; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  text-align: left; padding: 10px 14px;
+  color: var(--fg-muted); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border); background: var(--bg-muted);
+}
+td { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--accent-soft); }
+
+.slide-title-bg::before {
+  content: '';
+  position: absolute; top: -120px; right: -120px;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,94,62,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.slide.active .anim { animation: fadeInUp 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.d1 { animation-delay: 0.05s !important; }
+.d2 { animation-delay: 0.10s !important; }
+.d3 { animation-delay: 0.15s !important; }
+.d4 { animation-delay: 0.20s !important; }
+.d5 { animation-delay: 0.25s !important; }
+
+/* ディレクトリツリー表示 */
+.dir-tree {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--fg-muted);
+  background: var(--bg-muted);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  width: 100%;
+}
+.dir-tree .hl        { color: var(--accent); font-weight: 700; }
+.dir-tree .hl-green  { color: var(--green);  font-weight: 700; }
+.dir-tree .hl-blue   { color: var(--blue);   font-weight: 700; }
+.dir-tree .comment   { color: var(--fg-muted); opacity: 0.65; }
+
+@media (max-width: 640px) {
+  .slide { padding: 32px 20px 72px; }
+  .grid-3 { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row { flex-direction: column; gap: 14px; }
+  h3 { font-size: 15px; }
+  #nav { padding: 7px 14px; gap: 10px; bottom: 16px; }
+  .card { padding: 16px; }
+  .dir-tree { font-size: 11px; padding: 14px 16px; }
+}
+@media (max-width: 400px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide.active .anim { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 01 タイトル -->
+  <div class="slide slide-title-bg active">
+    <div class="center" style="max-width: 700px;">
+      <div class="mono-label anim">keyaki development — 内部資料 / 2026年6月</div>
+      <h1 class="anim d1">
+        AI組織<span class="accent-text">内部開発計画</span>
+      </h1>
+      <p class="sub anim d2">
+        keyaki の AI 組織（山下 + 川上）を検証フィールドとして、<br>
+        ディレクトリ構成とセッション管理の設計方針をまとめた社内資料。
+      </p>
+      <div style="margin-top: 32px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;" class="anim d3">
+        <span class="tag">社内限定</span>
+        <span class="tag blue">設計確定版</span>
+        <span class="tag green">Scaffold 検証</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 Section 1 -->
+  <div class="slide">
+    <div class="center" style="max-width: 560px;">
+      <div class="mono-label anim">Section 01</div>
+      <h2 class="anim d1">AI組織<span class="accent-text">ディレクトリ構成</span></h2>
+      <div class="divider anim d2" style="margin: 18px auto;"></div>
+      <p class="sub anim d3">ペルソナ分離と共通ルール共有を両立するVM上の設計。<span style="color:var(--accent)">確定事項。</span></p>
+    </div>
+  </div>
+
+  <!-- 03 ディレクトリ全体像 -->
+  <div class="slide">
+    <div class="full" style="max-width: 900px;">
+      <div class="mono-label anim">Directory Structure</div>
+      <h2 class="anim d1"><code style="font-family:var(--font-mono);font-size:0.75em;">~/agent/</code> が<span class="accent-text">AI組織のオフィス</span></h2>
+      <div class="dir-tree anim d2" style="margin-top: 20px;">
+<span class="hl">~/agent/</span><br>
+├── <span class="hl-green">_shared/</span>          <span class="comment"># 全ペルソナ共通（読み取り専用）</span><br>
+│   ├── COMPANY.md    <span class="comment"># 会社方針・Slack設定・報告ルール</span><br>
+│   └── WORKFLOWS.md  <span class="comment"># GitHub フロー・コミット規則</span><br>
+│<br>
+├── <span class="hl">kawakam/</span>          <span class="comment"># 川上（エンジニアリング担当）</span><br>
+│   ├── CLAUDE.md     <span class="comment"># @./AGENTS.md を指す</span><br>
+│   ├── AGENTS.md     <span class="comment"># 川上のペルソナ定義・tick動作</span><br>
+│   └── DOCS.md       <span class="comment"># 川上の外部記憶・作業経緯</span><br>
+│<br>
+└── <span class="hl-blue">keiri/</span>            <span class="comment"># 経理担当（将来追加）</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── CLAUDE.md     <span class="comment"># @./AGENTS.md を指す</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── AGENTS.md     <span class="comment"># 経理ペルソナの定義</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;└── DOCS.md       <span class="comment"># 経理の外部記憶</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 ペルソナ分離の仕組み -->
+  <div class="slide">
+    <div class="full" style="max-width: 900px;">
+      <div class="mono-label anim">Isolation Design</div>
+      <h2 class="anim d1">ペルソナが<span class="accent-text">混ざらない</span>仕組み</h2>
+      <div class="grid-2" style="margin-top: 28px; align-items: start;">
+        <div class="card anim d2" style="border-left: 3px solid var(--accent);">
+          <h3 style="margin-bottom: 14px;">起動ディレクトリで分離</h3>
+          <ul class="feature-list">
+            <li>川上: <code style="font-family:var(--font-mono);font-size:12px;">cd ~/agent/kawakam &amp;&amp; claude</code></li>
+            <li>経理: <code style="font-family:var(--font-mono);font-size:12px;">cd ~/agent/keiri &amp;&amp; claude</code></li>
+            <li>Claude Code は起動ディレクトリの CLAUDE.md のみ読み込む</li>
+            <li>別ペルソナの AGENTS.md・DOCS.md は参照されない</li>
+          </ul>
+        </div>
+        <div class="card anim d3" style="border-left: 3px solid var(--green);">
+          <h3 style="margin-bottom: 14px;">共通ルールは常時読み込み</h3>
+          <ul class="feature-list">
+            <li><code style="font-family:var(--font-mono);font-size:12px;">~/.claude/CLAUDE.md</code> は全セッション共通</li>
+            <li>→ <code style="font-family:var(--font-mono);font-size:12px;">@~/agent/_shared/COMPANY.md</code> を参照</li>
+            <li>Slack 設定・報告フォーマット・行動規範を共有</li>
+            <li>ペルソナ固有の定義は各自の AGENTS.md に閉じる</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sm anim d4" style="margin-top: 18px;">
+        <span style="color: var(--accent); font-weight: 600;">今後の移行作業：</span>
+        <span class="muted" style="font-size: 14px;">現在の <code style="font-family:var(--font-mono);">~/agent/AGENTS.md</code> と <code style="font-family:var(--font-mono);">DOCS.md</code> を <code style="font-family:var(--font-mono);">kawakam/</code> に移動し、共通部分を <code style="font-family:var(--font-mono);">_shared/</code> に分離する。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 Section 2 -->
+  <div class="slide">
+    <div class="center" style="max-width: 560px;">
+      <div class="mono-label anim">Section 02</div>
+      <h2 class="anim d1">セッション<span class="accent-text">管理・自律稼働</span></h2>
+      <div class="divider anim d2" style="margin: 18px auto;"></div>
+      <p class="sub anim d3">各ペルソナのセッションをどう立ち上げ、維持し、リセットするか。</p>
+    </div>
+  </div>
+
+  <!-- 06 設計の前提 -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Design Premise</div>
+      <h2 class="anim d1">インタラクティブセッションを<span class="accent-text">常駐させる</span></h2>
+      <div class="grid-2" style="margin-top: 28px; align-items: start;">
+        <div class="card anim d2" style="border-left: 3px solid var(--fg-muted);">
+          <h3 style="margin-bottom: 12px; color: var(--fg-muted);">採用しない方針</h3>
+          <ul class="feature-list">
+            <li>非インタラクティブモード（<code style="font-family:var(--font-mono);font-size:12px;">claude -p</code>）</li>
+            <li>理由：都度起動ではコンテキストが消える</li>
+            <li>作業精度が大きく落ちるため対象外</li>
+          </ul>
+        </div>
+        <div class="card anim d3" style="border-left: 3px solid var(--accent);">
+          <h3 style="margin-bottom: 12px;">採用する方針</h3>
+          <ul class="feature-list">
+            <li>tmux でセッションをサーバーに常駐</li>
+            <li>SSH 切断後もセッションは生き続ける</li>
+            <li>コンテキストを保持したまま継続作業</li>
+            <li>Slack チェックはセッション内のスケジューリングで対応</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sm anim d4" style="margin-top: 18px; background: var(--bg-muted);">
+        <span class="muted" style="font-size: 13px; font-family: var(--font-mono);">
+          tmux 3.2a ✓ &nbsp;|&nbsp; systemd 249 ✓ &nbsp;|&nbsp; Claude OAuth 永続保存済み ✓ &nbsp;— 技術的前提はすべて揃っている
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 セッションライフサイクル -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Session Lifecycle</div>
+      <h2 class="anim d1">セッションの<span class="accent-text">ライフサイクル</span></h2>
+      <div class="card anim d2" style="margin-top: 24px; padding: 0; overflow: hidden;">
+        <table>
+          <thead>
+            <tr><th>フェーズ</th><th>内容</th><th>備考</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>起動</strong></td>
+              <td>tmux でセッションを作成 → claude を起動</td>
+              <td>Phase 1: 手動 / Phase 3: systemd 自動</td>
+            </tr>
+            <tr>
+              <td><strong>初期化</strong></td>
+              <td>DOCS.md を読んで前回コンテキストを把握、当日の方針を確認</td>
+              <td>Phase 2 以降は指示書を自動読み込み</td>
+            </tr>
+            <tr>
+              <td><strong>稼働</strong></td>
+              <td>作業実行 → 一段落したら Slack をチェック → 報告</td>
+              <td>/loop や /schedule で定期実行</td>
+            </tr>
+            <tr>
+              <td><strong>リセット</strong></td>
+              <td>コンテキスト上限に近づいたら DOCS.md に引き継ぎ内容を書き出してセッション終了</td>
+              <td>新セッションは DOCS.md から再開</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 段階的ロードマップ -->
+  <div class="slide">
+    <div class="full" style="max-width: 920px;">
+      <div class="mono-label anim">Autonomy Roadmap</div>
+      <h2 class="anim d1">段階的に<span class="accent-text">自律度を高める</span></h2>
+      <div class="grid-3" style="margin-top: 28px;">
+        <div class="card anim d2" style="border-top: 3px solid var(--blue);">
+          <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--blue); margin-bottom: 10px;">Phase 1</div>
+          <h3 style="margin-bottom: 8px;">手動起動 + 朝の指示</h3>
+          <div class="muted" style="font-size: 12px; margin-bottom: 12px;">今日からできる</div>
+          <ul class="feature-list">
+            <li>山下が朝に tmux attach して当日の方針を伝える</li>
+            <li>川上がセッション内で自律的に作業を進める</li>
+            <li>SSH 切断後も tmux でセッションが継続</li>
+            <li>夜間は dormant（22:00〜07:59）</li>
+          </ul>
+        </div>
+        <div class="card anim d3" style="border-top: 3px solid var(--accent);">
+          <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 10px;">Phase 2</div>
+          <h3 style="margin-bottom: 8px;">起動・初期化の自動化</h3>
+          <div class="muted" style="font-size: 12px; margin-bottom: 12px;">スクリプト整備で対応</div>
+          <ul class="feature-list">
+            <li>起動スクリプトが tmux + claude を立ち上げる</li>
+            <li>「今日の指示書」を自動読み込みして始動</li>
+            <li>山下の朝の作業が不要になる</li>
+            <li>セッションリセット時も DOCS.md 経由で自動引き継ぎ</li>
+          </ul>
+        </div>
+        <div class="card anim d4" style="border-top: 3px solid var(--green);">
+          <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--green); margin-bottom: 10px;">Phase 3</div>
+          <h3 style="margin-bottom: 8px;">完全自律稼働</h3>
+          <div class="muted" style="font-size: 12px; margin-bottom: 12px;">systemd で自動管理</div>
+          <ul class="feature-list">
+            <li>VM 再起動後もセッションが自動復旧</li>
+            <li>24時間・365日、人手なしで稼働</li>
+            <li>Slack を受信口に、必要時のみ山下が介入</li>
+            <li>複数ペルソナのセッションを並列で管理</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 09 現在地と次のアクション -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Next Steps</div>
+      <h2 class="anim d1">現在地と<span class="accent-text">次のアクション</span></h2>
+      <div class="grid-2" style="margin-top: 28px; align-items: start;">
+        <div class="card anim d2">
+          <h3 style="margin-bottom: 14px; color: var(--accent);">確定事項（着手可能）</h3>
+          <ul class="feature-list">
+            <li>ディレクトリ構成の設計（Section 01）</li>
+            <li>既存ファイルの <code style="font-family:var(--font-mono);font-size:11px;">kawakam/</code> への移行</li>
+            <li><code style="font-family:var(--font-mono);font-size:11px;">_shared/COMPANY.md</code> の作成・分離</li>
+            <li>Phase 1 の運用開始（tmux + 手動起動）</li>
+          </ul>
+        </div>
+        <div class="card anim d3">
+          <h3 style="margin-bottom: 14px; color: var(--blue);">今後の検討事項</h3>
+          <ul class="feature-list">
+            <li>経理ペルソナの AGENTS.md 定義</li>
+            <li>Phase 2 用起動スクリプトの設計</li>
+            <li>オーケストレーター層の要否判断</li>
+            <li>この構成の Scaffold テンプレート化</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sm anim d4" style="margin-top: 18px; border-color: var(--accent-soft); text-align: center;">
+        <span class="muted" style="font-size: 14px;">この組織の構築・運用プロセスそのものが Scaffold の開発ロードマップ。実運用で検証したアーキテクチャを顧客向けパッケージとして提供する。</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<div id="nav">
+  <button onclick="prev()" title="前へ">←</button>
+  <div class="dot-row" id="dots"></div>
+  <span id="counter">1 / 1</span>
+  <button onclick="next()" title="次へ">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+  const dotsEl    = document.getElementById('dots');
+  const counterEl = document.getElementById('counter');
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => go(i);
+    dotsEl.appendChild(d);
+  });
+  counterEl.textContent = '1 / ' + slides.length;
+
+  function go(n) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    counterEl.textContent = (cur + 1) + ' / ' + slides.length;
+  }
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+
+  let ts = 0;
+  document.addEventListener('touchstart', e => { ts = e.touches[0].clientX; });
+  document.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - ts;
+    if (Math.abs(dx) > 50) dx < 0 ? next() : prev();
+  });
+</script>
+</body>
+</html>
