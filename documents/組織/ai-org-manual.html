@@ -271,12 +271,12 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
           <ul class="fl">
             <li><code>CLAUDE.md</code> — ローダ（@import のみ）</li>
             <li><code>AGENTS.md</code> — 役割・tick フロー定義</li>
-            <li><code>DOCS.md</code> — 外部記憶（サーバー側が正）</li>
+            <li><code>DOCS.md</code> — 外部記憶（git 管理）</li>
           </ul>
         </div>
         <div class="card" style="border-color:var(--accent-soft);">
           <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:8px;font-family:var(--font-mono);">DOCS.md の扱い</div>
-          <p style="font-size:12px;color:var(--fg-muted);line-height:1.6;">サーバー側が常に正。<code>make push</code> 時は自動除外されるため、ローカルから上書きされない。</p>
+          <p style="font-size:12px;color:var(--fg-muted);line-height:1.6;">git（<code>keyaki-org-workdir</code>）で管理。ローカルとサーバーが分岐したら、黙って上書きせず git のコンフリクトとして検知・解決する。</p>
         </div>
       </div>
     </div>
@@ -358,16 +358,17 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
         </table>
       </div>
       <div class="card anim d4">
-        <h3 style="margin-bottom:12px;color:var(--fg-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.06em;">ローカルミラー（混雑時）</h3>
+        <h3 style="margin-bottom:12px;color:var(--fg-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.06em;">ワークディレクトリ同期（git）</h3>
         <table style="font-size:12px;">
           <tbody>
-            <tr><td><code>make pull</code></td><td style="color:var(--fg-muted);">サーバー → ローカルへ引き取る</td></tr>
-            <tr><td><code>make push</code></td><td style="color:var(--fg-muted);">ローカル → サーバーへ戻す（DOCS.md 除外）</td></tr>
-            <tr><td><code>make pull-dry</code></td><td style="color:var(--fg-muted);">転送差分プレビュー（pull）</td></tr>
-            <tr><td><code>make push-dry</code></td><td style="color:var(--fg-muted);">転送差分プレビュー（push）</td></tr>
+            <tr><td><code>git pull</code></td><td style="color:var(--fg-muted);">サーバーの最新を取り込む（作業前に必ず）</td></tr>
+            <tr><td><code>git commit</code></td><td style="color:var(--fg-muted);">ローカルの変更を記録</td></tr>
+            <tr><td><code>git push</code></td><td style="color:var(--fg-muted);">サーバーへ戻す（cron が毎時取り込み）</td></tr>
           </tbody>
         </table>
-        <p style="font-size:11px;color:var(--fg-muted);margin-top:8px;">ミラー先: <code>~/Documents/repos/keyaki/server-share/</code></p>
+        <p style="font-size:11px;color:var(--fg-muted);margin-top:8px;">repo: <code>keyaki-dev/keyaki-org-workdir</code>（サーバー <code>~</code> を private 管理）<br>ローカル clone: <code>~/Documents/repos/keyaki/keyaki-org-workdir/</code></p>
+        <p style="font-size:11px;color:var(--fg-muted);margin-top:6px;">サーバーは cron 毎時で自動 commit+push。同一行が衝突したら自動解決せず <code>~/org-autocommit.log</code> に記録 → 手動解決。</p>
+        <p style="font-size:11px;color:var(--fg-muted);margin-top:6px;opacity:0.7;">※ 旧 <code>make pull/push</code>（rsync ミラー <code>server-share/</code>）は補助手段に降格・将来廃止予定。</p>
       </div>
       <div class="card anim d5">
         <h3 style="margin-bottom:12px;color:var(--fg-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.06em;">マニュアル</h3>
