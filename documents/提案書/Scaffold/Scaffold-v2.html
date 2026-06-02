@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI開発組織 構築サービス v2 — keyaki development</title>
+<style>
+/* ──────────────────────────────────────────────────────
+   Design Tokens  (portal / portfolio Warm Minimalist)
+────────────────────────────────────────────────────── */
+:root {
+  --bg:          #F8F5F1;
+  --bg-card:     #FDFAF7;
+  --bg-muted:    #F2EDE8;
+  --fg:          #2C2C2C;
+  --fg-muted:    #6B6560;
+  --border:      #E5DDD6;
+  --accent:      #C45E3E;
+  --accent-soft: #F5E1D6;
+
+  --green:       #4A7C6F;
+  --green-soft:  #E6F0EE;
+  --yellow:      #8A6A2E;
+  --yellow-soft: #F5EDD6;
+  --blue:        #3A5F8A;
+  --blue-soft:   #DDE8F5;
+  --red:         #9A3030;
+  --red-soft:    #F5DEDE;
+
+  --font-sans:   'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Segoe UI', system-ui, sans-serif;
+  --font-serif:  'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --font-mono:   'Fira Code', 'Geist Mono', monospace;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.deck { width: 100%; height: 100vh; position: relative; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 56px 72px;
+  overflow: hidden;
+}
+.slide.active { display: flex; }
+
+.slide::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+}
+
+#nav {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 14px; z-index: 200;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 40px; padding: 9px 20px;
+  box-shadow: 0 4px 24px rgba(196,94,62,0.06);
+}
+#nav button {
+  background: none; border: none; color: var(--fg-muted);
+  cursor: pointer; font-size: 16px; padding: 4px 10px;
+  border-radius: 20px; transition: all 0.15s; font-family: var(--font-sans);
+}
+#nav button:hover { background: var(--bg-muted); color: var(--fg); }
+#counter { color: var(--fg-muted); font-size: 12px; min-width: 44px; text-align: center; font-family: var(--font-mono); }
+.dot-row { display: flex; gap: 5px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); cursor: pointer; transition: all 0.2s; }
+.dot.active { background: var(--accent); transform: scale(1.4); }
+
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 14px;
+}
+
+h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(36px, 5.5vw, 68px);
+  font-weight: 500; line-height: 1.1; letter-spacing: -0.02em;
+  color: var(--fg);
+}
+h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 3.8vw, 48px);
+  font-weight: 500; line-height: 1.15; letter-spacing: -0.02em;
+  color: var(--fg);
+}
+h3 {
+  font-size: 18px; font-weight: 600;
+  color: var(--fg); line-height: 1.3;
+}
+.sub {
+  font-size: clamp(14px, 1.6vw, 17px);
+  color: var(--fg-muted); line-height: 1.75; margin-top: 14px;
+}
+.accent-text { color: var(--accent); }
+.muted      { color: var(--fg-muted); }
+.center     { text-align: center; }
+.full       { width: 100%; }
+
+.row   { display: flex; gap: 24px; width: 100%; }
+.col   { flex: 1; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; width: 100%; }
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px;
+}
+.card-sm {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 18px;
+}
+
+.stat-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px 24px; text-align: center;
+}
+.stat-num {
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 4.5vw, 52px);
+  font-weight: 500; line-height: 1;
+  color: var(--accent);
+}
+.stat-label { font-size: 12px; color: var(--fg-muted); margin-top: 7px; letter-spacing: 0.5px; }
+
+.tag {
+  display: inline-block; padding: 3px 11px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+  background: var(--accent-soft); color: var(--accent);
+  border: 1px solid var(--border);
+}
+.tag.green  { background: var(--green-soft);  color: var(--green);  }
+.tag.yellow { background: var(--yellow-soft); color: var(--yellow); }
+.tag.blue   { background: var(--blue-soft);   color: var(--blue);   }
+
+.feature-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.feature-list li {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14px; color: var(--fg-muted); line-height: 1.6;
+}
+.feature-list li::before {
+  content: '—'; color: var(--accent); font-weight: 700; flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.divider {
+  width: 40px; height: 2px;
+  background: var(--accent); border-radius: 1px;
+  margin: 18px 0;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  text-align: left; padding: 10px 14px;
+  color: var(--fg-muted); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-muted);
+}
+td { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--accent-soft); }
+
+blockquote {
+  border-left: 2px solid var(--accent);
+  padding: 8px 20px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(16px, 2vw, 22px);
+  color: var(--fg-muted);
+  line-height: 1.7;
+}
+
+.slide-title-bg::before {
+  content: '';
+  position: absolute; top: -120px; right: -120px;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,94,62,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.slide.active .anim {
+  animation: fadeInUp 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.d1 { animation-delay: 0.05s !important; }
+.d2 { animation-delay: 0.10s !important; }
+.d3 { animation-delay: 0.15s !important; }
+.d4 { animation-delay: 0.20s !important; }
+.d5 { animation-delay: 0.25s !important; }
+
+/* role diagram */
+.role-diagram {
+  display: flex; flex-direction: column; gap: 10px; width: 100%;
+}
+.role-row {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 20px;
+}
+.role-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.role-icon.coder  { background: var(--accent-soft); }
+.role-icon.review { background: var(--green-soft); }
+.role-icon.admin  { background: var(--blue-soft); }
+.role-body { flex: 1; }
+.role-title { font-size: 14px; font-weight: 600; color: var(--fg); }
+.role-desc  { font-size: 12px; color: var(--fg-muted); margin-top: 2px; }
+.role-badge { flex-shrink: 0; }
+
+/* ──────────────────────────────────────────────────────
+   Mobile Responsive
+────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .slide { padding: 32px 20px 72px; }
+  .grid-3 { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row { flex-direction: column; gap: 14px; }
+  h3 { font-size: 15px; }
+  #nav { padding: 7px 14px; gap: 10px; bottom: 16px; }
+  .card { padding: 16px; }
+  .card-sm { padding: 10px 14px; }
+  .feature-list li { font-size: 13px; }
+  table { font-size: 12px; }
+  th, td { padding: 8px 10px; }
+}
+@media (max-width: 400px) {
+  .slide { padding: 24px 16px 72px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide.active .anim { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 01 タイトル -->
+  <div class="slide slide-title-bg active">
+    <div class="center" style="max-width: 700px;">
+      <div class="mono-label anim">keyaki development — 2026年6月 / Ver.2</div>
+      <h1 class="anim d1">
+        AI開発組織を<br><span class="accent-text">丸ごと構築</span>して渡す
+      </h1>
+      <p class="sub anim d2">
+        アイデアと経営力はある。開発リソースだけが足りない。<br>
+        そのギャップを、実証済みのAI組織アーキテクチャで埋めます。
+      </p>
+      <div style="margin-top: 32px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;" class="anim d3">
+        <span class="tag">スタートアップ向け</span>
+        <span class="tag green">ターンキー提供</span>
+        <span class="tag blue">実証済み構成</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 セクション：こんな課題ありませんか -->
+  <div class="slide">
+    <div class="center" style="max-width: 560px;">
+      <div class="mono-label anim">Section 01</div>
+      <h2 class="anim d1">こんな<span class="accent-text">課題</span>はありませんか</h2>
+      <div class="divider anim d2" style="margin: 18px auto;"></div>
+      <p class="sub anim d3">アイデアはある。でも開発チームを作るのが難しい。</p>
+    </div>
+  </div>
+
+  <!-- 03 課題 -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">The Problem</div>
+      <h2 class="anim d1">「作りたいが、<span class="accent-text">作れない</span>」</h2>
+      <div class="grid-2" style="margin-top: 28px; align-items: start;">
+        <div class="card anim d2" style="border-left: 3px solid var(--accent);">
+          <h3 style="margin-bottom: 14px; color: var(--accent);">持っているもの</h3>
+          <ul class="feature-list">
+            <li>プロダクトのアイデア・ビジョン</li>
+            <li>資金・投資の目処</li>
+            <li>事業運営・営業の力</li>
+          </ul>
+        </div>
+        <div class="card anim d3" style="border-left: 3px solid var(--fg-muted);">
+          <h3 style="margin-bottom: 14px; color: var(--fg-muted);">足りないもの</h3>
+          <ul class="feature-list">
+            <li>開発エンジニアのリソース</li>
+            <li>採用コスト・時間</li>
+            <li>AI開発環境の構築ノウハウ</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sm anim d4" style="margin-top: 18px;">
+        <span style="color: var(--accent); font-weight: 600;">ポイント：</span>
+        <span class="muted" style="font-size: 14px;">エンジニアがいなくても、AIエージェントが動く開発組織を持てる時代が来ています。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 セクション：サービス概要 -->
+  <div class="slide">
+    <div class="center" style="max-width: 560px;">
+      <div class="mono-label anim">Section 02</div>
+      <h2 class="anim d1">サービス<span class="accent-text">概要</span></h2>
+      <div class="divider anim d2" style="margin: 18px auto;"></div>
+      <p class="sub anim d3">何を、どのように提供するか。</p>
+    </div>
+  </div>
+
+  <!-- 05 提供価値（一言） -->
+  <div class="slide">
+    <div class="full" style="max-width: 760px;">
+      <div class="mono-label anim">Core Value</div>
+      <blockquote class="anim d1">
+        AIエージェントで構成された開発組織を、<br>
+        すぐ動く状態で丸ごと渡す。
+      </blockquote>
+      <div class="divider anim d2"></div>
+      <ul class="feature-list anim d3">
+        <li>お客様は受け取るだけ。環境構築・設定は一切不要</li>
+        <li>翌日から「AI開発チーム」を持つ状態でスタートできる</li>
+        <li>テンプレートベースのため品質が安定しており、属人化しない</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 06 AI組織のアーキテクチャ -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Architecture</div>
+      <h2 class="anim d1">サーバーが<span class="accent-text">オフィス</span>、エージェントが<span class="accent-text">社員</span></h2>
+      <div style="margin-top: 24px;" class="anim d2">
+        <div class="card-sm" style="margin-bottom: 12px; background: var(--bg-muted); text-align: center; font-size: 13px; color: var(--fg-muted);">
+          GCE サーバー（共有オフィス）　｜　Slack で全社員と会話
+        </div>
+        <div class="role-diagram">
+          <div class="role-row anim d3">
+            <div class="role-icon coder">💻</div>
+            <div class="role-body">
+              <div class="role-title">コーディング担当</div>
+              <div class="role-desc">実装・PR作成・コードレビューなどの開発コア業務を担当</div>
+            </div>
+            <div class="role-badge"><span class="tag">Claude Code</span></div>
+          </div>
+          <div class="role-row anim d4">
+            <div class="role-icon review">🔍</div>
+            <div class="role-body">
+              <div class="role-title">レビュー・QA担当</div>
+              <div class="role-desc">コードレビュー・テスト確認・ドキュメント整備などの中程度タスク</div>
+            </div>
+            <div class="role-badge"><span class="tag green">ローカルLLM</span></div>
+          </div>
+          <div class="role-row anim d5">
+            <div class="role-icon admin">📋</div>
+            <div class="role-body">
+              <div class="role-title">雑務・管理担当</div>
+              <div class="role-desc">タスク整理・進捗確認・Slack報告など軽量な定型業務</div>
+            </div>
+            <div class="role-badge"><span class="tag blue">ローカルLLM</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 コスト最適化 -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Cost Design</div>
+      <h2 class="anim d1">役割に応じた<span class="accent-text">コスト設計</span></h2>
+      <div class="grid-2" style="margin-top: 28px; align-items: start;">
+        <div class="card anim d2">
+          <h3 style="margin-bottom: 14px;">重要タスク → 高性能モデル</h3>
+          <ul class="feature-list">
+            <li>Claude Code は実装担当のみに絞って使用</li>
+            <li>品質と速度が必要な作業に集中投資</li>
+            <li>アウトプットの品質を担保</li>
+          </ul>
+        </div>
+        <div class="card anim d3">
+          <h3 style="margin-bottom: 14px;">軽量タスク → ローカルLLM</h3>
+          <ul class="feature-list">
+            <li>レビュー・雑務はローカルモデルで代替</li>
+            <li>APIコストをゼロに抑える</li>
+            <li>24時間稼働してもランニングコストが低い</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sm anim d4" style="margin-top: 18px;">
+        <span style="color: var(--accent); font-weight: 600;">設計思想：</span>
+        <span class="muted" style="font-size: 14px;">「誰でもAIを使える」ではなく「最小コストで最大成果を出す組織設計」を提供します。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 提供フロー -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Delivery Flow</div>
+      <h2 class="anim d1">3ステップで<span class="accent-text">引き渡し</span>まで</h2>
+      <div class="grid-3" style="margin-top: 28px;">
+        <div class="card anim d2">
+          <div style="font-family: var(--font-mono); font-size: 28px; font-weight: 700; color: var(--accent); margin-bottom: 10px;">01</div>
+          <h3 style="margin-bottom: 12px;">ヒアリング・設計</h3>
+          <ul class="feature-list">
+            <li>事業内容・開発ニーズのヒアリング</li>
+            <li>AI社員の構成・役割を設計</li>
+            <li>カスタマイズ範囲の確定</li>
+          </ul>
+        </div>
+        <div class="card anim d3">
+          <div style="font-family: var(--font-mono); font-size: 28px; font-weight: 700; color: var(--accent); margin-bottom: 10px;">02</div>
+          <h3 style="margin-bottom: 12px;">構築・セットアップ</h3>
+          <ul class="feature-list">
+            <li>GCEサーバー立ち上げ</li>
+            <li>エージェント配置・Slack連携</li>
+            <li>Terraformで一括デプロイ</li>
+          </ul>
+        </div>
+        <div class="card anim d4">
+          <div style="font-family: var(--font-mono); font-size: 28px; font-weight: 700; color: var(--accent); margin-bottom: 10px;">03</div>
+          <h3 style="margin-bottom: 12px;">引き渡し・レクチャー</h3>
+          <ul class="feature-list">
+            <li>操作マニュアル納品</li>
+            <li>オンボーディングセッション</li>
+            <li>翌日から自走できる状態へ</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 09 セクション：差別化 -->
+  <div class="slide">
+    <div class="center" style="max-width: 560px;">
+      <div class="mono-label anim">Section 03</div>
+      <h2 class="anim d1">なぜ<span class="accent-text">私たちか</span></h2>
+      <div class="divider anim d2" style="margin: 18px auto;"></div>
+      <p class="sub anim d3">同じことをやっている人はいない。その理由。</p>
+    </div>
+  </div>
+
+  <!-- 10 競合との比較 -->
+  <div class="slide">
+    <div class="full" style="max-width: 900px;">
+      <div class="mono-label anim">Differentiation</div>
+      <h2 class="anim d1">「組織として動く」が<span class="accent-text">違い</span></h2>
+      <div class="card anim d2" style="margin-top: 24px; padding: 0; overflow: hidden;">
+        <table>
+          <thead>
+            <tr>
+              <th>比較軸</th>
+              <th>一般的なAI活用</th>
+              <th>本サービス</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>動作環境</strong></td>
+              <td>個人PCのローカル</td>
+              <td><span class="tag green">クラウドサーバー（24時間稼働）</span></td>
+            </tr>
+            <tr>
+              <td><strong>コミュニケーション</strong></td>
+              <td>ターミナルやチャットUIで操作</td>
+              <td><span class="tag green">Slack連携（既存ワークフローに統合）</span></td>
+            </tr>
+            <tr>
+              <td><strong>体制</strong></td>
+              <td>AIを1人で使う</td>
+              <td><span class="tag green">役割分担した複数エージェントの組織</span></td>
+            </tr>
+            <tr>
+              <td><strong>導入負荷</strong></td>
+              <td>自分で設定・運用が必要</td>
+              <td><span class="tag green">完成品を渡す、翌日から使える</span></td>
+            </tr>
+            <tr>
+              <td><strong>実績</strong></td>
+              <td>PoC・試験運用レベル</td>
+              <td><span class="tag green">実際に稼働中の構成を提供</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11 実証済みの強み -->
+  <div class="slide">
+    <div class="full" style="max-width: 760px;">
+      <div class="mono-label anim">Proof of Concept</div>
+      <blockquote class="anim d1">
+        このサービス自体が、すでに動いている。
+      </blockquote>
+      <div class="divider anim d2"></div>
+      <ul class="feature-list anim d3">
+        <li>提供者自身がGCE + Claude Code + Slack連携の構成を日常運用中</li>
+        <li>単なる提案ではなく、実稼働アーキテクチャをそのまま展開</li>
+        <li>設計の正解・失敗パターンの両方を知っている</li>
+        <li>Terraformによる再現性担保で、提供品質のばらつきがない</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 12 セクション：自律稼働 -->
+  <div class="slide">
+    <div class="center" style="max-width: 560px;">
+      <div class="mono-label anim">Section 04</div>
+      <h2 class="anim d1"><span class="accent-text">24時間</span>自律稼働</h2>
+      <div class="divider anim d2" style="margin: 18px auto;"></div>
+      <p class="sub anim d3">AIチームは、指示がなくても動き続ける。</p>
+    </div>
+  </div>
+
+  <!-- 13 セッション常駐型アーキテクチャ -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Always-On Architecture</div>
+      <h2 class="anim d1">セッションが<span class="accent-text">サーバーに常駐</span>する</h2>
+      <p class="sub anim d2" style="margin-bottom: 24px;">一般的なAIは「呼んだら答える」だけ。このシステムは違います。</p>
+      <div class="grid-2" style="align-items: start;">
+        <div class="card anim d3" style="border-left: 3px solid var(--fg-muted);">
+          <h3 style="margin-bottom: 12px; color: var(--fg-muted);">一般的なAI活用</h3>
+          <ul class="feature-list">
+            <li>人が画面を開いて話しかけた時だけ動く</li>
+            <li>会話が終わればコンテキストは消える</li>
+            <li>翌日は「はじめまして」から再スタート</li>
+          </ul>
+        </div>
+        <div class="card anim d4" style="border-left: 3px solid var(--accent);">
+          <h3 style="margin-bottom: 12px; color: var(--accent);">本サービスの構成</h3>
+          <ul class="feature-list">
+            <li>エージェントのセッションがサーバー上で常時稼働</li>
+            <li>作業が一段落したらSlackを確認・報告</li>
+            <li>コンテキストを保持したまま継続して作業</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sm anim d5" style="margin-top: 18px; background: var(--bg-muted);">
+        <span style="font-family: var(--font-mono); font-size: 12px; color: var(--fg-muted);">
+          技術基盤: tmux（セッション常駐）+ systemd（自動起動）+ Slack連携
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14 段階的自律化ロードマップ -->
+  <div class="slide">
+    <div class="full" style="max-width: 900px;">
+      <div class="mono-label anim">Autonomy Roadmap</div>
+      <h2 class="anim d1">段階的に<span class="accent-text">自律度を高める</span></h2>
+      <div class="grid-3" style="margin-top: 28px;">
+        <div class="card anim d2" style="border-top: 3px solid var(--blue);">
+          <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--blue); margin-bottom: 10px;">Phase 1</div>
+          <h3 style="margin-bottom: 8px;">常駐 + 朝の指示</h3>
+          <div class="muted" style="font-size: 12px; margin-bottom: 12px;">導入直後から実現</div>
+          <ul class="feature-list">
+            <li>セッションをサーバーに常駐（SSH切断後も継続）</li>
+            <li>オーナーが朝に当日の方針を伝える</li>
+            <li>日中は自律的に作業・完了後にSlack報告</li>
+          </ul>
+        </div>
+        <div class="card anim d3" style="border-top: 3px solid var(--accent);">
+          <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 10px;">Phase 2</div>
+          <h3 style="margin-bottom: 8px;">起動の自動化</h3>
+          <div class="muted" style="font-size: 12px; margin-bottom: 12px;">スクリプト整備で対応</div>
+          <ul class="feature-list">
+            <li>起動時に「今日の指示書」を自動で読み込んで始動</li>
+            <li>オーナーの朝の作業が不要になる</li>
+            <li>セッションリセット時も自動で引き継ぎ</li>
+          </ul>
+        </div>
+        <div class="card anim d4" style="border-top: 3px solid var(--green);">
+          <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--green); margin-bottom: 10px;">Phase 3</div>
+          <h3 style="margin-bottom: 8px;">完全自律稼働</h3>
+          <div class="muted" style="font-size: 12px; margin-bottom: 12px;">systemdで自動管理</div>
+          <ul class="feature-list">
+            <li>VM再起動でもセッションが自動復旧</li>
+            <li>24時間・365日、人手なしで稼働</li>
+            <li>Slackを受信口に、必要時のみ人が介入</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 15 セクション：料金 -->
+  <div class="slide">
+    <div class="center" style="max-width: 560px;">
+      <div class="mono-label anim">Section 05</div>
+      <h2 class="anim d1">料金<span class="accent-text">プラン</span></h2>
+      <div class="divider anim d2" style="margin: 18px auto;"></div>
+      <p class="sub anim d3">初期費用と運用サポートの2段構成。</p>
+    </div>
+  </div>
+
+  <!-- 13 料金プラン -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Pricing</div>
+      <h2 class="anim d1">シンプルな<span class="accent-text">2プラン</span></h2>
+      <div class="grid-2" style="margin-top: 28px; align-items: start;">
+        <div class="card anim d2" style="border-top: 3px solid var(--accent);">
+          <div class="mono-label" style="margin-bottom: 8px;">Standard</div>
+          <div class="stat-num" style="font-size: 36px; margin-bottom: 4px;">¥20〜30万</div>
+          <div class="muted" style="font-size: 12px; margin-bottom: 18px;">ヒアリング〜引き渡しまで一括</div>
+          <ul class="feature-list">
+            <li>ニーズヒアリング・組織設計</li>
+            <li>GCEサーバー構築・エージェント配置</li>
+            <li>Slack連携・Terraform一括デプロイ</li>
+            <li>操作マニュアル納品</li>
+            <li>オンボーディングセッション（1回）</li>
+          </ul>
+        </div>
+        <div class="card anim d3" style="border-top: 3px solid var(--green);">
+          <div class="mono-label" style="margin-bottom: 8px; color: var(--green);">Custom</div>
+          <div class="stat-num" style="font-size: 36px; margin-bottom: 4px; color: var(--green);">要相談</div>
+          <div class="muted" style="font-size: 12px; margin-bottom: 18px;">カスタマイズ度合いに応じて算出</div>
+          <ul class="feature-list">
+            <li>Standardの全内容</li>
+            <li>業種・業務特化のエージェント追加</li>
+            <li>独自ツール・API連携</li>
+            <li>月次伴走サポート（オプション）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sm anim d4" style="margin-top: 18px;">
+        <span class="muted" style="font-size: 13px;">※ 料金は競合調査・市場フィードバックを踏まえて今後調整予定。現時点は参考値。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14 クロージング -->
+  <div class="slide slide-title-bg">
+    <div class="full" style="max-width: 760px; text-align: center;">
+      <div class="mono-label anim">Get Started</div>
+      <h2 class="anim d1">まず、<span class="accent-text">話を聞かせてください。</span></h2>
+      <p class="sub anim d2">
+        どんな事業を作りたいか、どんな開発組織が必要か。<br>
+        ヒアリングから始めます。
+      </p>
+      <div class="grid-2" style="margin-top: 32px;">
+        <div class="stat-box anim d3">
+          <div class="stat-num">1日</div>
+          <div class="stat-label">構築〜引き渡しの目安期間<br>（標準テンプレート使用時）</div>
+        </div>
+        <div class="stat-box anim d4">
+          <div class="stat-num">0</div>
+          <div class="stat-label">お客様の初期作業量<br>受け取るだけでOK</div>
+        </div>
+      </div>
+      <div class="card-sm anim d5" style="margin-top: 20px; text-align: left;">
+        <span style="font-size: 13px; color: var(--fg-muted);">contact@keyaki-dev.com</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<div id="nav">
+  <button onclick="prev()" title="前へ">←</button>
+  <div class="dot-row" id="dots"></div>
+  <span id="counter">1 / 1</span>
+  <button onclick="next()" title="次へ">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+  const dotsEl    = document.getElementById('dots');
+  const counterEl = document.getElementById('counter');
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => go(i);
+    dotsEl.appendChild(d);
+  });
+  counterEl.textContent = '1 / ' + slides.length;
+
+  function go(n) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    counterEl.textContent = (cur + 1) + ' / ' + slides.length;
+  }
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+
+  let ts = 0;
+  document.addEventListener('touchstart', e => { ts = e.touches[0].clientX; });
+  document.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - ts;
+    if (Math.abs(dx) > 50) dx < 0 ? next() : prev();
+  });
+</script>
+</body>
+</html>
