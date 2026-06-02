@@ -1,5 +1,5 @@
 ---
-created: 2026-06-04
+created: 2026-06-10
 flags:
   - 1_draft
 blog_tag:
