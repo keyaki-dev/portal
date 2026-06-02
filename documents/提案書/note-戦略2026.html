@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>note 運営戦略 2026 — keyaki</title>
+<style>
+:root {
+  --bg:          #F8F5F1;
+  --bg-card:     #FDFAF7;
+  --bg-muted:    #F2EDE8;
+  --fg:          #2C2C2C;
+  --fg-muted:    #6B6560;
+  --border:      #E5DDD6;
+  --accent:      #C45E3E;
+  --accent-soft: #F5E1D6;
+  --green:       #4A7C6F;
+  --green-soft:  #E6F0EE;
+  --yellow:      #8A6A2E;
+  --yellow-soft: #F5EDD6;
+  --blue:        #3A5F8A;
+  --blue-soft:   #DDE8F5;
+  --red:         #9A3030;
+  --red-soft:    #F5DEDE;
+  --font-sans:   'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Segoe UI', system-ui, sans-serif;
+  --font-serif:  'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --font-mono:   'Fira Code', 'Geist Mono', monospace;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+.deck { width: 100%; height: 100vh; position: relative; }
+.slide {
+  position: absolute; inset: 0;
+  display: none; flex-direction: column;
+  justify-content: center; align-items: center;
+  padding: 50px 68px; overflow: hidden;
+}
+.slide.active { display: flex; }
+.slide::after {
+  content: ''; position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.025; pointer-events: none;
+}
+#nav {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 14px; z-index: 200;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 40px; padding: 9px 20px;
+  box-shadow: 0 4px 24px rgba(196,94,62,0.06);
+}
+#nav button {
+  background: none; border: none; color: var(--fg-muted);
+  cursor: pointer; font-size: 16px; padding: 4px 10px;
+  border-radius: 20px; transition: all 0.15s;
+}
+#nav button:hover { background: var(--bg-muted); color: var(--fg); }
+#counter { color: var(--fg-muted); font-size: 12px; min-width: 44px; text-align: center; font-family: var(--font-mono); }
+.dot-row { display: flex; gap: 5px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); cursor: pointer; transition: all 0.2s; }
+.dot.active { background: var(--accent); transform: scale(1.4); }
+
+.mono-label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+h1 { font-family: var(--font-serif); font-size: clamp(34px, 5vw, 62px); font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; }
+h2 { font-family: var(--font-serif); font-size: clamp(24px, 3.5vw, 44px); font-weight: 500; line-height: 1.15; letter-spacing: -0.02em; }
+h3 { font-size: 16px; font-weight: 600; line-height: 1.3; }
+.sub { font-size: clamp(13px, 1.5vw, 16px); color: var(--fg-muted); line-height: 1.75; margin-top: 14px; }
+.accent-text { color: var(--accent); }
+.green-text  { color: var(--green); }
+.blue-text   { color: var(--blue); }
+.muted       { color: var(--fg-muted); }
+.center      { text-align: center; }
+.full        { width: 100%; }
+
+.row   { display: flex; gap: 20px; width: 100%; }
+.col   { flex: 1; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; width: 100%; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; width: 100%; }
+.grid-5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; width: 100%; }
+
+.card    { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
+.card-sm { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+.card-accent { background: var(--accent-soft); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+
+.stat-box  { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; }
+.stat-num  { font-family: var(--font-serif); font-size: clamp(28px, 4vw, 48px); font-weight: 500; line-height: 1; color: var(--accent); }
+.stat-label { font-size: 11px; color: var(--fg-muted); margin-top: 6px; }
+
+.tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--border); }
+.tag.green  { background: var(--green-soft);  color: var(--green); }
+.tag.yellow { background: var(--yellow-soft); color: var(--yellow); }
+.tag.blue   { background: var(--blue-soft);   color: var(--blue); }
+.tag.red    { background: var(--red-soft);     color: var(--red); }
+
+.fl { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.fl li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--fg-muted); line-height: 1.6; }
+.fl li::before { content: '—'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+
+.divider { width: 40px; height: 2px; background: var(--accent); border-radius: 1px; margin: 16px 0; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { text-align: left; padding: 9px 12px; color: var(--fg-muted); font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--bg-muted); }
+td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--accent-soft); }
+
+.day-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.day-label { font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+.day-type  { font-size: 11px; font-weight: 600; color: var(--fg-muted); margin-bottom: 4px; }
+.day-example { font-size: 11px; color: var(--fg-muted); line-height: 1.5; }
+
+.pattern-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.bar-track   { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.bar-fill    { height: 100%; border-radius: 3px; background: var(--accent); }
+.bar-pct     { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--accent); min-width: 38px; text-align: right; }
+
+.slide-title-bg::before {
+  content: ''; position: absolute; top: -120px; right: -120px;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,94,62,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.slide.active .anim { animation: fadeInUp 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.d1{animation-delay:0.05s!important}.d2{animation-delay:0.10s!important}
+.d3{animation-delay:0.15s!important}.d4{animation-delay:0.20s!important}
+.d5{animation-delay:0.25s!important}.d6{animation-delay:0.30s!important}
+
+@media (max-width: 640px) {
+  .slide { padding: 28px 18px 68px; }
+  .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row { flex-direction: column; gap: 12px; }
+  #nav { padding: 6px 12px; gap: 8px; }
+}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- ── 01 Title ─────────────────────────────── -->
+<div class="slide slide-title-bg active">
+  <div class="center" style="max-width:700px;">
+    <div class="mono-label anim">keyaki — Marketing / 2026.06.02</div>
+    <h1 class="anim d1">
+      note<span class="accent-text">運営戦略</span><br>2026
+    </h1>
+    <p class="sub anim d2">
+      39記事・約4ヶ月の運営データを踏まえ、<br>
+      週5本体制への移行と製品 GTM への接続を設計する。
+    </p>
+    <div style="margin-top:28px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" class="anim d3">
+      <span class="tag">コンテンツ戦略</span>
+      <span class="tag green">週5本設計</span>
+      <span class="tag blue">Focus for ADHD 連動</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── 02 現状KPI ──────────────────────────── -->
+<div class="slide">
+  <div class="full" style="max-width:880px;">
+    <div class="mono-label anim">Current State — as of 2026.06</div>
+    <h2 class="anim d1">4ヶ月の<span class="accent-text">実績</span></h2>
+    <div class="grid-4" style="margin-top:24px;">
+      <div class="stat-box anim d2">
+        <div class="stat-num">39</div>
+        <div class="stat-label">総記事数<br>Feb〜Jun</div>
+      </div>
+      <div class="stat-box anim d3">
+        <div class="stat-num">2,332</div>
+        <div class="stat-label">累計ビュー<br>（3/27時点）</div>
+      </div>
+      <div class="stat-box anim d4">
+        <div class="stat-num">109</div>
+        <div class="stat-label">累計スキ<br>（3/27時点）</div>
+      </div>
+      <div class="stat-box anim d5">
+        <div class="stat-num">4.7%</div>
+        <div class="stat-label">平均スキ率<br>（3/27時点）</div>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:14px;">
+      <div class="card-sm anim d5">
+        <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:4px;">トップ記事</div>
+        <div style="font-size:12px;">Obsidian最強の理由<br><span class="muted">649ビュー / スキ37 / 5.7%</span></div>
+      </div>
+      <div class="card-sm anim d5">
+        <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:4px;">スキ率最高</div>
+        <div style="font-size:12px;">AIで「作る」はじめの一歩<br><span class="muted">57ビュー / スキ12 / 21.1%</span></div>
+      </div>
+      <div class="card-sm anim d5">
+        <div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:4px;">最新投稿</div>
+        <div style="font-size:12px;">OpenCodeという選択肢<br><span class="muted">2026-06-01</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 03 課題と転換 ───────────────────────── -->
+<div class="slide">
+  <div class="full" style="max-width:880px;">
+    <div class="mono-label anim">Problem &amp; Pivot</div>
+    <h2 class="anim d1">失速の<span class="accent-text">原因</span>と方針転換</h2>
+    <div class="row" style="margin-top:24px;align-items:flex-start;">
+      <div class="col anim d2">
+        <div class="card" style="border-left:3px solid var(--red);height:100%;">
+          <h3 style="color:var(--red);margin-bottom:12px;">4〜5月の失速</h3>
+          <ul class="fl">
+            <li>Claude Code シリーズ（#1〜6）・Gemini CLI 記事が中心</li>
+            <li>スキ数 1〜4 と低迷。エンジニア向けチュートリアルは「検索で来て終わり」</li>
+            <li>「やってみた→すごかった」止まりで共感が生まれない</li>
+            <li>ターゲットが「エンジニア」に偏り、製品ユーザー候補に届いていない</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col anim d3">
+        <div class="card" style="border-left:3px solid var(--green);height:100%;">
+          <h3 style="color:var(--green);margin-bottom:12px;">方針転換（2026-05-25〜）</h3>
+          <ul class="fl">
+            <li><strong>旧目標：</strong>PV・スキを増やす</li>
+            <li><strong>新目標：</strong>個人開発アプリの将来ユーザーを集め、定着させる</li>
+            <li>エンジニア専用コンテンツを減らし、非エンジニア向け体験記を軸にする</li>
+            <li>Focus for ADHD の GTM と note を連動させる</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 04 ターゲット読者 ───────────────────── -->
+<div class="slide">
+  <div class="full" style="max-width:880px;">
+    <div class="mono-label anim">Target Audience</div>
+    <h2 class="anim d1">届けたい<span class="accent-text">読者</span></h2>
+    <div class="grid-3" style="margin-top:24px;">
+      <div class="card anim d2">
+        <div style="font-size:22px;margin-bottom:10px;">🏢</div>
+        <h3 style="margin-bottom:10px;">非エンジニアの<br>ナレッジワーカー</h3>
+        <ul class="fl">
+          <li>AI・生産性ツールに興味があるが技術ハードルを感じる</li>
+          <li>不動産・医療・教育などの非IT業種</li>
+          <li>「自分ごと」の話に共感しやすい</li>
+        </ul>
+      </div>
+      <div class="card anim d3">
+        <div style="font-size:22px;margin-bottom:10px;">🧠</div>
+        <h3 style="margin-bottom:10px;">ADHD/グレーゾーンの<br>20〜35歳</h3>
+        <ul class="fl">
+          <li>集中・タスク管理に悩みを抱える</li>
+          <li>既存ツールでは解決できないと感じている</li>
+          <li>Focus for ADHD の直接的な将来ユーザー</li>
+        </ul>
+      </div>
+      <div class="card anim d4">
+        <div style="font-size:22px;margin-bottom:10px;">🛠️</div>
+        <h3 style="margin-bottom:10px;">アプリ自給自足に<br>関心のある人</h3>
+        <ul class="fl">
+          <li>「自分で使いたいものを自分で作る」時代に共鳴</li>
+          <li>開発の裏側・動機の話を好む</li>
+          <li>Building in Public の読者として定着する</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-sm anim d5" style="margin-top:14px;">
+      <span style="color:var(--accent);font-weight:600;">共通点：</span>
+      <span class="muted" style="font-size:13px;">「成功体験」より「葛藤・正直さ・等身大のリアル」に共感する読者。スキ率の高い記事は全てこのパターン。</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── 05 コンテンツ3役割 ─────────────────── -->
+<div class="slide">
+  <div class="full" style="max-width:880px;">
+    <div class="mono-label anim">Content Framework</div>
+    <h2 class="anim d1">コンテンツの<span class="accent-text">3役割</span></h2>
+    <div class="grid-3" style="margin-top:22px;">
+      <div class="card anim d2" style="border-top:3px solid var(--accent);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <h3>役割 A — 集客</h3>
+          <span class="tag">50%</span>
+        </div>
+        <ul class="fl">
+          <li>読者の母数を増やす</li>
+          <li>Obsidianシリーズ継続（全体44%のビュー源）</li>
+          <li>「AIが業務をこう変えた」体験談</li>
+          <li>週刊ニュースまとめ（所感強化版）</li>
+          <li>社内DX系：非IT視点のリアル話</li>
+        </ul>
+      </div>
+      <div class="card anim d3" style="border-top:3px solid var(--blue);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <h3>役割 B — 信頼構築</h3>
+          <span class="tag blue">30%</span>
+        </div>
+        <ul class="fl">
+          <li>「このひとのツールを使いたい」と思わせる</li>
+          <li>開発動機・葛藤・限界を正直に語る記事</li>
+          <li>「アプリを自給自足する時代」体験談</li>
+          <li>不動産会社のエンジニアとしての視点</li>
+          <li>Building in Public 開発日誌</li>
+        </ul>
+      </div>
+      <div class="card anim d4" style="border-top:3px solid var(--green);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <h3>役割 C — 製品認知</h3>
+          <span class="tag green">20%</span>
+        </div>
+        <ul class="fl">
+          <li>Focus for ADHD / madolas を直接認知</li>
+          <li>「なぜこれを作ったか」開発経緯</li>
+          <li>実際の使い方・活用シーン紹介</li>
+          <li>アップデート報告・ユーザーの声</li>
+          <li>β公開告知・事前登録CTA</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-sm anim d5" style="margin-top:14px;">
+      <span style="color:var(--fg-muted);font-size:12px;">
+        <strong style="color:var(--fg);">減らすもの：</strong>エンジニア専用CLIツール解説 / チュートリアル止まりの「やってみた」系 / 「すごかった」だけで終わる記事
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ── 06 週5本設計 ─────────────────────────── -->
+<div class="slide">
+  <div class="full" style="max-width:920px;">
+    <div class="mono-label anim">Weekly Schedule — 週5本体制</div>
+    <h2 class="anim d1">曜日別<span class="accent-text">コンテンツ設計</span></h2>
+    <div class="grid-5" style="margin-top:22px;">
+      <div class="day-card anim d2">
+        <div class="day-label" style="color:var(--accent);">月曜</div>
+        <div class="day-type">メイン記事</div>
+        <div style="margin:6px 0;"><span class="tag">役割 B/C</span></div>
+        <div class="day-example">深い体験・Building in Public・開発動機を正直に語る。1,500〜2,500字。週の看板。</div>
+      </div>
+      <div class="day-card anim d3">
+        <div class="day-label" style="color:var(--blue);">水曜</div>
+        <div class="day-type">実用記事</div>
+        <div style="margin:6px 0;"><span class="tag blue">役割 A</span></div>
+        <div class="day-example">Obsidianシリーズ・AIツール・生産性系。看板テーマを絶やさない。1,000〜2,000字。</div>
+      </div>
+      <div class="day-card anim d4">
+        <div class="day-label" style="color:var(--green);">木曜</div>
+        <div class="day-type">クイック記事</div>
+        <div style="margin:6px 0;"><span class="tag green">役割 A/B</span></div>
+        <div class="day-example">短め考察・ランキング・tips系。500〜800字。仕込みコストが低く週5本を支える。</div>
+      </div>
+      <div class="day-card anim d5">
+        <div class="day-label" style="color:var(--yellow);">金曜</div>
+        <div class="day-type">雑談・考察</div>
+        <div style="margin:6px 0;"><span class="tag yellow">役割 A/B</span></div>
+        <div class="day-example">感情×共感系。「AIには敬語を使うべきか？」型。スキ率が上がりやすいフォーマット。</div>
+      </div>
+      <div class="day-card anim d6">
+        <div class="day-label" style="color:var(--fg-muted);">土曜</div>
+        <div class="day-type">週刊ニュース</div>
+        <div style="margin:6px 0;"><span class="tag">役割 A</span></div>
+        <div class="day-example">生成AIニュースまとめ。各トピックに「不動産エンジニア視点の所感」を必ず添える。</div>
+      </div>
+    </div>
+    <div class="card-sm anim d6" style="margin-top:14px;">
+      <span style="color:var(--accent);font-weight:600;">運用ルール：</span>
+      <span class="muted" style="font-size:12px;">月・水が核心。木・金は短くていい。土は定番フォーマットで省エネ化。週2本でも「月+土」だけは必ず出す。</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── 07 ヒットパターン ───────────────────── -->
+<div class="slide">
+  <div class="full" style="max-width:860px;">
+    <div class="mono-label anim">Evidence-Based Rules</div>
+    <h2 class="anim d1">データが示す<span class="accent-text">ヒットパターン</span></h2>
+    <div class="row" style="margin-top:22px;align-items:flex-start;">
+      <div class="col anim d2" style="flex:1.1;">
+        <div class="card" style="height:100%;">
+          <h3 style="margin-bottom:16px;">スキ率ランキング</h3>
+          <div style="margin-bottom:14px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:6px;">感情 × 共感（「AIで作る初めの一歩」）</div>
+            <div class="pattern-bar"><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--accent);"></div></div><div class="bar-pct">21.1%</div></div>
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:6px;">体験 × 正直な限界評価（GAS DX 限界）</div>
+            <div class="pattern-bar"><div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--blue);"></div></div><div class="bar-pct">14.3%</div></div>
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:6px;">体験 × ツール名（Obsidian最強の理由）</div>
+            <div class="pattern-bar"><div class="bar-track"><div class="bar-fill" style="width:27%;background:var(--green);"></div></div><div class="bar-pct">5.7%</div></div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;margin-bottom:6px;">チュートリアル止まり（Claude Codeシリーズ平均）</div>
+            <div class="pattern-bar"><div class="bar-track"><div class="bar-fill" style="width:10%;background:var(--border);"></div></div><div class="bar-pct" style="color:var(--fg-muted);">2.0%</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="col anim d3">
+        <div class="card" style="height:100%;">
+          <h3 style="margin-bottom:14px;">共通する法則</h3>
+          <ul class="fl">
+            <li><strong>「なぜ作ったか」が刺さる。</strong>動機・葛藤を語ると共感スキに直結する</li>
+            <li><strong>「限界」を語る正直さが武器。</strong>成功だけより「ここがダメだった」がスキ率を上げる</li>
+            <li><strong>「やってみた→すごかった」は弱い。</strong>「→こう思った/困った/気づいた」まで踏み込む</li>
+            <li><strong>Obsidianは最強の看板。</strong>全体ビューの44%を占める。シリーズ化で安定成長</li>
+            <li><strong>週刊ニュースは所感が命。</strong>羅列だけではスキ0。不動産エンジニア視点の一言を必ず</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 08 直近4週コンテンツ計画 ──────────── -->
+<div class="slide">
+  <div class="full" style="max-width:920px;">
+    <div class="mono-label anim">Content Calendar — Jun 2026</div>
+    <h2 class="anim d1">直近4週の<span class="accent-text">コンテンツ計画</span></h2>
+    <div class="card anim d2" style="margin-top:20px;padding:0;overflow:hidden;">
+      <table>
+        <thead>
+          <tr>
+            <th>週</th>
+            <th>月：メイン</th>
+            <th>水：実用</th>
+            <th>木：クイック</th>
+            <th>金：雑談</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>第1週<br><span class="muted">6/2〜</span></strong></td>
+            <td>使いたいものがなかったから作った<br>—madolas開発前夜 <span class="tag">B</span></td>
+            <td>AIと使うObsidian<br>——第二の脳を育てる方法 <span class="tag blue">A</span></td>
+            <td>アプリを自給自足する<br>時代が来ている <span class="tag">B</span></td>
+            <td>ADHDじゃなくても<br>集中アプリが欲しくなる理由 <span class="tag green">C</span></td>
+          </tr>
+          <tr>
+            <td><strong>第2週<br><span class="muted">6/9〜</span></strong></td>
+            <td>非エンジニアの仕事環境を<br>整えてみた｜Obsidian×AI <span class="tag blue">A</span></td>
+            <td>madolas開発で気づいた<br>ローカルノートの真価 <span class="tag green">C</span></td>
+            <td>AIが道具になった日<br>—不動産会社の小さな変化 <span class="tag blue">A</span></td>
+            <td>集中が苦手な私が<br>アプリを作ることにした <span class="tag green">C</span></td>
+          </tr>
+          <tr>
+            <td><strong>第3週<br><span class="muted">6/16〜</span></strong></td>
+            <td>ADHDのための集中アプリを作っている<br>——設計と試行錯誤の話 <span class="tag green">C</span></td>
+            <td>社内DX続編:<br>GASの次にやったこと <span class="tag blue">A</span></td>
+            <td>開発中にぶつかった<br>「集中を邪魔するもの」 <span class="tag">B</span></td>
+            <td>Building in Public<br>始めます <span class="tag">B</span></td>
+          </tr>
+          <tr>
+            <td><strong>第4週<br><span class="muted">6/23〜</span></strong></td>
+            <td>Focus for ADHD<br>—β公開前開発レポート <span class="tag green">C</span></td>
+            <td>Obsidianシリーズ続編<br>プラグイン選定の旅 <span class="tag blue">A</span></td>
+            <td>Claude Code vs Antigravity<br>乗り換えて正直に感じたこと <span class="tag">B</span></td>
+            <td>個人開発者の私が<br>noteを書き続ける理由 <span class="tag">B</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-sm anim d3" style="margin-top:12px;">
+      <span class="muted" style="font-size:11px;">土曜は毎週「週刊AIニュースまとめ（所感強化版）」を固定投稿。記事タイトルは投稿前日に微調整可。</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── 09 Focus for ADHD 連動 ─────────────── -->
+<div class="slide">
+  <div class="full" style="max-width:880px;">
+    <div class="mono-label anim">GTM Integration</div>
+    <h2 class="anim d1">Focus for ADHD との<span class="accent-text">連動設計</span></h2>
+    <div class="row" style="margin-top:22px;align-items:flex-start;">
+      <div class="col anim d2">
+        <div class="card" style="height:100%;">
+          <h3 style="margin-bottom:12px;">note → GTM の流れ</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="card-accent">
+              <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px;">Phase 1（〜PWAリリース前）</div>
+              <div style="font-size:12px;color:var(--fg-muted);">Building in Public 記事で開発過程を公開。「作っている人」として認知を作る。役割B中心。</div>
+            </div>
+            <div class="card-sm" style="border-color:var(--blue);">
+              <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:3px;">Phase 2（PWAリリース時）</div>
+              <div style="font-size:12px;color:var(--fg-muted);">リリース告知記事を投稿。既読者へのCTA（β登録・アプリDL）を配置。役割C全開。</div>
+            </div>
+            <div class="card-sm" style="border-color:var(--green);">
+              <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:3px;">Phase 3（リリース後）</div>
+              <div style="font-size:12px;color:var(--fg-muted);">ユーザー声・改善記録・使い方ガイドを継続投稿。リテンション読者がアプリ定着ユーザーへ。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col anim d3">
+        <div class="card" style="height:100%;">
+          <h3 style="margin-bottom:12px;">X（@keyaki_dev）との連携</h3>
+          <ul class="fl">
+            <li>月・水のメイン記事 → X で告知ツイート（記事リンク＋1行要約）</li>
+            <li>木・金のクイック記事 → X でスレッド展開（note の要約版）</li>
+            <li>Building in Public 記事 → X でリアルタイム進捗を先出しし、詳細はnoteへ誘導</li>
+            <li>週刊ニュース → X で「今週一番気になったニュース」を1ツイートでまとめ、詳細はnoteへ</li>
+          </ul>
+          <div class="card-accent" style="margin-top:14px;">
+            <div style="font-size:12px;color:var(--fg-muted);">
+              <strong style="color:var(--accent);">原則：</strong>X はフック、note は本文。X で興味を持たせて note に流す導線を設計する。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 10 KPI ──────────────────────────────── -->
+<div class="slide">
+  <div class="full" style="max-width:860px;">
+    <div class="mono-label anim">KPIs &amp; Measurement</div>
+    <h2 class="anim d1">計測<span class="accent-text">指標</span>と目標値</h2>
+    <div class="row" style="margin-top:22px;align-items:flex-start;">
+      <div class="col anim d2">
+        <div class="card" style="height:100%;padding:0;overflow:hidden;">
+          <table>
+            <thead>
+              <tr><th>指標</th><th>現状</th><th>目標（月次）</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>投稿本数</strong></td>
+                <td>週1〜2本</td>
+                <td><span class="tag green">週5本</span></td>
+              </tr>
+              <tr>
+                <td><strong>月間ビュー</strong></td>
+                <td>〜400/月</td>
+                <td><span class="tag">+20%/月成長</span></td>
+              </tr>
+              <tr>
+                <td><strong>平均スキ率</strong></td>
+                <td>4.7%</td>
+                <td><span class="tag green">5%以上</span></td>
+              </tr>
+              <tr>
+                <td><strong>新規フォロワー</strong></td>
+                <td>—</td>
+                <td><span class="tag blue">+50人/月</span></td>
+              </tr>
+              <tr>
+                <td><strong>Focus ADHD CTA</strong></td>
+                <td>0（未実装）</td>
+                <td><span class="tag">月20クリック</span></td>
+              </tr>
+              <tr>
+                <td><strong>Building in Public投稿</strong></td>
+                <td>0本</td>
+                <td><span class="tag yellow">月4本以上</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col anim d3">
+        <div class="card" style="height:100%;">
+          <h3 style="margin-bottom:14px;">週次チェック項目</h3>
+          <ul class="fl">
+            <li>その週の記事別スキ率を確認し、5%以上の記事のパターンをメモ</li>
+            <li>Obsidianシリーズの週間ビューが落ちていないか確認</li>
+            <li>週刊ニュースのスキ数をモニタリング（所感の強さと相関を観察）</li>
+            <li>Focus for ADHD 関連記事のCTAクリック数を記録</li>
+          </ul>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+            <h3 style="margin-bottom:10px;">月次チェック項目</h3>
+            <ul class="fl">
+              <li>A/B/C 役割別の比率が計画通りか（目標 5:3:2）</li>
+              <li>スキ率ランキングを更新し、ヒットパターンを追記</li>
+              <li>Focus for ADHD GTM フェーズの進行状況に合わせて C 比率を調整</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 11 週5本実現のための運用 ───────────── -->
+<div class="slide">
+  <div class="full" style="max-width:880px;">
+    <div class="mono-label anim">Operations</div>
+    <h2 class="anim d1">週5本を<span class="accent-text">持続させる</span>仕組み</h2>
+    <div class="grid-2" style="margin-top:22px;">
+      <div class="card anim d2">
+        <h3 style="margin-bottom:12px;">コンテンツバックログ管理</h3>
+        <ul class="fl">
+          <li>常時タイトル案を10本以上ストックする</li>
+          <li>月曜メイン・水曜実用は前週中に草稿を仕込む</li>
+          <li>木・金・土は当日仕込みでも対応できる軽量フォーマットにする</li>
+          <li>投稿できなかった記事はキャンセルせず翌週に繰り越す</li>
+        </ul>
+      </div>
+      <div class="card anim d3">
+        <h3 style="margin-bottom:12px;">クオリティ基準（下げない線）</h3>
+        <ul class="fl">
+          <li>「なぜ書いたか」「何に困ったか」を必ず1段落入れる</li>
+          <li>「やってみた→すごかった」で終わる記事は投稿しない</li>
+          <li>週刊ニュースは各トピックに1〜2行の所感を必ず書く</li>
+          <li>Obsidianシリーズは月1本以上のペースを維持する</li>
+        </ul>
+      </div>
+      <div class="card anim d4">
+        <h3 style="margin-bottom:12px;">週2本最低ラインの設定</h3>
+        <ul class="fl">
+          <li>週5本が難しい週は「月曜メイン＋土曜ニュース」の2本を最低ラインとする</li>
+          <li>週3本なら「月曜＋水曜＋土曜」を選ぶ</li>
+          <li>品質を犠牲にしてまで週5本を守らない</li>
+        </ul>
+      </div>
+      <div class="card anim d5">
+        <h3 style="margin-bottom:12px;">石川の自律運用ルール</h3>
+        <ul class="fl">
+          <li>毎週月曜にその週のタイトル案を確定し、DOCS.md に記録</li>
+          <li>投稿実績は月次で DOCS.md に追記（スキ率・ビューを含む）</li>
+          <li>記事の方向転換が必要な場合は千葉経由で山下に確認</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 12 Closing ──────────────────────────── -->
+<div class="slide slide-title-bg">
+  <div class="full" style="max-width:880px;">
+    <div class="mono-label anim center">Summary &amp; Next Actions</div>
+    <h2 class="anim d1 center">まとめと<span class="accent-text">ネクストアクション</span></h2>
+    <div class="grid-2" style="margin-top:24px;">
+      <div class="card anim d2">
+        <h3 style="color:var(--accent);margin-bottom:12px;">戦略の3本柱</h3>
+        <ul class="fl">
+          <li><strong>ターゲット転換：</strong>エンジニア→非エンジニア・ADHD当事者。届ける相手を決め直す</li>
+          <li><strong>役割設計（A/B/C）：</strong>集客5:信頼3:製品認知2の比率で記事を設計する</li>
+          <li><strong>GTM 連動：</strong>note を Focus for ADHD のユーザー獲得チャネルとして育てる</li>
+        </ul>
+      </div>
+      <div class="card anim d3">
+        <h3 style="color:var(--green);margin-bottom:12px;">今週やること（6/2〜）</h3>
+        <ul class="fl">
+          <li>「使いたいものがなかったから作った——madolas開発前夜」を月曜に投稿</li>
+          <li>週5本コンテンツカレンダーに基づき今週分の草稿を仕込む</li>
+          <li>Building in Public 第1弾の構成を決める（Focus for ADHD 設計の話）</li>
+          <li>X 投稿との導線を記事のCTAとして設定する</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-sm anim d4" style="margin-top:16px;border-color:var(--accent-soft);text-align:center;">
+      <span style="font-family:var(--font-serif);font-style:italic;font-size:15px;color:var(--fg-muted);">
+        「読者が共感するのは成功より葛藤。正直に語ることが、最強のマーケティングになる。」
+      </span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<div id="nav">
+  <button onclick="prev()">←</button>
+  <div class="dot-row" id="dots"></div>
+  <span id="counter">1 / 1</span>
+  <button onclick="next()">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+  const dotsEl    = document.getElementById('dots');
+  const counterEl = document.getElementById('counter');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => go(i);
+    dotsEl.appendChild(d);
+  });
+  counterEl.textContent = '1 / ' + slides.length;
+  function go(n) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    counterEl.textContent = (cur + 1) + ' / ' + slides.length;
+  }
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+  let ts = 0;
+  document.addEventListener('touchstart', e => { ts = e.touches[0].clientX; });
+  document.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - ts;
+    if (Math.abs(dx) > 50) dx < 0 ? next() : prev();
+  });
+</script>
+</body>
+</html>
