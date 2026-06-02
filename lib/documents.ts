@@ -81,7 +81,7 @@ function walkDir(dir: string, base: string = dir): DocMeta[] {
         type,
         folder,
         relativePath,
-        updatedAt: stat.mtime.toISOString().slice(0, 10),
+        updatedAt: new Date(stat.mtime.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16).replace("T", " "),
       });
     }
   }

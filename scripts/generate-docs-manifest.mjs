@@ -62,7 +62,9 @@ for (const { relativePath, fullPath, ext } of files) {
 
   // コンテンツは safeKey で索引付け（ASCII キーなので比較が確実）
   content[safeKey] = raw;
-  index.push({ safeKey, relativePath, slug, title, type, folder, updatedAt: stat.mtime.toISOString().slice(0, 10) });
+  const jst = new Date(stat.mtime.getTime() + 9 * 60 * 60 * 1000);
+  const updatedAt = jst.toISOString().slice(0, 16).replace('T', ' ');
+  index.push({ safeKey, relativePath, slug, title, type, folder, updatedAt });
 }
 
 index.sort((a, b) => {
