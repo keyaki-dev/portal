@@ -214,7 +214,48 @@ tr:hover td { background: var(--accent-soft); }
     </div>
   </div>
 
-  <!-- 03 ディレクトリ全体像 -->
+  <!-- 03 チーム構成 -->
+  <div class="slide">
+    <div class="full" style="max-width: 900px;">
+      <div class="mono-label anim">Team Roster</div>
+      <h2 class="anim d1">4名体制で<span class="accent-text">スタート</span></h2>
+      <div class="card anim d2" style="margin-top: 24px; padding: 0; overflow: hidden;">
+        <table>
+          <thead>
+            <tr><th>名前</th><th>役割</th><th>主な担当業務</th><th>モデル</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>川上</strong></td>
+              <td><span class="tag">エンジニア</span></td>
+              <td>実装・コーディング・PR作成</td>
+              <td><span class="tag blue">Claude Sonnet 4.6</span></td>
+            </tr>
+            <tr>
+              <td><strong>千葉</strong></td>
+              <td><span class="tag green">マネージャー</span></td>
+              <td>オーケストレーション・タスク管理・進捗確認</td>
+              <td><span class="tag blue">Claude Sonnet 4.6</span></td>
+            </tr>
+            <tr>
+              <td><strong>石川</strong></td>
+              <td><span class="tag green">マーケティング</span></td>
+              <td>コンテンツ制作・SNS・Scaffold販促</td>
+              <td><span class="tag blue">Claude Sonnet 4.6</span></td>
+            </tr>
+            <tr>
+              <td><strong>佐藤</strong></td>
+              <td><span class="tag yellow">経理</span></td>
+              <td>帳簿・月次レポート・申告準備</td>
+              <td><span class="tag yellow">ローカルLLM</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 ディレクトリ全体像 -->
   <div class="slide">
     <div class="full" style="max-width: 900px;">
       <div class="mono-label anim">Directory Structure</div>
@@ -225,15 +266,12 @@ tr:hover td { background: var(--accent-soft); }
 │   ├── COMPANY.md    <span class="comment"># 会社方針・Slack設定・報告ルール</span><br>
 │   └── WORKFLOWS.md  <span class="comment"># GitHub フロー・コミット規則</span><br>
 │<br>
-├── <span class="hl">kawakam/</span>          <span class="comment"># 川上（エンジニアリング担当）</span><br>
-│   ├── CLAUDE.md     <span class="comment"># @./AGENTS.md を指す</span><br>
-│   ├── AGENTS.md     <span class="comment"># 川上のペルソナ定義・tick動作</span><br>
-│   └── DOCS.md       <span class="comment"># 川上の外部記憶・作業経緯</span><br>
-│<br>
-└── <span class="hl-blue">keiri/</span>            <span class="comment"># 経理担当（将来追加）</span><br>
-&nbsp;&nbsp;&nbsp;&nbsp;├── CLAUDE.md     <span class="comment"># @./AGENTS.md を指す</span><br>
-&nbsp;&nbsp;&nbsp;&nbsp;├── AGENTS.md     <span class="comment"># 経理ペルソナの定義</span><br>
-&nbsp;&nbsp;&nbsp;&nbsp;└── DOCS.md       <span class="comment"># 経理の外部記憶</span>
+├── <span class="hl">kawakam/</span>          <span class="comment"># 川上（エンジニア）</span><br>
+├── <span class="hl">chiba/</span>            <span class="comment"># 千葉（マネージャー）</span><br>
+├── <span class="hl">ishikawa/</span>         <span class="comment"># 石川（マーケティング）</span><br>
+└── <span class="hl-blue">sato/</span>             <span class="comment"># 佐藤（経理・ローカルLLM）</span><br>
+<br>
+<span class="comment"># 各ディレクトリ共通: CLAUDE.md + AGENTS.md + DOCS.md</span>
       </div>
     </div>
   </div>
@@ -401,18 +439,18 @@ tr:hover td { background: var(--accent-soft); }
         <div class="card anim d2">
           <h3 style="margin-bottom: 14px; color: var(--accent);">確定事項（着手可能）</h3>
           <ul class="feature-list">
-            <li>ディレクトリ構成の設計（Section 01）</li>
-            <li>既存ファイルの <code style="font-family:var(--font-mono);font-size:11px;">kawakam/</code> への移行</li>
-            <li><code style="font-family:var(--font-mono);font-size:11px;">_shared/COMPANY.md</code> の作成・分離</li>
-            <li>Phase 1 の運用開始（tmux + 手動起動）</li>
+            <li>既存 <code style="font-family:var(--font-mono);font-size:11px;">~/agent/</code> を新構成へ移行（kawakam/ 分割）</li>
+            <li><code style="font-family:var(--font-mono);font-size:11px;">_shared/</code> 作成・共通ルール分離</li>
+            <li>千葉・石川・佐藤の AGENTS.md 整備</li>
+            <li>Phase 1 運用開始（tmux + 手動起動）</li>
           </ul>
         </div>
         <div class="card anim d3">
           <h3 style="margin-bottom: 14px; color: var(--blue);">今後の検討事項</h3>
           <ul class="feature-list">
-            <li>経理ペルソナの AGENTS.md 定義</li>
+            <li>佐藤さん用ローカルLLMのセットアップ（モデル・スペック選定）</li>
             <li>Phase 2 用起動スクリプトの設計</li>
-            <li>オーケストレーター層の要否判断</li>
+            <li>千葉さん（マネージャー）の指示フロー設計</li>
             <li>この構成の Scaffold テンプレート化</li>
           </ul>
         </div>
