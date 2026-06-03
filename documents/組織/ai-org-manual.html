@@ -361,14 +361,14 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
         <h3 style="margin-bottom:12px;color:var(--fg-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.06em;">ワークディレクトリ同期（git）</h3>
         <table style="font-size:12px;">
           <tbody>
-            <tr><td><code>git pull</code></td><td style="color:var(--fg-muted);">サーバーの最新を取り込む（作業前に必ず）</td></tr>
-            <tr><td><code>git commit</code></td><td style="color:var(--fg-muted);">ローカルの変更を記録</td></tr>
-            <tr><td><code>git push</code></td><td style="color:var(--fg-muted);">サーバーへ戻す（cron が毎時取り込み）</td></tr>
+            <tr><td><code>make pull</code></td><td style="color:var(--fg-muted);">サーバーの最新を git pull で取り込む（作業前に必ず）</td></tr>
+            <tr><td><code>make push</code></td><td style="color:var(--fg-muted);">自動コミット → git push → サーバーで git pull まで実行（反映完結）</td></tr>
+            <tr><td><code>make pull-dry / push-dry</code></td><td style="color:var(--fg-muted);">未取得コミット / 未コミット変更のプレビュー</td></tr>
           </tbody>
         </table>
         <p style="font-size:11px;color:var(--fg-muted);margin-top:8px;">repo: <code>keyaki-dev/keyaki-org-workdir</code>（サーバー <code>~</code> を private 管理）<br>ローカル clone: <code>~/Documents/repos/keyaki/keyaki-org-workdir/</code></p>
         <p style="font-size:11px;color:var(--fg-muted);margin-top:6px;">サーバーは cron 毎時で自動 commit+push。同一行が衝突したら自動解決せず <code>~/org-autocommit.log</code> に記録 → 手動解決。</p>
-        <p style="font-size:11px;color:var(--fg-muted);margin-top:6px;opacity:0.7;">※ 旧 <code>make pull/push</code>（rsync ミラー <code>server-share/</code>）は補助手段に降格・将来廃止予定。</p>
+        <p style="font-size:11px;color:var(--fg-muted);margin-top:6px;opacity:0.7;">※ 同期は git に一本化済み。旧 rsync ミラー（<code>server-share/</code>・<code>scripts/sync.sh</code>）は廃止した。</p>
       </div>
       <div class="card anim d5">
         <h3 style="margin-bottom:12px;color:var(--fg-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.06em;">マニュアル</h3>
