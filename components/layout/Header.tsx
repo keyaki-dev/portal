@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, PenLine } from "lucide-react";
+import { Home, PenLine, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Header() {
@@ -42,6 +42,19 @@ export function Header() {
           >
             <PenLine className="h-4 w-4 flex-shrink-0" />
             <span className="hidden sm:inline">ブログ</span>
+          </Link>
+          <Link
+            href="/products"
+            className={cn(
+              "flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1.5 text-sm transition-colors",
+              pathname.startsWith("/products")
+                ? "bg-muted text-foreground font-medium"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            )}
+            aria-label="プロダクト"
+          >
+            <Layers className="h-4 w-4 flex-shrink-0" />
+            <span className="hidden sm:inline">プロダクト</span>
           </Link>
         </nav>
       </div>
