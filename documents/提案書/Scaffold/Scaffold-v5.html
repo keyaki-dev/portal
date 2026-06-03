@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Startup Scaffold — AI開発組織 構築サービス v5 — keyaki development</title>
+<style>
+/* ──────────────────────────────────────────────────────
+   Design Tokens  (portal / portfolio Warm Minimalist)
+────────────────────────────────────────────────────── */
+:root {
+  --bg:          #F8F5F1;
+  --bg-card:     #FDFAF7;
+  --bg-muted:    #F2EDE8;
+  --fg:          #2C2C2C;
+  --fg-muted:    #6B6560;
+  --border:      #E5DDD6;
+  --accent:      #C45E3E;
+  --accent-soft: #F5E1D6;
+
+  --green:       #4A7C6F;
+  --green-soft:  #E6F0EE;
+  --yellow:      #8A6A2E;
+  --yellow-soft: #F5EDD6;
+  --blue:        #3A5F8A;
+  --blue-soft:   #DDE8F5;
+  --red:         #9A3030;
+  --red-soft:    #F5DEDE;
+
+  --font-sans:   'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Segoe UI', system-ui, sans-serif;
+  --font-serif:  'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --font-mono:   'Fira Code', 'Geist Mono', monospace;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.deck { width: 100%; height: 100vh; position: relative; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 56px 72px;
+  overflow: hidden;
+}
+.slide.active { display: flex; }
+
+.slide::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+}
+
+#nav {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 14px; z-index: 200;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 40px; padding: 9px 20px;
+  box-shadow: 0 4px 24px rgba(196,94,62,0.06);
+}
+#nav button {
+  background: none; border: none; color: var(--fg-muted);
+  cursor: pointer; font-size: 16px; padding: 4px 10px;
+  border-radius: 20px; transition: all 0.15s; font-family: var(--font-sans);
+}
+#nav button:hover { background: var(--bg-muted); color: var(--fg); }
+#counter { color: var(--fg-muted); font-size: 12px; min-width: 44px; text-align: center; font-family: var(--font-mono); }
+.dot-row { display: flex; gap: 5px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); cursor: pointer; transition: all 0.2s; }
+.dot.active { background: var(--accent); transform: scale(1.4); }
+
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 14px;
+}
+
+h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(36px, 5.5vw, 68px);
+  font-weight: 500; line-height: 1.1; letter-spacing: -0.02em;
+  color: var(--fg);
+}
+h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 3.8vw, 48px);
+  font-weight: 500; line-height: 1.15; letter-spacing: -0.02em;
+  color: var(--fg);
+}
+h3 {
+  font-size: 18px; font-weight: 600;
+  color: var(--fg); line-height: 1.3;
+}
+.sub {
+  font-size: clamp(14px, 1.6vw, 17px);
+  color: var(--fg-muted); line-height: 1.75; margin-top: 14px;
+}
+.accent-text { color: var(--accent); }
+.muted      { color: var(--fg-muted); }
+.center     { text-align: center; }
+.full       { width: 100%; }
+
+.row   { display: flex; gap: 24px; width: 100%; }
+.col   { flex: 1; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; width: 100%; }
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px;
+}
+.card-sm {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 18px;
+}
+
+.stat-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px 24px; text-align: center;
+}
+.stat-num {
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 4.5vw, 52px);
+  font-weight: 500; line-height: 1;
+  color: var(--accent);
+}
+.stat-label { font-size: 12px; color: var(--fg-muted); margin-top: 7px; letter-spacing: 0.5px; }
+
+.tag {
+  display: inline-block; padding: 3px 11px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+  background: var(--accent-soft); color: var(--accent);
+  border: 1px solid var(--border);
+}
+.tag.green  { background: var(--green-soft);  color: var(--green);  }
+.tag.yellow { background: var(--yellow-soft); color: var(--yellow); }
+.tag.blue   { background: var(--blue-soft);   color: var(--blue);   }
+.tag.muted  { background: var(--bg-muted);    color: var(--fg-muted); }
+
+.feature-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.feature-list li {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14px; color: var(--fg-muted); line-height: 1.6;
+}
+.feature-list li::before {
+  content: '—'; color: var(--accent); font-weight: 700; flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.divider {
+  width: 40px; height: 2px;
+  background: var(--accent); border-radius: 1px;
+  margin: 18px 0;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  text-align: left; padding: 10px 14px;
+  color: var(--fg-muted); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-muted);
+}
+td { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--accent-soft); }
+
+blockquote {
+  border-left: 2px solid var(--accent);
+  padding: 8px 20px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(16px, 2vw, 22px);
+  color: var(--fg-muted);
+  line-height: 1.7;
+}
+
+.slide-title-bg::before {
+  content: '';
+  position: absolute; top: -120px; right: -120px;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,94,62,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.slide.active .anim {
+  animation: fadeInUp 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.d1 { animation-delay: 0.05s !important; }
+.d2 { animation-delay: 0.10s !important; }
+.d3 { animation-delay: 0.15s !important; }
+.d4 { animation-delay: 0.20s !important; }
+.d5 { animation-delay: 0.25s !important; }
+
+/* ──────────────────────────────────────────────────────
+   Org Chart
+────────────────────────────────────────────────────── */
+.org-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0;
+}
+.org-top-row,
+.org-mid-row {
+  display: flex;
+  justify-content: center;
+}
+.org-v-line {
+  width: 2px;
+  height: 20px;
+  background: var(--border);
+}
+/* Branch connector: vertical stem → horizontal bar */
+.org-branch {
+  position: relative;
+  width: 72%;
+  height: 32px;
+}
+.org-branch::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  width: 1px; height: 16px;
+  background: var(--border);
+}
+.org-branch::after {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 0; right: 0;
+  height: 1px;
+  background: var(--border);
+}
+.org-bottom-row {
+  display: flex;
+  gap: 0;
+  width: 72%;
+}
+.org-bottom-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 8px;
+}
+.org-bottom-col::before {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+}
+.org-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  text-align: center;
+  width: 100%;
+}
+.org-box.owner   { border: 2px solid var(--yellow); }
+.org-box.manager { border: 2px solid var(--accent); min-width: 200px; }
+.org-box.future  { border: 1px dashed var(--border); opacity: 0.65; }
+.org-box-icon  { font-size: 22px; margin-bottom: 6px; }
+.org-box-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: var(--fg); }
+.org-box-desc  { font-size: 11px; color: var(--fg-muted); line-height: 1.5; margin-top: 4px; }
+
+/* ──────────────────────────────────────────────────────
+   Usage Scene Mocks
+────────────────────────────────────────────────────── */
+.mock-terminal,
+.mock-slack {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: #1E1E1E;
+  color: #D4D4D4;
+  flex: 1;
+}
+.mock-terminal-header,
+.mock-slack-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #2D2D2D;
+  border-bottom: 1px solid #3A3A3A;
+}
+.mock-traffic {
+  display: flex; gap: 6px;
+}
+.mock-traffic span {
+  width: 10px; height: 10px; border-radius: 50%; display: block;
+}
+.mock-traffic .red    { background: #FF5F57; }
+.mock-traffic .yellow { background: #FFBD2E; }
+.mock-traffic .green  { background: #28C840; }
+.mock-win-title {
+  font-size: 11px;
+  color: #888;
+  letter-spacing: 0.05em;
+}
+.mock-terminal-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  line-height: 1.6;
+}
+.mock-prompt-line {
+  color: #888;
+  font-size: 11px;
+}
+.mock-msg-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mock-msg-meta {
+  font-size: 10px;
+  color: #666;
+}
+.mock-msg-user .mock-msg-meta  { color: #8A6A2E; }
+.mock-msg-ai   .mock-msg-meta  { color: var(--accent); }
+.mock-msg-text { color: #D4D4D4; padding-left: 2px; }
+.mock-cursor   { color: var(--accent); animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Slack mock */
+.mock-slack { background: var(--bg-card); color: var(--fg); font-family: var(--font-sans); }
+.mock-slack-header { background: #3F0E40; }
+.mock-slack-icon { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: 0.05em; }
+.mock-slack-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 14px; }
+.mock-slack-channel { font-size: 12px; font-weight: 700; color: var(--fg-muted); padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.mock-slack-entry { display: flex; gap: 10px; }
+.mock-slack-avatar {
+  width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0;
+  background: var(--accent-soft); color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+}
+.mock-slack-content { flex: 1; }
+.mock-slack-meta { font-size: 11px; margin-bottom: 3px; }
+.mock-slack-meta .name { font-weight: 700; color: var(--fg); }
+.mock-slack-meta .time { color: var(--fg-muted); margin-left: 6px; }
+.mock-slack-text { font-size: 12.5px; color: var(--fg); line-height: 1.6; }
+.mock-slack-link { font-size: 11px; color: var(--blue); text-decoration: underline; }
+.mock-slack-reaction {
+  display: inline-block; margin-top: 5px;
+  font-size: 11px; padding: 2px 8px;
+  background: var(--bg-muted); border: 1px solid var(--border);
+  border-radius: 12px; color: var(--fg-muted);
+}
+
+/* Case study placeholder card */
+.case-card-placeholder {
+  background: var(--bg-muted);
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  min-height: 160px;
+}
+
+/* ──────────────────────────────────────────────────────
+   Mobile Responsive
+────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .slide { padding: 32px 20px 72px; }
+  .grid-3 { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row { flex-direction: column; gap: 14px; }
+  h3 { font-size: 15px; }
+  #nav { padding: 7px 14px; gap: 10px; bottom: 16px; }
+  .card { padding: 16px; }
+  .card-sm { padding: 10px 14px; }
+  .feature-list li { font-size: 13px; }
+  table { font-size: 12px; }
+  th, td { padding: 8px 10px; }
+  .org-branch { width: 90%; }
+  .org-bottom-row { width: 90%; }
+}
+@media (max-width: 400px) {
+  .slide { padding: 24px 16px 72px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide.active .anim { animation: none; }
+  .mock-cursor { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 01 タイトル -->
+  <div class="slide slide-title-bg active">
+    <div class="center" style="max-width: 700px;">
+      <div class="mono-label anim">Startup Scaffold — keyaki development — 2026年6月 / Ver.5</div>
+      <h1 class="anim d1">
+        私たちが実証した<br><span class="accent-text">AI開発体制</span>を、<br>あなたの会社にも
+      </h1>
+      <p class="sub anim d2">
+        社長1名と AI メンバー 3名だけで動く<span class="accent-text">AI駆動開発組織</span>。<br>
+        その同じ仕組みを、丸ごと構築して渡します。
+      </p>
+      <div style="margin-top: 32px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;" class="anim d3">
+        <span class="tag">スタートアップ向け</span>
+        <span class="tag green">自社で実証済み</span>
+        <span class="tag blue">ターンキー提供</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 組織図 -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Organization</div>
+      <h2 class="anim d1"><span class="accent-text">AI駆動開発組織</span>の構造</h2>
+      <p class="sub anim d2" style="margin-bottom: 24px;">Owner と 3種の AI が役割分担。将来の役割追加にも対応できる構造です。</p>
+
+      <div class="org-chart anim d3">
+        <!-- Owner -->
+        <div class="org-top-row">
+          <div class="org-box owner" style="min-width: 220px;">
+            <div class="org-box-icon">👤</div>
+            <div class="org-box-title">Owner（事業主）</div>
+            <span class="tag yellow">Human</span>
+            <div class="org-box-desc">方針決定・事業戦略<br>朝の指示出しのみ</div>
+          </div>
+        </div>
+
+        <div class="org-v-line"></div>
+
+        <!-- Manager -->
+        <div class="org-mid-row">
+          <div class="org-box manager">
+            <div class="org-box-icon">📋</div>
+            <div class="org-box-title">Manager</div>
+            <span class="tag blue">AI</span>
+            <div class="org-box-desc">タスク分配・進捗把握<br>Owner への報告集約（唯一の窓口）</div>
+          </div>
+        </div>
+
+        <!-- Branch connector -->
+        <div class="org-branch"></div>
+
+        <!-- Members -->
+        <div class="org-bottom-row">
+          <div class="org-bottom-col">
+            <div class="org-box">
+              <div class="org-box-icon">💻</div>
+              <div class="org-box-title">Engineer</div>
+              <span class="tag blue">AI</span>
+              <div class="org-box-desc">実装・インフラ<br>PR・Vercel 対応</div>
+            </div>
+          </div>
+          <div class="org-bottom-col">
+            <div class="org-box">
+              <div class="org-box-icon">📣</div>
+              <div class="org-box-title">Marketer</div>
+              <span class="tag blue">AI</span>
+              <div class="org-box-desc">LP・SEO<br>SNS・GTM戦略</div>
+            </div>
+          </div>
+          <div class="org-bottom-col">
+            <div class="org-box future">
+              <div class="org-box-icon" style="opacity:.5;">＋</div>
+              <div class="org-box-title" style="opacity:.6;">Future Role</div>
+              <span class="tag muted">拡張可能</span>
+              <div class="org-box-desc">業務に応じて<br>役割を追加</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 How We Work -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">How We Work</div>
+      <h2 class="anim d1">指示10分 → <span class="accent-text">自律実行</span>のサイクル</h2>
+      <div class="grid-3" style="margin-top: 28px;">
+        <div class="card anim d2">
+          <div style="font-size: 28px; margin-bottom: 12px;">🌅</div>
+          <h3 style="margin-bottom: 10px;">朝の指示出し</h3>
+          <p style="font-size: 13px; color: var(--fg-muted); line-height: 1.7;">Owner が今日の方針をSlackで伝えるだけ。AI チームが優先順位を判断し、タスクを自分たちで分解・着手</p>
+        </div>
+        <div class="card anim d3">
+          <div style="font-size: 28px; margin-bottom: 12px;">📂</div>
+          <h3 style="margin-bottom: 10px;">ファイルキュー連携</h3>
+          <p style="font-size: 13px; color: var(--fg-muted); line-height: 1.7;">メンバー間の仕事の受け渡しはファイルシステムで管理。inbox → doing → done の状態遷移で非同期協働</p>
+        </div>
+        <div class="card anim d4">
+          <div style="font-size: 28px; margin-bottom: 12px;">⚡</div>
+          <h3 style="margin-bottom: 10px;">VM常駐・自律実行</h3>
+          <p style="font-size: 13px; color: var(--fg-muted); line-height: 1.7;">AIセッションはサーバー上で常時稼働。人が離席中も作業を続け、完了後にSlackで自動報告</p>
+        </div>
+      </div>
+      <div class="card-sm anim d5" style="margin-top: 18px; background: var(--bg-muted); text-align: center;">
+        <span style="font-size: 13px; color: var(--fg-muted);">
+          <span class="accent-text" style="font-weight: 600;">Owner がやること：</span>朝10分の方針確認 + Slack通知の受信だけ
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 使用シーン モック -->
+  <div class="slide">
+    <div class="full" style="max-width: 900px;">
+      <div class="mono-label anim">A Day in the Life</div>
+      <h2 class="anim d1">実際の<span class="accent-text">使用シーン</span>はこんな感じ</h2>
+      <div class="row anim d2" style="margin-top: 22px; align-items: stretch; gap: 18px;">
+
+        <!-- Terminal mock -->
+        <div class="mock-terminal">
+          <div class="mock-terminal-header">
+            <div class="mock-traffic">
+              <span class="red"></span><span class="yellow"></span><span class="green"></span>
+            </div>
+            <div class="mock-win-title">Claude Code — Manager Session  &nbsp;|&nbsp; 09:02 JST</div>
+          </div>
+          <div class="mock-terminal-body">
+            <div class="mock-prompt-line">$ # セッション開始 — Manager が起動しました</div>
+            <div class="mock-msg-block mock-msg-user">
+              <div class="mock-msg-meta">山下（Owner）</div>
+              <div class="mock-msg-text">今日はFocusBurstのLP修正と<br>提案資料のv5を頼む。</div>
+            </div>
+            <div class="mock-msg-block mock-msg-ai">
+              <div class="mock-msg-meta" style="color:#C45E3E;">Manager</div>
+              <div class="mock-msg-text">了解です。<br>
+                Engineer → LP修正 を割り当てます。<br>
+                Engineer → Scaffold v5 作成も着手します。<br>
+                完了後にSlackで報告します。</div>
+            </div>
+            <div class="mock-cursor">▌</div>
+          </div>
+        </div>
+
+        <!-- Slack mock -->
+        <div class="mock-slack">
+          <div class="mock-slack-header">
+            <div class="mock-slack-icon">Slack</div>
+          </div>
+          <div class="mock-slack-body">
+            <div class="mock-slack-channel"># general</div>
+            <div class="mock-slack-entry">
+              <div class="mock-slack-avatar">M</div>
+              <div class="mock-slack-content">
+                <div class="mock-slack-meta">
+                  <span class="name">Manager</span>
+                  <span class="time">10:48</span>
+                </div>
+                <div class="mock-slack-text">
+                  ✅ LP修正 PR#42 を作成しました。<br>
+                  確認をお願いします。<br>
+                  <span class="mock-slack-link">github.com/keyaki-dev/portfolio/pull/42</span>
+                </div>
+                <div><span class="mock-slack-reaction">👍 2</span></div>
+              </div>
+            </div>
+            <div class="mock-slack-entry">
+              <div class="mock-slack-avatar">M</div>
+              <div class="mock-slack-content">
+                <div class="mock-slack-meta">
+                  <span class="name">Manager</span>
+                  <span class="time">14:31</span>
+                </div>
+                <div class="mock-slack-text">
+                  ✅ Scaffold v5 完成・デプロイ済み。<br>
+                  <span class="mock-slack-link">portal.keyaki-dev.com/documents/...</span>
+                </div>
+                <div><span class="mock-slack-reaction">🎉 1</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="card-sm anim d3" style="margin-top: 14px; text-align: center;">
+        <span style="font-size: 13px; color: var(--fg-muted);">
+          朝に一言指示するだけ → 日中は AI が自律実行 → 完了通知が Slack に届く
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 実績 -->
+  <div class="slide">
+    <div class="full" style="max-width: 900px;">
+      <div class="mono-label anim">Case Studies</div>
+      <h2 class="anim d1">AI駆動開発組織が作った<span class="accent-text">実績</span></h2>
+      <div class="grid-3" style="margin-top: 24px; align-items: start;">
+
+        <!-- FocusBurst -->
+        <div class="card anim d2" style="border-top: 3px solid var(--accent);">
+          <div style="font-size: 22px; margin-bottom: 10px;">🎯</div>
+          <h3 style="margin-bottom: 6px;">FocusBurst</h3>
+          <div class="muted" style="font-size: 11px; margin-bottom: 12px;">ADHD 集中サポート PWA</div>
+          <ul class="feature-list">
+            <li>Engineer が実装・Vercel デプロイ</li>
+            <li>Marketer が LP文章・GTM戦略立案</li>
+            <li>Manager がタスク管理・報告集約</li>
+            <li>Owner は方針決定のみ・コード 0行</li>
+          </ul>
+          <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+            <span class="tag green">公開済み</span>
+            <span class="tag">1日で完成</span>
+          </div>
+        </div>
+
+        <!-- App #2 placeholder -->
+        <div class="case-card-placeholder anim d3">
+          <div style="font-size: 32px; opacity: 0.35;">📦</div>
+          <div style="font-size: 14px; font-weight: 600; color: var(--fg-muted);">App #2</div>
+          <span class="tag yellow">開発中</span>
+          <div style="font-size: 12px; color: var(--fg-muted); line-height: 1.6; margin-top: 6px;">
+            次のプロダクトを開発中。<br>リリース後にここに追加されます。
+          </div>
+        </div>
+
+        <!-- App #3 placeholder -->
+        <div class="case-card-placeholder anim d4">
+          <div style="font-size: 32px; opacity: 0.25;">🚀</div>
+          <div style="font-size: 14px; font-weight: 600; color: var(--fg-muted);">App #3</div>
+          <span class="tag muted">準備中</span>
+          <div style="font-size: 12px; color: var(--fg-muted); line-height: 1.6; margin-top: 6px;">
+            実績は積み上がっていきます。<br>あなたのプロジェクトもここに。
+          </div>
+        </div>
+
+      </div>
+      <div class="grid-3" style="margin-top: 16px;">
+        <div class="stat-box anim d5">
+          <div class="stat-num">3</div>
+          <div class="stat-label">AIメンバーが協働</div>
+        </div>
+        <div class="stat-box anim d5">
+          <div class="stat-num">1日</div>
+          <div class="stat-label">LP＋アプリ＋PWA完成</div>
+        </div>
+        <div class="stat-box anim d5">
+          <div class="stat-num">0行</div>
+          <div class="stat-label">Owner が書いたコード</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 自律稼働の仕組み -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Always-On Architecture</div>
+      <h2 class="anim d1">セッションが<span class="accent-text">サーバーに常駐</span>する</h2>
+      <p class="sub anim d2" style="margin-bottom: 24px;">一般的なAIは「呼んだら答える」だけ。このシステムは違います。</p>
+      <div class="grid-2" style="align-items: start;">
+        <div class="card anim d3" style="border-left: 3px solid var(--fg-muted);">
+          <h3 style="margin-bottom: 12px; color: var(--fg-muted);">一般的なAI活用</h3>
+          <ul class="feature-list">
+            <li>人が画面を開いて話しかけた時だけ動く</li>
+            <li>会話が終わればコンテキストは消える</li>
+            <li>翌日は「はじめまして」から再スタート</li>
+          </ul>
+        </div>
+        <div class="card anim d4" style="border-left: 3px solid var(--accent);">
+          <h3 style="margin-bottom: 12px; color: var(--accent);">AI駆動開発組織の構成</h3>
+          <ul class="feature-list">
+            <li>エージェントのセッションがサーバー上で常時稼働</li>
+            <li>作業が一段落したらSlackを確認・報告</li>
+            <li>コンテキストを保持したまま継続して作業</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sm anim d5" style="margin-top: 18px; background: var(--bg-muted);">
+        <span style="font-family: var(--font-mono); font-size: 12px; color: var(--fg-muted);">
+          技術基盤: tmux（セッション常駐）+ systemd（自動起動）+ Slack連携
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 課題提示 -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">The Problem</div>
+      <h2 class="anim d1">「作りたいが、<span class="accent-text">作れない</span>」</h2>
+      <div class="grid-2" style="margin-top: 28px; align-items: start;">
+        <div class="card anim d2" style="border-left: 3px solid var(--accent);">
+          <h3 style="margin-bottom: 14px; color: var(--accent);">持っているもの</h3>
+          <ul class="feature-list">
+            <li>プロダクトのアイデア・ビジョン</li>
+            <li>資金・投資の目処</li>
+            <li>事業運営・営業の力</li>
+          </ul>
+        </div>
+        <div class="card anim d3" style="border-left: 3px solid var(--fg-muted);">
+          <h3 style="margin-bottom: 14px; color: var(--fg-muted);">足りないもの</h3>
+          <ul class="feature-list">
+            <li>開発エンジニアのリソース</li>
+            <li>採用コスト・時間</li>
+            <li>AI開発環境の構築ノウハウ</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sm anim d4" style="margin-top: 18px;">
+        <span style="color: var(--accent); font-weight: 600;">ポイント：</span>
+        <span class="muted" style="font-size: 14px;">エンジニアがいなくても、AIエージェントが動く開発組織を持てる時代が来ています。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 Startup Scaffold とは -->
+  <div class="slide">
+    <div class="full" style="max-width: 760px;">
+      <div class="mono-label anim">Core Value</div>
+      <blockquote class="anim d1">
+        実証済みのAI開発体制を、<br>
+        すぐ動く状態で丸ごと渡す。
+      </blockquote>
+      <div class="divider anim d2"></div>
+      <ul class="feature-list anim d3">
+        <li>自社で実証済みの構成をそのまま展開するため、品質が安定</li>
+        <li>お客様は受け取るだけ。環境構築・設定は一切不要</li>
+        <li>翌日から「AI開発チームを持つ会社」としてスタートできる</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 09 3ステップで引き渡し -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Delivery Flow</div>
+      <h2 class="anim d1">3ステップで<span class="accent-text">引き渡し</span>まで</h2>
+      <div class="grid-3" style="margin-top: 28px;">
+        <div class="card anim d2">
+          <div style="font-family: var(--font-mono); font-size: 28px; font-weight: 700; color: var(--accent); margin-bottom: 10px;">01</div>
+          <h3 style="margin-bottom: 12px;">ヒアリング・設計</h3>
+          <ul class="feature-list">
+            <li>事業内容・開発ニーズのヒアリング</li>
+            <li>AI組織の構成・役割を設計</li>
+            <li>カスタマイズ範囲の確定</li>
+          </ul>
+        </div>
+        <div class="card anim d3">
+          <div style="font-family: var(--font-mono); font-size: 28px; font-weight: 700; color: var(--accent); margin-bottom: 10px;">02</div>
+          <h3 style="margin-bottom: 12px;">構築・セットアップ</h3>
+          <ul class="feature-list">
+            <li>GCEサーバー立ち上げ</li>
+            <li>エージェント配置・Slack連携</li>
+            <li>Terraformで一括デプロイ</li>
+          </ul>
+        </div>
+        <div class="card anim d4">
+          <div style="font-family: var(--font-mono); font-size: 28px; font-weight: 700; color: var(--accent); margin-bottom: 10px;">03</div>
+          <h3 style="margin-bottom: 12px;">引き渡し・レクチャー</h3>
+          <ul class="feature-list">
+            <li>操作マニュアル納品</li>
+            <li>オンボーディングセッション</li>
+            <li>翌日から自走できる状態へ</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 コスト設計 -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Cost Design</div>
+      <h2 class="anim d1">役割に応じた<span class="accent-text">コスト設計</span></h2>
+      <div class="grid-2" style="margin-top: 28px; align-items: start;">
+        <div class="card anim d2">
+          <h3 style="margin-bottom: 14px;">重要タスク → 高性能モデル</h3>
+          <ul class="feature-list">
+            <li>Claude Code は実装担当のみに絞って使用</li>
+            <li>品質と速度が必要な作業に集中投資</li>
+            <li>アウトプットの品質を担保</li>
+          </ul>
+        </div>
+        <div class="card anim d3">
+          <h3 style="margin-bottom: 14px;">軽量タスク → ローカルLLM</h3>
+          <ul class="feature-list">
+            <li>レビュー・雑務はローカルモデルで代替</li>
+            <li>APIコストをゼロに抑える</li>
+            <li>24時間稼働してもランニングコストが低い</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sm anim d4" style="margin-top: 18px;">
+        <span style="color: var(--accent); font-weight: 600;">設計思想：</span>
+        <span class="muted" style="font-size: 14px;">「誰でもAIを使える」ではなく「最小コストで最大成果を出す組織設計」を提供します。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11 段階的自律化ロードマップ -->
+  <div class="slide">
+    <div class="full" style="max-width: 900px;">
+      <div class="mono-label anim">Autonomy Roadmap</div>
+      <h2 class="anim d1">段階的に<span class="accent-text">自律度を高める</span></h2>
+      <div class="grid-3" style="margin-top: 28px;">
+        <div class="card anim d2" style="border-top: 3px solid var(--blue);">
+          <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--blue); margin-bottom: 10px;">Phase 1</div>
+          <h3 style="margin-bottom: 8px;">常駐 + 朝の指示</h3>
+          <div class="muted" style="font-size: 12px; margin-bottom: 12px;">導入直後から実現</div>
+          <ul class="feature-list">
+            <li>セッションをサーバーに常駐（SSH切断後も継続）</li>
+            <li>Owner が朝に当日の方針を伝える</li>
+            <li>日中は自律的に作業・完了後にSlack報告</li>
+          </ul>
+        </div>
+        <div class="card anim d3" style="border-top: 3px solid var(--accent);">
+          <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 10px;">Phase 2</div>
+          <h3 style="margin-bottom: 8px;">起動の自動化</h3>
+          <div class="muted" style="font-size: 12px; margin-bottom: 12px;">スクリプト整備で対応</div>
+          <ul class="feature-list">
+            <li>起動時に「今日の指示書」を自動で読み込んで始動</li>
+            <li>Owner の朝の作業が不要になる</li>
+            <li>セッションリセット時も自動で引き継ぎ</li>
+          </ul>
+        </div>
+        <div class="card anim d4" style="border-top: 3px solid var(--green);">
+          <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--green); margin-bottom: 10px;">Phase 3</div>
+          <h3 style="margin-bottom: 8px;">完全自律稼働</h3>
+          <div class="muted" style="font-size: 12px; margin-bottom: 12px;">systemdで自動管理</div>
+          <ul class="feature-list">
+            <li>VM再起動でもセッションが自動復旧</li>
+            <li>24時間・365日、人手なしで稼働</li>
+            <li>Slackを受信口に、必要時のみ人が介入</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12 料金プラン -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Pricing</div>
+      <h2 class="anim d1">シンプルな<span class="accent-text">2プラン</span></h2>
+      <div class="grid-2" style="margin-top: 28px; align-items: start;">
+        <div class="card anim d2" style="border-top: 3px solid var(--accent);">
+          <div class="mono-label" style="margin-bottom: 8px;">Standard</div>
+          <div class="stat-num" style="font-size: 36px; margin-bottom: 4px;">¥20〜30万</div>
+          <div class="muted" style="font-size: 12px; margin-bottom: 18px;">ヒアリング〜引き渡しまで一括</div>
+          <ul class="feature-list">
+            <li>ニーズヒアリング・組織設計</li>
+            <li>GCEサーバー構築・エージェント配置</li>
+            <li>Slack連携・Terraform一括デプロイ</li>
+            <li>操作マニュアル納品</li>
+            <li>オンボーディングセッション（1回）</li>
+          </ul>
+        </div>
+        <div class="card anim d3" style="border-top: 3px solid var(--green);">
+          <div class="mono-label" style="margin-bottom: 8px; color: var(--green);">Custom</div>
+          <div class="stat-num" style="font-size: 36px; margin-bottom: 4px; color: var(--green);">要相談</div>
+          <div class="muted" style="font-size: 12px; margin-bottom: 18px;">カスタマイズ度合いに応じて算出</div>
+          <ul class="feature-list">
+            <li>Standardの全内容</li>
+            <li>業種・業務特化のエージェント追加</li>
+            <li>独自ツール・API連携</li>
+            <li>月次伴走サポート（オプション）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sm anim d4" style="margin-top: 18px;">
+        <span class="muted" style="font-size: 13px;">※ 料金は競合調査・市場フィードバックを踏まえて今後調整予定。現時点は参考値。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 13 クロージング -->
+  <div class="slide slide-title-bg">
+    <div class="full" style="max-width: 760px; text-align: center;">
+      <div class="mono-label anim">Get Started</div>
+      <h2 class="anim d1">まず、<span class="accent-text">話を聞かせてください。</span></h2>
+      <p class="sub anim d2">
+        どんな事業を作りたいか、どんな開発組織が必要か。<br>
+        ヒアリングから始めます。
+      </p>
+      <div class="grid-2" style="margin-top: 32px;">
+        <div class="stat-box anim d3">
+          <div class="stat-num">1日</div>
+          <div class="stat-label">構築〜引き渡しの目安期間<br>（標準テンプレート使用時）</div>
+        </div>
+        <div class="stat-box anim d4">
+          <div class="stat-num">0</div>
+          <div class="stat-label">お客様の初期作業量<br>受け取るだけでOK</div>
+        </div>
+      </div>
+      <div class="card-sm anim d5" style="margin-top: 20px; text-align: left;">
+        <span style="font-size: 13px; color: var(--fg-muted);">contact@keyaki-dev.com</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<div id="nav">
+  <button onclick="prev()" title="前へ">←</button>
+  <div class="dot-row" id="dots"></div>
+  <span id="counter">1 / 1</span>
+  <button onclick="next()" title="次へ">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+  const dotsEl    = document.getElementById('dots');
+  const counterEl = document.getElementById('counter');
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => go(i);
+    dotsEl.appendChild(d);
+  });
+  counterEl.textContent = '1 / ' + slides.length;
+
+  function go(n) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    counterEl.textContent = (cur + 1) + ' / ' + slides.length;
+  }
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+
+  let ts = 0;
+  document.addEventListener('touchstart', e => { ts = e.touches[0].clientX; });
+  document.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - ts;
+    if (Math.abs(dx) > 50) dx < 0 ? next() : prev();
+  });
+</script>
+</body>
+</html>
