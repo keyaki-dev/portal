@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>職務経歴書 — 山下 健太</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+      font-size: 11pt;
+      line-height: 1.7;
+      color: #1a1a1a;
+      background: #fff;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      padding: 18mm 20mm;
+    }
+
+    /* ヘッダー */
+    .header {
+      border-bottom: 2px solid #1a1a1a;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 20pt;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+    }
+    .header .subtitle {
+      font-size: 10pt;
+      color: #555;
+      margin-top: 4px;
+    }
+    .header .contact {
+      font-size: 9.5pt;
+      color: #555;
+      margin-top: 2px;
+    }
+
+    /* セクション */
+    section {
+      margin-bottom: 22px;
+    }
+    section h2 {
+      font-size: 12pt;
+      font-weight: bold;
+      border-left: 4px solid #1a1a1a;
+      padding-left: 8px;
+      margin-bottom: 10px;
+    }
+
+    /* 職歴テーブル */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5pt;
+    }
+    th {
+      background: #f4f4f4;
+      text-align: left;
+      padding: 5px 8px;
+      font-weight: bold;
+      border: 1px solid #ccc;
+      white-space: nowrap;
+    }
+    td {
+      padding: 5px 8px;
+      border: 1px solid #ccc;
+      vertical-align: top;
+    }
+    .period { white-space: nowrap; font-size: 10pt; color: #333; }
+
+    /* スキルグリッド */
+    .skill-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 4px 12px;
+      font-size: 10.5pt;
+    }
+    .skill-label {
+      font-weight: bold;
+      color: #333;
+    }
+    .skill-tags span {
+      display: inline-block;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      padding: 1px 7px;
+      margin: 2px 3px 2px 0;
+      font-size: 10pt;
+    }
+
+    /* 職務詳細 */
+    .job {
+      margin-bottom: 16px;
+    }
+    .job-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+    .job-company {
+      font-weight: bold;
+      font-size: 11.5pt;
+    }
+    .job-period {
+      font-size: 9.5pt;
+      color: #555;
+    }
+    .job-role {
+      font-size: 10pt;
+      color: #444;
+      margin-bottom: 5px;
+    }
+    .job-desc ul {
+      padding-left: 18px;
+      font-size: 10.5pt;
+    }
+    .job-desc li {
+      margin-bottom: 3px;
+    }
+    .job-tech {
+      font-size: 10pt;
+      color: #555;
+      margin-top: 4px;
+    }
+
+    /* 資格 */
+    .cert-list {
+      font-size: 10.5pt;
+    }
+    .cert-list li {
+      margin-bottom: 3px;
+      padding-left: 4px;
+    }
+
+    /* 自己PR */
+    .pr-text {
+      font-size: 10.5pt;
+      line-height: 1.8;
+    }
+
+    @media print {
+      body { background: #fff; }
+      .page { margin: 0; padding: 15mm 18mm; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ヘッダー -->
+  <div class="header">
+    <h1>職務経歴書</h1>
+    <div class="subtitle">山下 健太（Kenta Yamashita）</div>
+    <div class="contact">連絡先：contact@keyaki-dev.com</div>
+  </div>
+
+  <!-- 略歴 -->
+  <section>
+    <h2>略歴</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:110px">期間</th>
+          <th>所属</th>
+          <th>役職・内容</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="period">2017.04 〜 2021.03</td>
+          <td>筑波大学 理工学群 数学類</td>
+          <td>卒業</td>
+        </tr>
+        <tr>
+          <td class="period">2021.04 〜 2022.09</td>
+          <td>三井不動産リアルティ中国株式会社</td>
+          <td>リパーク営業部</td>
+        </tr>
+        <tr>
+          <td class="period">2022.11 〜 2024.07</td>
+          <td>株式会社アゼスト</td>
+          <td>データエンジニア</td>
+        </tr>
+        <tr>
+          <td class="period">2024.08 〜 2026.01</td>
+          <td>テックプロパティジャパン株式会社</td>
+          <td>社内エンジニア／バックオフィスマネージャー／執行役員・CTO</td>
+        </tr>
+        <tr>
+          <td class="period">2026.02 〜 現在</td>
+          <td>株式会社リアテクス</td>
+          <td>エンジニア</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- スキル -->
+  <section>
+    <h2>技術スキル</h2>
+    <div class="skill-grid">
+      <div class="skill-label">言語</div>
+      <div class="skill-tags">
+        <span>Python</span><span>TypeScript</span><span>Ruby</span>
+        <span>Google Apps Script</span><span>SQL</span>
+      </div>
+
+      <div class="skill-label">フロントエンド</div>
+      <div class="skill-tags">
+        <span>Next.js</span><span>React</span><span>HTML / CSS</span>
+      </div>
+
+      <div class="skill-label">クラウド (AWS)</div>
+      <div class="skill-tags">
+        <span>Lambda</span><span>RDS</span><span>S3</span><span>EC2</span>
+      </div>
+
+      <div class="skill-label">クラウド (GCP)</div>
+      <div class="skill-tags">
+        <span>Cloud Functions</span><span>Cloud Run</span>
+        <span>Compute Engine</span><span>Cloud Storage</span>
+        <span>Firebase</span>
+      </div>
+
+      <div class="skill-label">BI / データ</div>
+      <div class="skill-tags">
+        <span>Tableau</span><span>MySQL</span>
+      </div>
+
+      <div class="skill-label">AI / LLM</div>
+      <div class="skill-tags">
+        <span>Gemini API</span><span>ChatGPT API</span>
+        <span>Claude Code（AI駆動開発）</span>
+      </div>
+
+      <div class="skill-label">その他</div>
+      <div class="skill-tags">
+        <span>GitHub</span><span>Docker</span>
+        <span>Infrastructure as Code</span><span>Google Workspace</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 資格 -->
+  <section>
+    <h2>資格・認定</h2>
+    <ul class="cert-list">
+      <li>Certified Tableau Consultant（Salesforce）</li>
+      <li>AWS Certified Developer - Associate</li>
+      <li>宅地建物取引士</li>
+      <li>統計検定 2 級</li>
+      <li>情報処理安全確保支援士（取得に向けて勉強中）</li>
+    </ul>
+  </section>
+
+  <!-- 職務詳細 -->
+  <section>
+    <h2>職務詳細</h2>
+
+    <!-- アゼスト -->
+    <div class="job">
+      <div class="job-header">
+        <span class="job-company">株式会社アゼスト</span>
+        <span class="job-period">2022.11 〜 2024.07</span>
+      </div>
+      <div class="job-role">データエンジニア（社員数 30 名規模の SIer）</div>
+      <div class="job-desc">
+        <ul>
+          <li>ECサイトの売上・顧客データ処理基盤の構築・運用保守（AWS Lambda / RDS / S3 / Python）</li>
+          <li>医療機関の診療データ処理基盤の運用保守、Tableau BI ダッシュボード構築</li>
+          <li>運送会社の倉庫内データ処理基盤をスクラッチで実装（単独担当）</li>
+          <li>Tableau のライセンス販売から導入・伴走支援まで一気通貫で担当（官公庁・大学含む 10 社以上）</li>
+          <li>クライアントとの定例 MTG に参加し、新規顧客獲得施策の検討も共同実施</li>
+        </ul>
+      </div>
+      <div class="job-tech">技術：AWS Lambda / RDS / S3 ／ Python ／ MySQL ／ Tableau</div>
+    </div>
+
+    <!-- テックプロパティ -->
+    <div class="job">
+      <div class="job-header">
+        <span class="job-company">テックプロパティジャパン株式会社</span>
+        <span class="job-period">2024.08 〜 2026.01</span>
+      </div>
+      <div class="job-role">社内唯一のエンジニア → バックオフィスマネージャー → 執行役員・CTO（社員数 10 名規模の不動産ベンチャー）</div>
+      <div class="job-desc">
+        <ul>
+          <li>入社直後に既存 Google Cloud システムをリアーキテクト。インフラコストを月 200〜300 万円 → 約 50 万円に削減</li>
+          <li>LINE WORKS bot・タスク管理アプリ（Google Appsheet）・顧客向け申込フォーム（Next.js / Firebase）など社内効率化ツールを多数構築</li>
+          <li>案件・顧客対応データを一元管理する社内 Web アプリをスクラッチ開発（Next.js / TypeScript / Cloud Run）</li>
+          <li>ChatGPT API を活用した不動産投資・売買業務効率化 SaaS の企画・開発（リリース前）</li>
+          <li>バックオフィスマネージャーとして 5 名のタスク管理・進捗管理を担当（月 10〜20 件の売買決済をカバー）</li>
+          <li>CTO として経営陣の戦略検討に参加、社員のデータリテラシー向上のため勉強会を定期開催</li>
+        </ul>
+      </div>
+      <div class="job-tech">技術：Google Cloud（Functions / Compute Engine / Cloud Storage / Cloud Run） ／ Next.js ／ TypeScript ／ Firebase ／ Python ／ Google Apps Script ／ ChatGPT API</div>
+    </div>
+
+    <!-- リアテクス -->
+    <div class="job">
+      <div class="job-header">
+        <span class="job-company">株式会社リアテクス</span>
+        <span class="job-period">2026.02 〜 現在</span>
+      </div>
+      <div class="job-role">エンジニア（社員数 20 名規模の不動産会社）</div>
+      <div class="job-desc">
+        <ul>
+          <li>Gemini API を活用した社内 Web アプリを開発。売買業務の大半を自動化</li>
+          <li>社内 DB・コミュニケーションツールの MCP 化により、Claude Code を単なるコーディング支援ではなく「自律的に業務を実行するエージェント」として活用できる開発体制を構築</li>
+          <li>社員全員が AI ツールを自走活用できる組織づくりを提案・推進中</li>
+        </ul>
+      </div>
+      <div class="job-tech">技術：Gemini API ／ Claude Code（AI エージェント活用） ／ Google Workspace ／ Google Apps Script</div>
+    </div>
+  </section>
+
+  <!-- 自己PR -->
+  <section>
+    <h2>自己 PR</h2>
+    <p class="pr-text">
+      データエンジニアとして SIer でのプロジェクト経験を積んだ後、不動産ベンチャーでは社内唯一のエンジニアとして社内 DX を全て主導し、最終的に CTO に就任しました。インフラコスト削減・フルスタック開発・経営視点でのシステム設計まで、幅広く経験しています。<br><br>
+      現職では Gemini API・Claude Code を活用した AI 駆動開発を実践しており、LLM をプロダクトに組み込む能力と、開発体制そのものを AI で高速化するノウハウを持ちます。「エンジニアリング × ビジネス理解 × AI 活用」を強みに、即戦力として貢献できます。
+    </p>
+  </section>
+
+</div>
+</body>
+</html>
