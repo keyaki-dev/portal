@@ -62,11 +62,17 @@ export function CoverImageUpload({ slug, currentImage }: CoverImageUploadProps) 
         method: "POST",
         body: formData,
       });
-      const data = await res.json() as { filename?: string; error?: string };
+
+      let data: { filename?: string; error?: string } = {};
+      try {
+        data = await res.json() as { filename?: string; error?: string };
+      } catch {
+        // JSON パース失敗（サーバーエラーで HTML が返った場合など）
+      }
 
       if (!res.ok) {
         setStatus("error");
-        setErrorMessage(data.error ?? "アップロードに失敗しました");
+        setErrorMessage(data.error ?? `サーバーエラー (${res.status})`);
         return;
       }
 
