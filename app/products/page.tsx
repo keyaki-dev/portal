@@ -5,8 +5,8 @@ const products = [
     name: "FocusBurst",
     description: "ADHD脳専用の集中サポートアプリ。超短ポモドーロタイマーとAIボディダブリング機能を搭載。",
     links: [
-      { label: "LP を見る", url: "https://keyaki-dev.com/focus" },
-      { label: "アプリを開く", url: "https://keyaki-dev.com/focus/app", primary: true },
+      { label: "LP を見る", url: "https://focusburst.keyaki-dev.com" },
+      { label: "アプリを開く", url: "https://focusburst.keyaki-dev.com/app", primary: true },
     ],
     status: "β公開中",
     statusColor: "text-[#C45E3E]",
