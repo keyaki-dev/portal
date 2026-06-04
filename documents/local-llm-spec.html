@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ローカルLLM 概要・必要スペック</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1117; --surface: #161b22; --border: #30363d;
+  --text: #e6edf3; --muted: #7d8590;
+  --accent: #58a6ff; --green: #3fb950; --red: #f85149;
+  --yellow: #d29922; --purple: #bc8cff; --orange: #f0883e;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 15px; line-height: 1.7;
+  max-width: 860px; margin: 0 auto; padding: 40px 24px 80px;
+}
+header { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 40px; }
+header .badge {
+  display: inline-block; background: #1f2c3d; border: 1px solid var(--accent);
+  border-radius: 20px; padding: 4px 14px; font-size: 12px; color: var(--accent);
+  margin-bottom: 16px;
+}
+header h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+header .meta { font-size: 13px; color: var(--muted); }
+header .meta span { margin-right: 20px; }
+
+nav {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px 20px; margin-bottom: 40px;
+}
+nav h2 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 10px; }
+nav ol { padding-left: 20px; }
+nav li { margin: 4px 0; }
+nav a { color: var(--accent); text-decoration: none; font-size: 14px; }
+nav a:hover { text-decoration: underline; }
+
+section { margin-bottom: 48px; }
+h2.section-title {
+  font-size: 20px; font-weight: 700; margin-bottom: 16px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+h2.section-title .num {
+  display: inline-block; background: var(--accent); color: #0d1117;
+  border-radius: 50%; width: 24px; height: 24px; text-align: center;
+  line-height: 24px; font-size: 13px; margin-right: 10px;
+}
+p { margin-bottom: 12px; }
+p:last-child { margin-bottom: 0; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px 24px; margin-bottom: 16px;
+}
+.card-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+.card-body { font-size: 15px; }
+
+table {
+  width: 100%; border-collapse: collapse; font-size: 14px;
+  background: var(--surface); border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--border); margin-bottom: 16px;
+}
+th { background: #1c2330; color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+td { padding: 10px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+
+.tag {
+  display: inline-block; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 600; margin: 2px 2px 2px 0;
+}
+.tag-green { background: #1a3a24; color: var(--green); border: 1px solid #2d6a3e; }
+.tag-yellow { background: #2a2310; color: var(--yellow); border: 1px solid #5a4a10; }
+.tag-red { background: #3a1a1a; color: var(--red); border: 1px solid #6a2a2a; }
+.tag-blue { background: #1a2a3d; color: var(--accent); border: 1px solid #2a4a7d; }
+.tag-orange { background: #2a1e10; color: var(--orange); border: 1px solid #5a3e20; }
+
+.spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.spec-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px;
+}
+.spec-item .spec-key { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.spec-item .spec-val { font-size: 16px; font-weight: 700; }
+.spec-item .spec-note { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+.callout {
+  border-left: 3px solid var(--accent); background: #1a2234;
+  border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 16px;
+}
+.callout.warn { border-color: var(--yellow); background: #221e10; }
+.callout.info { border-color: var(--green); background: #111e14; }
+.callout p { margin: 0; }
+.callout strong { color: inherit; }
+
+code {
+  background: #161b22; border: 1px solid var(--border); border-radius: 4px;
+  padding: 1px 6px; font-family: 'SF Mono','Consolas',monospace; font-size: 13px;
+  color: var(--orange);
+}
+
+ul, ol { padding-left: 24px; margin-bottom: 12px; }
+li { margin: 4px 0; }
+
+footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">技術調査資料</div>
+  <h1>ローカルLLM 概要・必要スペック</h1>
+  <div class="meta">
+    <span>対象: Gemma 4 12B</span>
+    <span>作成: 川上（2026-06-04）</span>
+    <span>対象読者: 非エンジニア</span>
+  </div>
+</header>
+
+<nav>
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#s1">ローカルLLM とは</a></li>
+    <li><a href="#s2">Gemma 4 12B の概要</a></li>
+    <li><a href="#s3">動作に必要なスペック</a></li>
+    <li><a href="#s4">インストール方法（概要）</a></li>
+    <li><a href="#s5">keyaki 組織（GCE）での活用可能性</a></li>
+  </ol>
+</nav>
+
+<!-- S1 -->
+<section id="s1">
+  <h2 class="section-title"><span class="num">1</span>ローカルLLM とは</h2>
+  <p>
+    LLM（Large Language Model）とは ChatGPT や Claude のような AI です。通常はクラウド（インターネット上のサーバー）で動作し、質問を送るとインターネット越しに回答が返ってきます。
+  </p>
+  <p>
+    <strong>ローカルLLM</strong> は、同じ AI モデルを<strong>自分のパソコン・サーバー上で直接動かす</strong>仕組みです。クラウドに情報を送らないため、機密情報を安全に扱えます。またインターネット不要・従量課金なしで、繰り返し使い放題です。
+  </p>
+  <div class="callout info">
+    <p><strong>メリット</strong>: データが外部に出ない / 月額費用がかからない / オフライン動作可</p>
+  </div>
+  <div class="callout warn">
+    <p><strong>デメリット</strong>: GPT-4 / Claude Opus には精度で劣る場合がある / GPU 搭載 PC が必要</p>
+  </div>
+</section>
+
+<!-- S2 -->
+<section id="s2">
+  <h2 class="section-title"><span class="num">2</span>Gemma 4 12B の概要</h2>
+  <p>Google が 2025年に公開したオープンソースモデルです。12B（120億）パラメータながら、日本語対応・コード生成・文書要約など幅広い用途に使えます。</p>
+  <table>
+    <thead>
+      <tr><th>項目</th><th>内容</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>正式名称</td><td>Gemma 4 12B（Google DeepMind）</td></tr>
+      <tr><td>パラメータ数</td><td>120 億（12B）</td></tr>
+      <tr><td>ライセンス</td><td>Gemma Terms of Use（商用利用可、再配布に制限あり）</td></tr>
+      <tr><td>対応言語</td><td>日本語・英語を含む多言語</td></tr>
+      <tr>
+        <td>得意な用途</td>
+        <td>
+          <span class="tag tag-blue">文書要約</span>
+          <span class="tag tag-blue">Q&amp;A</span>
+          <span class="tag tag-blue">コード生成</span>
+          <span class="tag tag-blue">メール文案</span>
+          <span class="tag tag-blue">社内チャットbot</span>
+        </td>
+      </tr>
+      <tr><td>精度の目安</td><td>ChatGPT-3.5 に近い水準。クラウド GPT-4 / Claude 3 Opus より劣るが、社内 FAQ・文書処理なら十分実用的</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- S3 -->
+<section id="s3">
+  <h2 class="section-title"><span class="num">3</span>動作に必要なスペック</h2>
+  <p>Gemma 4 12B をローカルで動かすには、<strong>GPU 搭載の PC またはサーバー</strong>が必要です。CPU だけでも起動はできますが、応答が非常に遅くなります（実用困難）。</p>
+
+  <h3 style="font-size:15px;font-weight:700;margin:20px 0 10px;">必須要件</h3>
+  <div class="spec-grid">
+    <div class="spec-item">
+      <div class="spec-key">VRAM（GPU メモリ）</div>
+      <div class="spec-val" style="color:var(--red);">16 GB 以上</div>
+      <div class="spec-note">12B モデルの量子化版で最低ライン</div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-key">RAM（システムメモリ）</div>
+      <div class="spec-val" style="color:var(--yellow);">32 GB 以上</div>
+      <div class="spec-note">OS・他アプリとの共存分を含む</div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-key">ストレージ（空き）</div>
+      <div class="spec-val">30 GB 以上</div>
+      <div class="spec-note">モデルファイル本体 + OS</div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-key">CPU</div>
+      <div class="spec-val">Core i7 / Ryzen 7 相当</div>
+      <div class="spec-note">GPU が主役なので CPU は補助</div>
+    </div>
+  </div>
+
+  <h3 style="font-size:15px;font-weight:700;margin:20px 0 10px;">推奨構成</h3>
+  <table>
+    <thead>
+      <tr><th>環境</th><th>推奨 GPU / チップ</th><th>価格帯の目安</th><th>評価</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Windows / Linux PC</td>
+        <td>NVIDIA RTX 3080（10GB VRAM）以上<br><small style="color:var(--muted)">RTX 4080 / 4090 なら余裕</small></td>
+        <td>GPU 単体 ¥80,000〜</td>
+        <td><span class="tag tag-green">推奨</span></td>
+      </tr>
+      <tr>
+        <td>Mac（Apple Silicon）</td>
+        <td>M2 Pro / M3 Pro 以上（統合メモリ 32GB 以上）<br><small style="color:var(--muted)">M2 Max / M3 Max ならより快適</small></td>
+        <td>MacBook Pro ¥250,000〜</td>
+        <td><span class="tag tag-green">推奨</span></td>
+      </tr>
+      <tr>
+        <td>CPU のみ（非推奨）</td>
+        <td>なし（GPU なし）</td>
+        <td>—</td>
+        <td><span class="tag tag-red">実用困難</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p><strong>補足</strong>: VRAM 10 GB の RTX 3080 でも「量子化版（Q4）」モデルを使えばギリギリ動作します。ただし 16 GB VRAM（RTX 3080 Ti / 3090 など）があれば余裕をもって動かせます。</p>
+  </div>
+</section>
+
+<!-- S4 -->
+<section id="s4">
+  <h2 class="section-title"><span class="num">4</span>インストール方法（概要）</h2>
+  <p>ローカルLLM のセットアップには 2 つの主要ツールがあります。どちらも無料です。</p>
+
+  <div class="card">
+    <div class="card-title">方法 A — Ollama（CLI / サーバー向け）</div>
+    <div class="card-body">
+      <p>コマンドラインで動かすツール。Windows / macOS / Linux 対応。API サーバーとして立ち上げて他のアプリから呼び出す使い方に向いています。</p>
+      <ol>
+        <li><code>ollama.com</code> からインストーラをダウンロード・実行</li>
+        <li>ターミナルで <code>ollama pull gemma4:12b</code> を実行（モデルをダウンロード）</li>
+        <li><code>ollama run gemma4:12b</code> で起動 → チャット開始</li>
+      </ol>
+      <p style="margin-top:10px;font-size:13px;color:var(--muted);">参考: <code>https://ollama.com</code></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">方法 B — LM Studio（GUI / 非エンジニア向け）</div>
+    <div class="card-body">
+      <p>グラフィカルなアプリ。ボタン操作でモデルのダウンロード・起動・チャットが完結します。技術知識が少ない場合はこちらが簡単です。</p>
+      <ol>
+        <li><code>lmstudio.ai</code> からインストーラをダウンロード・実行</li>
+        <li>検索欄で「Gemma」と入力 → Gemma 4 12B を選択してダウンロード</li>
+        <li>「Load Model」→「Chat」で即使用可能</li>
+      </ol>
+      <p style="margin-top:10px;font-size:13px;color:var(--muted);">参考: <code>https://lmstudio.ai</code></p>
+    </div>
+  </div>
+</section>
+
+<!-- S5 -->
+<section id="s5">
+  <h2 class="section-title"><span class="num">5</span>keyaki 組織（GCE）での活用可能性</h2>
+  <p>現在 keyaki の VM は <strong>GCE e2-standard-2</strong>（vCPU 2 / RAM 8 GB）を使用しており、<strong>GPU は搭載していません</strong>。</p>
+
+  <table>
+    <thead>
+      <tr><th>項目</th><th>現在の GCE 構成</th><th>Gemma 4 12B の要件</th><th>可否</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>GPU（VRAM）</td>
+        <td>なし</td>
+        <td>16 GB 以上</td>
+        <td><span class="tag tag-red">✗ 不足</span></td>
+      </tr>
+      <tr>
+        <td>RAM</td>
+        <td>8 GB</td>
+        <td>32 GB 以上</td>
+        <td><span class="tag tag-red">✗ 不足</span></td>
+      </tr>
+      <tr>
+        <td>CPU</td>
+        <td>vCPU 2</td>
+        <td>i7 相当</td>
+        <td><span class="tag tag-yellow">△ 低速</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <p><strong>現状の GCE インスタンスではローカルLLM の実用運用は困難です。</strong><br>
+    CPU のみでも起動は可能ですが、1 トークンあたり数秒かかる速度になります（会話が非常に遅い）。</p>
+  </div>
+
+  <h3 style="font-size:15px;font-weight:700;margin:20px 0 10px;">GCE で動かすには</h3>
+  <p>GCE で実用的に使うには GPU インスタンスへの変更が必要です。</p>
+
+  <table>
+    <thead>
+      <tr><th>インスタンス例</th><th>GPU</th><th>VRAM</th><th>月額目安</th><th>評価</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>g2-standard-4</td>
+        <td>NVIDIA L4</td>
+        <td>24 GB</td>
+        <td>~$300/月</td>
+        <td><span class="tag tag-green">推奨</span></td>
+      </tr>
+      <tr>
+        <td>a2-highgpu-1g</td>
+        <td>NVIDIA A100</td>
+        <td>40 GB</td>
+        <td>~$2,000/月</td>
+        <td><span class="tag tag-yellow">高価</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p><strong>結論</strong>: 佐藤さん用ローカルLLMは GCE ではなく<strong>自社ローカルマシン（GPU 搭載 PC）</strong>で動かすのが現実的な選択です。GPU なし PC でも動くことは動きますが、応答速度が遅く実用に耐えません。スペック調査の際は「VRAM 16GB 以上の GPU」を最優先にご確認ください。</p>
+  </div>
+</section>
+
+<footer>
+  <p>作成: 川上（keyaki AI エンジニア）| 2026-06-04 | 内容に変更があれば随時更新</p>
+</footer>
+
+</body>
+</html>
