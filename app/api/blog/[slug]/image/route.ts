@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBlogPostBySlug } from "@/lib/blog";
 import matter from "gray-matter";
+import fs from "fs";
+import path from "path";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const PORTAL_OWNER = "keyaki-dev";
@@ -81,6 +83,12 @@ export async function POST(
     const updatedMd = matter.stringify(content, data);
     const mdSha = await getFileSha(mdPath);
     await putFile(mdPath, Buffer.from(updatedMd).toString("base64"), commitMessage, mdSha);
+
+    // ローカルファイルも同期（ポータルはローカル fs から読むため、リロード後も反映されるよう書き戻す）
+    fs.writeFileSync(path.join(process.cwd(), mdPath), updatedMd, "utf-8");
+    const localImagePath = path.join(process.cwd(), imagePath);
+    fs.mkdirSync(path.dirname(localImagePath), { recursive: true });
+    fs.writeFileSync(localImagePath, buffer);
   } catch (e) {
     console.error("GitHub API error:", e);
     return NextResponse.json({ error: "GitHub への保存に失敗しました" }, { status: 500 });
