@@ -11,6 +11,46 @@ interface CoverImageUploadProps {
 
 type UploadStatus = "idle" | "loading" | "success" | "error";
 
+async function compressImage(file: File): Promise<File> {
+  const MAX_WIDTH = 1200;
+  const MAX_HEIGHT = 630;
+  const QUALITY = 0.85;
+
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    const url = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+
+      if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+        const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { reject(new Error("canvas unavailable")); return; }
+      ctx.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { reject(new Error("compression failed")); return; }
+          resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+        },
+        "image/jpeg",
+        QUALITY
+      );
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("load failed")); };
+    img.src = url;
+  });
+}
+
 export function CoverImageUpload({ slug, currentImage }: CoverImageUploadProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -54,8 +94,15 @@ export function CoverImageUpload({ slug, currentImage }: CoverImageUploadProps) 
     setStatus("loading");
     setErrorMessage(null);
 
+    let fileToUpload: File;
+    try {
+      fileToUpload = await compressImage(selectedFile);
+    } catch {
+      fileToUpload = selectedFile;
+    }
+
     const formData = new FormData();
-    formData.append("file", selectedFile);
+    formData.append("file", fileToUpload);
 
     try {
       const res = await fetch(`/api/blog/${slug}/image`, {
