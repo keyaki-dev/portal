@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { ImageIcon, Upload, Loader2, CheckCircle2, AlertCircle, X } from "lucide-react";
 import Image from "next/image";
 
@@ -58,6 +58,15 @@ export function CoverImageUpload({ slug, currentImage }: CoverImageUploadProps) 
   const [savedFilename, setSavedFilename] = useState<string | null>(currentImage ?? null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    fetch(`/api/blog/${slug}/image`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { image?: string } | null) => {
+        if (data?.image) setSavedFilename(data.image);
+      })
+      .catch(() => {});
+  }, [slug]);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

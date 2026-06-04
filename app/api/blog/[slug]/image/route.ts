@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBlogPostBySlug } from "@/lib/blog";
+import { revalidatePath } from "next/cache";
 import matter from "gray-matter";
 import fs from "fs";
 import path from "path";
@@ -35,6 +36,34 @@ async function putFile(path: string, content: string, message: string, sha?: str
     const err = await res.text();
     throw new Error(`GitHub API error: ${err}`);
   }
+}
+
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await params;
+  const post = getBlogPostBySlug(slug);
+  if (!post) return NextResponse.json({ error: "記事が見つかりません" }, { status: 404 });
+
+  if (!GITHUB_TOKEN) {
+    return NextResponse.json({ image: post.image ?? null });
+  }
+
+  const mdPath = `blog/${post.filename}`;
+  const res = await fetch(
+    `https://api.github.com/repos/${PORTAL_OWNER}/${PORTAL_REPO}/contents/${encodeURIComponent(mdPath)}`,
+    {
+      headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, "X-GitHub-Api-Version": "2022-11-28" },
+      cache: "no-store",
+    }
+  );
+  if (!res.ok) return NextResponse.json({ image: post.image ?? null });
+
+  const data = (await res.json()) as { content: string };
+  const raw = Buffer.from(data.content, "base64").toString("utf-8");
+  const { data: frontmatter } = matter(raw);
+  return NextResponse.json({ image: (frontmatter.image as string) ?? null });
 }
 
 export async function POST(
@@ -94,5 +123,6 @@ export async function POST(
     return NextResponse.json({ error: "GitHub への保存に失敗しました" }, { status: 500 });
   }
 
+  revalidatePath(`/blog/${slug}`);
   return NextResponse.json({ filename });
 }

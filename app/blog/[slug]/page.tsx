@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getBlogPostBySlug, getAllBlogPosts, countChars } from "@/lib/blog";
 import { PublishButtons } from "@/components/blog/PublishButtons";
 import { CoverImageUpload } from "@/components/blog/CoverImageUpload";
+import { BlogEditor } from "@/components/blog/BlogEditor";
 import type { Metadata } from "next";
 
 interface Props {
@@ -98,6 +99,14 @@ export default async function BlogPostPage({ params }: Props) {
 
             <div className="border-t border-border pt-4">
               <CoverImageUpload slug={slug} currentImage={post.image} />
+            </div>
+
+            <div className="border-t border-border pt-4">
+              <BlogEditor
+                slug={slug}
+                initialTitle={post.title}
+                initialContent={post.content}
+              />
             </div>
 
             <div className="border-t border-border pt-4 space-y-2">
