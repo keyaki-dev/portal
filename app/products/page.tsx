@@ -11,6 +11,16 @@ const products = [
     status: "β公開中",
     statusColor: "text-[#C45E3E]",
   },
+  {
+    name: "Xando（サンドゥ）",
+    description: "AIで作った未完成・発展途上の成果物を共有するSNS型プラットフォーム。フォークされることが評価になる次世代の砂場。",
+    links: [
+      { label: "モックを見る", url: "https://frontend-4eltdd3j5-kenta-yamashitas-projects.vercel.app", primary: true },
+      { label: "デザインを見る", url: "https://portal.keyaki-dev.com/xando/design" },
+    ],
+    status: "開発中",
+    statusColor: "text-[#1A6EA8]",
+  },
 ];
 
 export const metadata = { title: "プロダクト" };
