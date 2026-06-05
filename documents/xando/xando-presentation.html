@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xando — ケ開発</title>
+<style>
+:root {
+  --bg:          #F8F5F1;
+  --bg-card:     #FDFAF7;
+  --bg-muted:    #F2EDE8;
+  --fg:          #2C2C2C;
+  --fg-muted:    #6B6560;
+  --border:      #E5DDD6;
+  --accent:      #C45E3E;
+  --accent-soft: #F5E1D6;
+  --green:       #4A7C6F;
+  --green-soft:  #E6F0EE;
+  --yellow:      #8A6A2E;
+  --yellow-soft: #F5EDD6;
+  --blue:        #3A5F8A;
+  --blue-soft:   #DDE8F5;
+  --red:         #9A3030;
+  --red-soft:    #F5DEDE;
+  --font-sans:   'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Segoe UI', system-ui, sans-serif;
+  --font-serif:  'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --font-mono:   'Fira Code', 'Geist Mono', monospace;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+.deck { width: 100%; height: 100vh; position: relative; }
+.slide {
+  position: absolute; inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 56px 72px;
+  overflow: hidden;
+}
+.slide.active { display: flex; }
+.slide::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+}
+#nav {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 14px; z-index: 200;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 40px; padding: 9px 20px;
+  box-shadow: 0 4px 24px rgba(196,94,62,0.06);
+}
+#nav button {
+  background: none; border: none; color: var(--fg-muted);
+  cursor: pointer; font-size: 16px; padding: 4px 10px;
+  border-radius: 20px; transition: all 0.15s; font-family: var(--font-sans);
+}
+#nav button:hover { background: var(--bg-muted); color: var(--fg); }
+#counter { color: var(--fg-muted); font-size: 12px; min-width: 44px; text-align: center; font-family: var(--font-mono); }
+.dot-row { display: flex; gap: 5px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); cursor: pointer; transition: all 0.2s; }
+.dot.active { background: var(--accent); transform: scale(1.4); }
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 14px;
+}
+h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(36px, 5.5vw, 68px);
+  font-weight: 500; line-height: 1.1; letter-spacing: -0.02em;
+  color: var(--fg);
+}
+h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 3.8vw, 48px);
+  font-weight: 500; line-height: 1.15; letter-spacing: -0.02em;
+  color: var(--fg);
+}
+h3 { font-size: 18px; font-weight: 600; color: var(--fg); line-height: 1.3; }
+.sub { font-size: clamp(14px, 1.6vw, 17px); color: var(--fg-muted); line-height: 1.75; margin-top: 14px; }
+.accent-text { color: var(--accent); }
+.muted { color: var(--fg-muted); }
+.center { text-align: center; }
+.full { width: 100%; }
+.row { display: flex; gap: 24px; width: 100%; }
+.col { flex: 1; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; width: 100%; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+.card-sm { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; }
+.stat-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; text-align: center; }
+.stat-num { font-family: var(--font-serif); font-size: clamp(30px, 4.5vw, 52px); font-weight: 500; line-height: 1; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--fg-muted); margin-top: 7px; letter-spacing: 0.5px; }
+.tag { display: inline-block; padding: 3px 11px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--border); }
+.tag.green { background: var(--green-soft); color: var(--green); }
+.tag.yellow { background: var(--yellow-soft); color: var(--yellow); }
+.tag.blue { background: var(--blue-soft); color: var(--blue); }
+.feature-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.feature-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--fg-muted); line-height: 1.6; }
+.feature-list li::before { content: '—'; color: var(--accent); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.divider { width: 40px; height: 2px; background: var(--accent); border-radius: 1px; margin: 18px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 10px 14px; color: var(--fg-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--bg-muted); }
+td { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--accent-soft); }
+blockquote { border-left: 2px solid var(--accent); padding: 8px 20px; font-family: var(--font-serif); font-style: italic; font-size: clamp(16px, 2vw, 22px); color: var(--fg-muted); line-height: 1.7; }
+.slide-title-bg::before { content: ''; position: absolute; top: -120px; right: -120px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(196,94,62,0.07) 0%, transparent 70%); pointer-events: none; }
+.slide.active .anim { animation: fadeInUp 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.d1 { animation-delay: 0.05s !important; }
+.d2 { animation-delay: 0.10s !important; }
+.d3 { animation-delay: 0.15s !important; }
+.d4 { animation-delay: 0.20s !important; }
+.d5 { animation-delay: 0.25s !important; }
+@media (max-width: 640px) {
+  .slide { padding: 32px 20px 72px; }
+  .grid-3 { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row { flex-direction: column; gap: 14px; }
+  h3 { font-size: 15px; }
+  #nav { padding: 7px 14px; gap: 10px; bottom: 16px; }
+  .card { padding: 16px; }
+}
+@media (max-width: 400px) {
+  .slide { padding: 24px 16px 72px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .slide.active .anim { animation: none; } }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- 1. タイトル -->
+  <div class="slide slide-title-bg active">
+    <div class="center" style="max-width: 680px;">
+      <div class="mono-label anim">keyaki — 2026年6月</div>
+      <h1 class="anim d1">
+        <span class="accent-text">Xando</span><br>次世代の砂場、高次元の遊び場
+      </h1>
+      <p class="sub anim d2">
+        AIで作った成果物を共有するSNS型プラットフォーム。<br>
+        文章ではなく「モノ」で語り、フォークで評価し合う場。
+      </p>
+      <div style="margin-top: 32px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;" class="anim d3">
+        <span class="tag">SNS型プラットフォーム</span>
+        <span class="tag green">AIネイティブ向け</span>
+        <span class="tag blue">成果物共有</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 背景・課題 -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Background</div>
+      <h2 class="anim d1">AIで誰でも作れる時代に、<span class="accent-text">発信の場がない</span></h2>
+      <div class="grid-2" style="margin-top: 28px;">
+        <div class="card anim d2">
+          <h3 style="margin-bottom: 14px;">時代の変化</h3>
+          <ul class="feature-list">
+            <li>AIの普及で「作れること」の希少性は失われた</li>
+            <li>エンジニア・アイデアマンが次々と成果物を生み出している</li>
+            <li>誰でも何かを作れる時代になった</li>
+          </ul>
+        </div>
+        <div class="card anim d3">
+          <h3 style="margin-bottom: 14px;">既存手段の限界</h3>
+          <ul class="feature-list">
+            <li>noteやブログ → 文章では「他人事」になる</li>
+            <li>GitHub → 技術者向け・完成品が前提</li>
+            <li>荒削りな成果物・アイデアだけのビジョンを置く場所がない</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sm anim d4" style="margin-top: 18px; border-color: var(--accent-soft);">
+        <span style="color: var(--accent); font-weight: 600;">核心：</span>
+        <span class="muted" style="font-size: 14px;">文章は情報を伝えるが、動くものは<strong>衝動を引き起こす</strong>。体験を通じてはじめて共感と欲求が生まれる。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 解決策 -->
+  <div class="slide">
+    <div class="full" style="max-width: 760px;">
+      <div class="mono-label anim">Solution</div>
+      <blockquote class="anim d1">
+        体験できるものを、ショーケースに並べる。
+      </blockquote>
+      <div class="divider anim d2"></div>
+      <div class="grid-3 anim d3" style="margin-top: 8px;">
+        <div class="card">
+          <div style="font-size: 28px; margin-bottom: 10px;">🏖️</div>
+          <h3 style="margin-bottom: 10px;">モノで語る</h3>
+          <p style="font-size: 13px; color: var(--fg-muted); line-height: 1.6;">文章ではなく成果物で自己表現。動かなくてもいい、アイデアだけでもいい。</p>
+        </div>
+        <div class="card">
+          <div style="font-size: 28px; margin-bottom: 10px;">🔀</div>
+          <h3 style="margin-bottom: 10px;">改造して使う</h3>
+          <p style="font-size: 13px; color: var(--fg-muted); line-height: 1.6;">他人の作品をベースに改造・発展させる。リミックス文化をプログラムへ。</p>
+        </div>
+        <div class="card">
+          <div style="font-size: 28px; margin-bottom: 10px;">💬</div>
+          <h3 style="margin-bottom: 10px;">SNS的な軽さ</h3>
+          <p style="font-size: 13px; color: var(--fg-muted); line-height: 1.6;">GitHubの堅苦しさはなし。Instagramのような軽い共感・反応の場。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. コアコンセプト「フォーク＝評価」 -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Core Concept</div>
+      <h2 class="anim d1"><span class="accent-text">フォーク＝評価</span>という設計</h2>
+      <div class="row" style="margin-top: 28px; align-items: flex-start;">
+        <div class="col anim d2">
+          <div class="card" style="height: 100%;">
+            <h3 style="margin-bottom: 14px;">フォークが勲章になる</h3>
+            <ul class="feature-list">
+              <li>他人のアイデアをベースに作ること＝いいねと同じ価値</li>
+              <li>フォークされた瞬間「あなたのアイデアは価値があった」というシグナルが届く</li>
+              <li>「パクられた」ではなく「自分のアイデアが広がった」という体験設計</li>
+            </ul>
+          </div>
+        </div>
+        <div class="col anim d3">
+          <div class="card" style="height: 100%;">
+            <h3 style="margin-bottom: 14px;">アイデアの家系図</h3>
+            <ul class="feature-list">
+              <li>フォークの連鎖が可視化され、アイデアの発展・分岐が見える</li>
+              <li>誰のアイデアが「原種」として広まったかが分かる</li>
+              <li>家系図自体がこのサービス固有のコンテンツになる</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="card-sm anim d4" style="margin-top: 18px; text-align: center;">
+        <span class="muted" style="font-size: 14px;">「誰かに使われること」と「評価されること」が<strong>同一の行為</strong>になる</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. ポジショニング -->
+  <div class="slide">
+    <div class="full" style="max-width: 920px;">
+      <div class="mono-label anim">Positioning</div>
+      <h2 class="anim d1">既存サービスとの<span class="accent-text">違い</span></h2>
+      <div class="grid-3" style="margin-top: 28px;">
+        <div class="card anim d2" style="border-color: var(--border);">
+          <div style="font-size: 24px; margin-bottom: 10px;">⚙️</div>
+          <h3 style="margin-bottom: 12px;">GitHub</h3>
+          <ul class="feature-list">
+            <li>技術者向け</li>
+            <li>完成品・コードが前提</li>
+            <li>評価軸＝技術力・完成度</li>
+            <li>堅苦しい文化</li>
+          </ul>
+        </div>
+        <div class="card anim d3" style="border-color: var(--border);">
+          <div style="font-size: 24px; margin-bottom: 10px;">📸</div>
+          <h3 style="margin-bottom: 12px;">Instagram</h3>
+          <ul class="feature-list">
+            <li>写真・動画が主役</li>
+            <li>日常・ライフスタイル</li>
+            <li>成果物を「見せる」場ではない</li>
+            <li>リミックス文化なし</li>
+          </ul>
+        </div>
+        <div class="card anim d4" style="border-color: var(--accent); background: var(--accent-soft);">
+          <div style="font-size: 24px; margin-bottom: 10px;">🏖️</div>
+          <h3 style="margin-bottom: 12px; color: var(--accent);">Xando</h3>
+          <ul class="feature-list">
+            <li>AIで作ったもの・アイデア</li>
+            <li>未完成・発展途上を肯定</li>
+            <li>評価軸＝アイデア・センス</li>
+            <li>フォーク文化でリミックス</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. 主要機能 -->
+  <div class="slide">
+    <div class="full" style="max-width: 920px;">
+      <div class="mono-label anim">Features</div>
+      <h2 class="anim d1">主要<span class="accent-text">機能</span></h2>
+      <div class="grid-3" style="margin-top: 24px;">
+        <div class="card anim d2">
+          <h3 style="margin-bottom: 12px; font-size: 15px;">作品投稿</h3>
+          <ul class="feature-list">
+            <li>URL・スクショ・コード対応</li>
+            <li>動かなくてもOK（アイデアだけ投稿モード）</li>
+            <li>AIツール選択・タグ設定</li>
+          </ul>
+        </div>
+        <div class="card anim d3">
+          <h3 style="margin-bottom: 12px; font-size: 15px;">フォーク＆系譜</h3>
+          <ul class="feature-list">
+            <li>「改造してみる」ボタンでワンクリックフォーク</li>
+            <li>フォーク元が自動紐づき</li>
+            <li>アイデアのツリー表示</li>
+          </ul>
+        </div>
+        <div class="card anim d4">
+          <h3 style="margin-bottom: 12px; font-size: 15px;">SNS機能</h3>
+          <ul class="feature-list">
+            <li>いいね / 軽い反応</li>
+            <li>フォロー / プロフィール</li>
+            <li>コメント・コレクション</li>
+          </ul>
+        </div>
+        <div class="card anim d3">
+          <h3 style="margin-bottom: 12px; font-size: 15px;">フィード</h3>
+          <ul class="feature-list">
+            <li>新着・トレンド・フォロー中</li>
+            <li>今週のお題（テーマ投稿）</li>
+          </ul>
+        </div>
+        <div class="card anim d4">
+          <h3 style="margin-bottom: 12px; font-size: 15px;">公開設定</h3>
+          <ul class="feature-list">
+            <li>全体公開</li>
+            <li>フォロワー限定</li>
+            <li>ユーザー指定</li>
+          </ul>
+        </div>
+        <div class="card anim d5">
+          <h3 style="margin-bottom: 12px; font-size: 15px;">将来構想</h3>
+          <ul class="feature-list">
+            <li>AIアシスト実装ボタン</li>
+            <li>マーケットプレイス化</li>
+            <li>SNSトレンド機能を随時追加</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. 画面デザイン -->
+  <div class="slide">
+    <div class="full" style="max-width: 900px;">
+      <div class="mono-label anim">Screen Design</div>
+      <h2 class="anim d1">4画面の<span class="accent-text">モックアップ</span>完成</h2>
+      <div class="grid-2" style="margin-top: 24px;">
+        <div class="card anim d2">
+          <h3 style="margin-bottom: 10px; font-size: 15px;">🏠 ホーム / フィード</h3>
+          <p style="font-size: 13px; color: var(--fg-muted); line-height: 1.6;">おすすめ・フォロー中・トレンドタブ。ピックアップバナー、作品カード、ボトムナビ。砂粒フローティングアニメーション。</p>
+        </div>
+        <div class="card anim d3">
+          <h3 style="margin-bottom: 10px; font-size: 15px;">📄 作品詳細</h3>
+          <p style="font-size: 13px; color: var(--fg-muted); line-height: 1.6;">いいね・フォークボタン、系譜ツリー、フォーク先一覧、コメント。フォーク数を前面に出したUX。</p>
+        </div>
+        <div class="card anim d4">
+          <h3 style="margin-bottom: 10px; font-size: 15px;">👤 プロフィール</h3>
+          <p style="font-size: 13px; color: var(--fg-muted); line-height: 1.6;">作品グリッド、フォロワー・フォーク統計、AIツールタグ表示。ポートフォリオとして機能。</p>
+        </div>
+        <div class="card anim d5">
+          <h3 style="margin-bottom: 10px; font-size: 15px;">✏️ 新規投稿</h3>
+          <p style="font-size: 13px; color: var(--fg-muted); line-height: 1.6;">タイプ選択（動く/アイデアのみ）、AIツール選択、公開設定、フォーク許可トグル。</p>
+        </div>
+      </div>
+      <div class="card-sm anim d5" style="margin-top: 16px; text-align: center;">
+        <span class="muted" style="font-size: 13px;">確認URL: </span>
+        <span style="font-size: 13px; color: var(--accent); font-family: var(--font-mono);">portal.keyaki-dev.com/xando/design/</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. ブランディング -->
+  <div class="slide">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim">Branding</div>
+      <h2 class="anim d1">Xandoの<span class="accent-text">ブランド</span></h2>
+      <div class="row" style="margin-top: 28px; align-items: flex-start;">
+        <div class="col anim d2">
+          <div class="card" style="height: 100%;">
+            <h3 style="margin-bottom: 16px;">カラーパレット</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 36px; height: 36px; border-radius: 8px; background: #FFF8F0; border: 1px solid var(--border);"></div>
+                <div><div style="font-size: 13px; font-weight: 600;">クリーム白</div><div style="font-size: 11px; color: var(--fg-muted); font-family: var(--font-mono);">#FFF8F0 ベース</div></div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 36px; height: 36px; border-radius: 8px; background: #F5CBA7;"></div>
+                <div><div style="font-size: 13px; font-weight: 600;">パステルサンド</div><div style="font-size: 11px; color: var(--fg-muted); font-family: var(--font-mono);">#F5CBA7 砂・温かみ</div></div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 36px; height: 36px; border-radius: 8px; background: #AED6F1;"></div>
+                <div><div style="font-size: 13px; font-weight: 600;">パステルスカイ</div><div style="font-size: 11px; color: var(--fg-muted); font-family: var(--font-mono);">#AED6F1 広がり</div></div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 36px; height: 36px; border-radius: 8px; background: #F1948A;"></div>
+                <div><div style="font-size: 13px; font-weight: 600;">パステルコーラル</div><div style="font-size: 11px; color: var(--fg-muted); font-family: var(--font-mono);">#F1948A ポップ</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col anim d3">
+          <div class="card" style="height: 100%;">
+            <h3 style="margin-bottom: 16px;">ビジュアルアイデンティティ</h3>
+            <ul class="feature-list">
+              <li>アイコン: コーラルピンクのバケツ＋砂粒がこぼれ落ちるデザイン</li>
+              <li>ロゴ: 砂粒テクスチャの「x」＋丸みあるコーラルフォントの「ando」</li>
+              <li>トーン: SNS寄り・ポップ・未完成を肯定する文化</li>
+              <li>モバイルファースト（430px基準）</li>
+            </ul>
+            <div style="margin-top: 20px; padding: 14px; background: var(--bg-muted); border-radius: 10px; text-align: center;">
+              <div style="font-size: 28px; font-family: var(--font-serif); color: var(--fg);">
+                <span style="background: linear-gradient(135deg, #F5CBA7, #F1948A); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700;">x</span><span style="color: #F1948A;">ando</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. 開発ロードマップ -->
+  <div class="slide">
+    <div class="full" style="max-width: 900px;">
+      <div class="mono-label anim">Roadmap</div>
+      <h2 class="anim d1">開発<span class="accent-text">ロードマップ</span></h2>
+      <div class="card anim d2" style="margin-top: 24px; padding: 0; overflow: hidden;">
+        <table>
+          <thead>
+            <tr>
+              <th>フェーズ</th>
+              <th>内容</th>
+              <th>状態</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Phase 1</strong></td>
+              <td>サービス名・ロゴ・ブランディング策定</td>
+              <td><span class="tag green">完了</span></td>
+            </tr>
+            <tr>
+              <td><strong>Phase 2</strong></td>
+              <td>機能実装なしの画面デザイン作成（4画面HTMLモックアップ）</td>
+              <td><span class="tag green">完了</span></td>
+            </tr>
+            <tr>
+              <td><strong>Phase 3</strong></td>
+              <td>X / note にティザー投稿 → ユーザー反応を取る</td>
+              <td><span class="tag yellow">準備中</span></td>
+            </tr>
+            <tr>
+              <td><strong>Phase 4</strong></td>
+              <td>要件定義書・プレゼン資料完成</td>
+              <td><span class="tag green">完了</span></td>
+            </tr>
+            <tr>
+              <td><strong>Phase 5</strong></td>
+              <td>開発チーム組成（デザイナー / フロント / バック / テスター）</td>
+              <td><span class="tag">未着手</span></td>
+            </tr>
+            <tr>
+              <td><strong>Phase 6</strong></td>
+              <td>ウォーターフォール開発着手 → βリリース</td>
+              <td><span class="tag">未着手</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-sm anim d3" style="margin-top: 16px;">
+        <span style="color: var(--accent); font-weight: 600;">開発方針：</span>
+        <span class="muted" style="font-size: 14px;">ウォーターフォール。規模・品質重視。スピードより確実性を優先。大規模なユーザー数を想定したアーキテクチャ設計から着手。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. まとめ -->
+  <div class="slide slide-title-bg">
+    <div class="full" style="max-width: 860px;">
+      <div class="mono-label anim center">Summary</div>
+      <h2 class="anim d1 center">AIネイティブ時代の、<br><span class="accent-text">新しい自己表現の場</span></h2>
+      <div class="grid-3" style="margin-top: 32px;">
+        <div class="stat-box anim d2">
+          <div class="stat-num">🏖️</div>
+          <div class="stat-label">未完成でいい<br>アイデアだけでいい</div>
+        </div>
+        <div class="stat-box anim d3">
+          <div class="stat-num">🔀</div>
+          <div class="stat-label">フォークされることが<br>最高の評価</div>
+        </div>
+        <div class="stat-box anim d4">
+          <div class="stat-num">🌱</div>
+          <div class="stat-label">アイデアの家系図が<br>育っていく</div>
+        </div>
+      </div>
+      <div class="card-sm anim d5" style="margin-top: 24px; text-align: center; border-color: var(--accent-soft);">
+        <p style="font-family: var(--font-serif); font-style: italic; font-size: 16px; color: var(--fg-muted); line-height: 1.8;">
+          「作れること」に価値がなくなった時代に。<br>
+          <strong style="color: var(--fg);">何を作るか・どう見せるか</strong>で評価される、次世代の砂場。
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="nav">
+  <button onclick="prev()" title="前へ">←</button>
+  <div class="dot-row" id="dots"></div>
+  <span id="counter">1 / 1</span>
+  <button onclick="next()" title="次へ">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  const counterEl = document.getElementById('counter');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => go(i);
+    dotsEl.appendChild(d);
+  });
+  counterEl.textContent = '1 / ' + slides.length;
+  function go(n) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    counterEl.textContent = (cur + 1) + ' / ' + slides.length;
+  }
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+  let ts = 0;
+  document.addEventListener('touchstart', e => { ts = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - ts;
+    if (Math.abs(dx) > 50) dx < 0 ? next() : prev();
+  });
+</script>
+</body>
+</html>
