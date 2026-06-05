@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xando 要件定義書 — ケ開発</title>
+<style>
+:root {
+  --bg: #F8F5F1; --bg-card: #FDFAF7; --bg-muted: #F2EDE8;
+  --fg: #2C2C2C; --fg-muted: #6B6560; --border: #E5DDD6;
+  --accent: #C45E3E; --accent-soft: #F5E1D6;
+  --green: #4A7C6F; --green-soft: #E6F0EE;
+  --yellow: #8A6A2E; --yellow-soft: #F5EDD6;
+  --blue: #3A5F8A; --blue-soft: #DDE8F5;
+  --font-sans: 'Hiragino Kaku Gothic ProN','Yu Gothic','Segoe UI',system-ui,sans-serif;
+  --font-serif: 'Hiragino Mincho ProN','Yu Mincho',Georgia,serif;
+  --font-mono: 'Fira Code','Geist Mono',monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--fg);line-height:1.8;-webkit-font-smoothing:antialiased;}
+.container{max-width:860px;margin:0 auto;padding:48px 32px 80px;}
+header{border-bottom:2px solid var(--border);padding-bottom:32px;margin-bottom:48px;}
+.logo-wrap{margin-bottom:20px;}
+.logo-wrap img{height:48px;object-fit:contain;}
+.meta{font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);letter-spacing:0.1em;margin-bottom:8px;}
+h1{font-family:var(--font-serif);font-size:32px;font-weight:500;color:var(--fg);letter-spacing:-0.02em;margin-bottom:12px;}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+.tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--accent-soft);color:var(--accent);border:1px solid var(--border);}
+.tag.green{background:var(--green-soft);color:var(--green);}
+.tag.blue{background:var(--blue-soft);color:var(--blue);}
+.toc{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:48px;}
+.toc h2{font-size:13px;font-weight:600;color:var(--fg-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px;}
+.toc ol{padding-left:20px;}
+.toc li{margin-bottom:6px;font-size:14px;}
+.toc a{color:var(--accent);text-decoration:none;}
+.toc a:hover{text-decoration:underline;}
+section{margin-bottom:56px;}
+h2.section-title{font-family:var(--font-serif);font-size:22px;font-weight:500;color:var(--fg);border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:24px;}
+h3{font-size:16px;font-weight:600;color:var(--fg);margin:24px 0 10px;}
+p{font-size:14px;color:var(--fg-muted);margin-bottom:12px;}
+strong{color:var(--fg);}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;}
+th{text-align:left;padding:10px 14px;color:var(--fg-muted);font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--bg-muted);}
+td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;}
+.priority-high{background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+.priority-mid{background:var(--yellow-soft);color:var(--yellow);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+.priority-low{background:var(--bg-muted);color:var(--fg-muted);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+.done{background:var(--green-soft);color:var(--green);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+.wip{background:var(--yellow-soft);color:var(--yellow);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+.todo{background:var(--bg-muted);color:var(--fg-muted);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="logo-wrap"><img src="/xando/logo.png" alt="Xando"></div>
+  <div class="meta">要件定義書 v1.0 — 2026-06-05 — 作成: 千葉（keyaki マネージャー）</div>
+  <h1>Xando 要件定義書</h1>
+  <p style="font-size:15px;color:var(--fg-muted);">AIで作った成果物を共有するSNS型プラットフォームの詳細要件</p>
+  <div class="tags">
+    <span class="tag">SNS型プラットフォーム</span>
+    <span class="tag green">AIネイティブ向け</span>
+    <span class="tag blue">成果物共有</span>
+  </div>
+</header>
+
+<div class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#s1">サービス概要</a></li>
+    <li><a href="#s2">ターゲットユーザー</a></li>
+    <li><a href="#s3">コアコンセプト</a></li>
+    <li><a href="#s4">機能一覧</a></li>
+    <li><a href="#s5">画面一覧</a></li>
+    <li><a href="#s6">非機能要件</a></li>
+    <li><a href="#s7">開発方針</a></li>
+    <li><a href="#s8">フェーズ計画</a></li>
+    <li><a href="#s9">ブランディング</a></li>
+  </ol>
+</div>
+
+<section id="s1">
+  <h2 class="section-title">1. サービス概要</h2>
+  <div class="card">
+    <table>
+      <tr><th width="160">項目</th><th>内容</th></tr>
+      <tr><td><strong>サービス名</strong></td><td><strong>Xando</strong>（サンドゥ）</td></tr>
+      <tr><td><strong>キャッチコピー</strong></td><td>次世代の砂場、高次元の遊び場</td></tr>
+      <tr><td><strong>ジャンル</strong></td><td>SNS型 成果物共有プラットフォーム</td></tr>
+      <tr><td><strong>立ち上げ</strong></td><td>2026-06-04</td></tr>
+      <tr><td><strong>主担当</strong></td><td>山下（主導）/ 千葉（PM）</td></tr>
+    </table>
+  </div>
+  <h3>背景・課題</h3>
+  <p>AIの普及により「ものを作ること」の希少性は失われつつある。エンジニア気質の人やアイデアマンたちは、AIの力を借りて様々なものを作り、noteやブログで発表している。しかし、文章による発表では読者が傍観者のままになり、「また誰かが何かを作ったな」という他人事になりがちである。</p>
+  <ul style="font-size:14px;color:var(--fg-muted);padding-left:20px;margin-bottom:12px;">
+    <li style="margin-bottom:6px;">文章は情報を伝えるが、動くものは<strong>衝動を引き起こす</strong></li>
+    <li style="margin-bottom:6px;">ソースコードの公開は技術者向けで敷居が高い</li>
+    <li style="margin-bottom:6px;">「荒削りだが動くもの」「アイデアだけのビジョン」を置く場所がない</li>
+  </ul>
+  <h3>解決策</h3>
+  <p>体験できる成果物をショーケースとして並べ、それに対して意見を出したり改造して使ったりできる場を提供する。評価軸を「完成度」ではなく「アイデア・表現のセンス」に置くことで、AIネイティブ時代の新しい自己表現の場を作る。</p>
+</section>
+
+<section id="s2">
+  <h2 class="section-title">2. ターゲットユーザー</h2>
+  <h3>主要ターゲット</h3>
+  <ul style="font-size:14px;color:var(--fg-muted);padding-left:20px;margin-bottom:16px;">
+    <li style="margin-bottom:6px;">AIツールを使って何かを作る人（エンジニア・デザイナー・アイデアマン）</li>
+    <li style="margin-bottom:6px;">作ったものを見せたい・フィードバックが欲しい人</li>
+    <li style="margin-bottom:6px;">他人のアイデアに刺激を受けたい・改造して使いたい人</li>
+  </ul>
+  <h3>ターゲット属性</h3>
+  <ul style="font-size:14px;color:var(--fg-muted);padding-left:20px;">
+    <li style="margin-bottom:6px;">20〜40代、テクノロジーに関心がある層</li>
+    <li style="margin-bottom:6px;">GitHubは堅苦しく感じる / SNSでは成果物を見せにくいと感じている層</li>
+    <li style="margin-bottom:6px;">「完成品でなくてもいい」という文化に共感できる人</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2 class="section-title">3. コアコンセプト</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <h3 style="margin-top:0;">評価軸</h3>
+      <p>完成度ではなく、<strong>アイデアと表現のセンス</strong>で評価される</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">フォーク＝評価</h3>
+      <p>他人のアイデアをベースに新たなものを作る行為が、いいね・高評価と同等の評価として機能する</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">家系図文化</h3>
+      <p>フォークの連鎖が可視化され、アイデアがどのように発展・分岐したかが見える</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">未完成を肯定する</h3>
+      <p>「動かなくてもいい」「アイデアだけでもいい」という文化を設計に組み込む</p>
+    </div>
+  </div>
+</section>
+
+<section id="s4">
+  <h2 class="section-title">4. 機能一覧</h2>
+  <h3>4.1 コア機能（MVP必須）</h3>
+  <table>
+    <tr><th>機能ID</th><th>機能名</th><th>概要</th><th>優先度</th></tr>
+    <tr><td>F-01</td><td>作品投稿</td><td>URL・スクリーンショット・コードを投稿。動くかどうかは問わない</td><td><span class="priority-high">最高</span></td></tr>
+    <tr><td>F-02</td><td>フォーク</td><td>他人の作品を派生元として自分の作品を作成。派生元が自動紐づき</td><td><span class="priority-high">最高</span></td></tr>
+    <tr><td>F-03</td><td>いいね/反応</td><td>軽い共感表明。複数の反応タイプを用意</td><td><span class="priority-high">最高</span></td></tr>
+    <tr><td>F-04</td><td>フォロー</td><td>作者をフォロー。フォロー中フィードで作品が流れる</td><td><span class="priority-high">最高</span></td></tr>
+    <tr><td>F-05</td><td>プロフィール</td><td>作品一覧・フォロワー数・フォーク数を表示するポートフォリオページ</td><td><span class="priority-high">最高</span></td></tr>
+    <tr><td>F-06</td><td>フィード</td><td>新着・トレンド・フォロー中の3タブ</td><td><span class="priority-high">最高</span></td></tr>
+    <tr><td>F-07</td><td>系譜の可視化</td><td>フォーク元・フォーク先をツリー表示</td><td><span class="priority-mid">高</span></td></tr>
+    <tr><td>F-08</td><td>コメント</td><td>作品へのコメント・意見</td><td><span class="priority-mid">高</span></td></tr>
+  </table>
+  <h3>4.2 Xandoならではの機能</h3>
+  <table>
+    <tr><th>機能ID</th><th>機能名</th><th>概要</th><th>優先度</th></tr>
+    <tr><td>F-09</td><td>アイデアだけ投稿モード</td><td>動かなくてもビジョン・スケッチだけの投稿が可能</td><td><span class="priority-high">最高</span></td></tr>
+    <tr><td>F-10</td><td>フォーク通知</td><td>自分の作品がフォークされたら通知。「評価された」として届く</td><td><span class="priority-mid">高</span></td></tr>
+    <tr><td>F-11</td><td>改造してみるボタン</td><td>フォークの入口をSNS的に軽くするCTA</td><td><span class="priority-mid">高</span></td></tr>
+    <tr><td>F-12</td><td>フォーク数スコア</td><td>直接フォーク数＋孫・ひ孫フォーク数を加味したスコア表示</td><td><span class="priority-mid">高</span></td></tr>
+  </table>
+  <h3>4.3 公開設定</h3>
+  <table>
+    <tr><th>機能ID</th><th>機能名</th><th>概要</th><th>優先度</th></tr>
+    <tr><td>F-13</td><td>全体公開</td><td>誰でも閲覧可能</td><td><span class="priority-high">最高</span></td></tr>
+    <tr><td>F-14</td><td>フォロワー限定公開</td><td>フォロワーのみ閲覧可能</td><td><span class="priority-mid">中</span></td></tr>
+    <tr><td>F-15</td><td>ユーザー指定公開</td><td>特定のユーザーのみ閲覧可能</td><td><span class="priority-mid">中</span></td></tr>
+  </table>
+  <h3>4.4 コミュニティ機能</h3>
+  <table>
+    <tr><th>機能ID</th><th>機能名</th><th>概要</th><th>優先度</th></tr>
+    <tr><td>F-16</td><td>コレクション / ブックマーク</td><td>気になる作品を保存・整理</td><td><span class="priority-mid">中</span></td></tr>
+    <tr><td>F-17</td><td>テーマ投稿</td><td>「今週のお題」等の企画枠。コミュニティ活性化</td><td><span class="priority-low">低</span></td></tr>
+    <tr><td>F-18</td><td>通知センター</td><td>いいね・フォーク・コメントの通知一覧</td><td><span class="priority-mid">高</span></td></tr>
+  </table>
+  <h3>4.5 将来検討機能</h3>
+  <table>
+    <tr><th>機能ID</th><th>機能名</th><th>概要</th></tr>
+    <tr><td>F-19</td><td>AIアシスト</td><td>「このアイデアをAIで実装してみる」ボタン</td></tr>
+    <tr><td>F-20</td><td>マーケットプレイス</td><td>発展したアプリの販売機能</td></tr>
+    <tr><td>F-21</td><td>SNSトレンド取り込み</td><td>他SNSの流行機能を随時追加</td></tr>
+  </table>
+</section>
+
+<section id="s5">
+  <h2 class="section-title">5. 画面一覧</h2>
+  <h3>5.1 認証系</h3>
+  <table>
+    <tr><th>画面ID</th><th>画面名</th><th>概要</th></tr>
+    <tr><td>S-01</td><td>ランディングページ</td><td>サービス説明・登録促進</td></tr>
+    <tr><td>S-02</td><td>新規登録</td><td>メール / SNSアカウントで登録</td></tr>
+    <tr><td>S-03</td><td>ログイン</td><td>メール / SNSアカウントでログイン</td></tr>
+  </table>
+  <h3>5.2 メイン（モックアップ完成済み）</h3>
+  <table>
+    <tr><th>画面ID</th><th>画面名</th><th>概要</th><th>参照</th></tr>
+    <tr><td>S-04</td><td>ホーム / フィード</td><td>新着・トレンド・フォロー中タブ。作品カード一覧</td><td><a href="https://portal.keyaki-dev.com/xando/design/feed" style="color:var(--accent);">feed.html</a></td></tr>
+    <tr><td>S-05</td><td>作品詳細</td><td>作品のビジュアル・説明・いいね・フォーク・系譜ツリー</td><td><a href="https://portal.keyaki-dev.com/xando/design/post" style="color:var(--accent);">post.html</a></td></tr>
+    <tr><td>S-06</td><td>プロフィール</td><td>作者情報・作品グリッド・フォロワー統計</td><td><a href="https://portal.keyaki-dev.com/xando/design/profile" style="color:var(--accent);">profile.html</a></td></tr>
+    <tr><td>S-07</td><td>新規投稿</td><td>作品タイプ選択・アップロード・AIツール選択・公開設定</td><td><a href="https://portal.keyaki-dev.com/xando/design/create" style="color:var(--accent);">create.html</a></td></tr>
+  </table>
+  <h3>5.3 サブ画面</h3>
+  <table>
+    <tr><th>画面ID</th><th>画面名</th><th>概要</th></tr>
+    <tr><td>S-08</td><td>検索</td><td>キーワード・タグ・AIツールで検索</td></tr>
+    <tr><td>S-09</td><td>通知</td><td>いいね・フォーク・コメントの通知一覧</td></tr>
+    <tr><td>S-10</td><td>コレクション</td><td>ブックマークした作品一覧</td></tr>
+    <tr><td>S-11</td><td>設定</td><td>プロフィール編集・通知設定・公開設定</td></tr>
+    <tr><td>S-12</td><td>系譜ビュー</td><td>アイデアの家系図をフルスクリーン表示</td></tr>
+  </table>
+</section>
+
+<section id="s6">
+  <h2 class="section-title">6. 非機能要件</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <h3 style="margin-top:0;">パフォーマンス</h3>
+      <ul style="font-size:13px;color:var(--fg-muted);padding-left:16px;">
+        <li style="margin-bottom:4px;">フィードの初期表示: 2秒以内</li>
+        <li style="margin-bottom:4px;">作品投稿: 5秒以内</li>
+        <li>同時接続数: 将来的に数万〜数十万ユーザー想定</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">セキュリティ</h3>
+      <ul style="font-size:13px;color:var(--fg-muted);padding-left:16px;">
+        <li style="margin-bottom:4px;">HTTPS必須</li>
+        <li style="margin-bottom:4px;">認証: JWT / OAuth2</li>
+        <li>不正アクセス対策（レートリミット等）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">スケーラビリティ</h3>
+      <ul style="font-size:13px;color:var(--fg-muted);padding-left:16px;">
+        <li style="margin-bottom:4px;">ユーザー数・コンテンツ数の増加に対応できるアーキテクチャ</li>
+        <li>CDNによるメディア配信</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">可用性</h3>
+      <ul style="font-size:13px;color:var(--fg-muted);padding-left:16px;">
+        <li>稼働率 99.9% 以上を目標</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="s7">
+  <h2 class="section-title">7. 開発方針</h2>
+  <h3>開発手法</h3>
+  <p><strong>ウォーターフォール</strong>。規模・品質重視。開発スピードより確実性を優先。</p>
+  <h3>開発体制（フルチーム構成時）</h3>
+  <table>
+    <tr><th>職種</th><th>役割</th></tr>
+    <tr><td>プロダクトマネージャー</td><td>千葉（AI）</td></tr>
+    <tr><td>デザイナー</td><td>山口（AI）</td></tr>
+    <tr><td>フロントエンドエンジニア</td><td>外部採用</td></tr>
+    <tr><td>バックエンドエンジニア</td><td>外部採用</td></tr>
+    <tr><td>テスター</td><td>外部採用</td></tr>
+  </table>
+  <h3>技術スタック（検討）</h3>
+  <table>
+    <tr><th>レイヤー</th><th>候補</th></tr>
+    <tr><td>フロントエンド</td><td>Next.js / React</td></tr>
+    <tr><td>バックエンド</td><td>Node.js または Python</td></tr>
+    <tr><td>DB</td><td>PostgreSQL</td></tr>
+    <tr><td>ストレージ</td><td>Cloudflare R2 または AWS S3</td></tr>
+    <tr><td>インフラ</td><td>Vercel / AWS</td></tr>
+  </table>
+</section>
+
+<section id="s8">
+  <h2 class="section-title">8. フェーズ計画</h2>
+  <table>
+    <tr><th>フェーズ</th><th>内容</th><th>状態</th></tr>
+    <tr><td>Phase 1</td><td>サービス名・ロゴ・ブランディング策定</td><td><span class="done">完了</span></td></tr>
+    <tr><td>Phase 2</td><td>機能実装なしの画面デザイン作成（4画面HTMLモックアップ）</td><td><span class="done">完了</span></td></tr>
+    <tr><td>Phase 3</td><td>X / note にティザー投稿 → ユーザー反応を取る</td><td><span class="wip">準備中</span></td></tr>
+    <tr><td>Phase 4</td><td>要件定義書・プレゼン資料完成</td><td><span class="done">完了</span></td></tr>
+    <tr><td>Phase 5</td><td>開発チーム組成（デザイナー / フロント / バック / テスター）</td><td><span class="todo">未着手</span></td></tr>
+    <tr><td>Phase 6</td><td>ウォーターフォール開発着手 → βリリース</td><td><span class="todo">未着手</span></td></tr>
+  </table>
+</section>
+
+<section id="s9">
+  <h2 class="section-title">9. ブランディング</h2>
+  <div class="card" style="margin-bottom:16px;">
+    <img src="/xando/logo.png" alt="Xando logo" style="height:48px;object-fit:contain;margin-bottom:16px;display:block;">
+    <table>
+      <tr><th>項目</th><th>内容</th></tr>
+      <tr><td>ベースカラー</td><td>クリーム白 <code style="font-family:var(--font-mono);font-size:12px;">#FFF8F0</code></td></tr>
+      <tr><td>アクセント①</td><td>パステルサンド <code style="font-family:var(--font-mono);font-size:12px;">#F5CBA7</code></td></tr>
+      <tr><td>アクセント②</td><td>パステルスカイ <code style="font-family:var(--font-mono);font-size:12px;">#AED6F1</code></td></tr>
+      <tr><td>アクセント③</td><td>パステルコーラル <code style="font-family:var(--font-mono);font-size:12px;">#F1948A</code></td></tr>
+      <tr><td>アイコン</td><td>バケツ＋砂粒がこぼれ落ちるデザイン</td></tr>
+      <tr><td>トーン</td><td>SNS寄り・ポップ・未完成を肯定</td></tr>
+      <tr><td>モックアップ</td><td><a href="https://portal.keyaki-dev.com/xando/design/" style="color:var(--accent);">portal.keyaki-dev.com/xando/design/</a></td></tr>
+    </table>
+  </div>
+</section>
+
+</div>
+</body>
+</html>
