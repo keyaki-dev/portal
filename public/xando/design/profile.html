@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Xando — プロフィール</title>
+<style>
+  :root {
+    --cream: #FFF8F0;
+    --sand: #F5CBA7;
+    --sky: #AED6F1;
+    --coral: #F1948A;
+    --text: #2D2D2D;
+    --text-muted: #9A8F8A;
+    --card-bg: #FFFFFF;
+    --border: rgba(245,203,167,0.35);
+    --radius: 18px;
+    --radius-sm: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    font-family: -apple-system, 'Hiragino Kaku Gothic ProN', sans-serif;
+    color: var(--text);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+
+  /* ── ヘッダー ── */
+  .header {
+    position: sticky;
+    top: 0; z-index: 100;
+    background: rgba(255,248,240,0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .back-btn {
+    width: 38px; height: 38px;
+    border: none; background: rgba(245,203,167,0.2); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; cursor: pointer;
+  }
+  .header-name { font-size: 15px; font-weight: 700; }
+  .more-btn {
+    width: 38px; height: 38px;
+    border: none; background: rgba(245,203,167,0.2); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; cursor: pointer;
+  }
+
+  /* ── ヒーロー ── */
+  .hero-cover {
+    width: 100%; height: 120px;
+    background: linear-gradient(135deg, #AED6F1, #D7BDE2, #F5CBA7);
+    position: relative;
+  }
+
+  .profile-section {
+    padding: 0 20px 20px;
+    position: relative;
+  }
+
+  .avatar-wrap {
+    position: relative;
+    display: inline-block;
+    margin-top: -36px;
+    margin-bottom: 12px;
+  }
+  .avatar-xl {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #AED6F1, #5DADE2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; font-weight: 800; color: white;
+    border: 4px solid var(--cream);
+  }
+  .online-dot {
+    position: absolute;
+    bottom: 4px; right: 4px;
+    width: 14px; height: 14px;
+    background: #2ECC71;
+    border-radius: 50%;
+    border: 2px solid var(--cream);
+  }
+
+  .profile-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .profile-name { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
+  .profile-handle { font-size: 13.5px; color: var(--text-muted); }
+
+  .profile-actions {
+    display: flex; gap: 8px; margin-top: 4px;
+  }
+  .btn-primary {
+    padding: 9px 20px;
+    background: linear-gradient(135deg, #F5CBA7, #F1948A);
+    border: none; border-radius: 20px;
+    font-size: 13.5px; font-weight: 700; color: white;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(241,148,138,0.3);
+  }
+  .btn-secondary {
+    padding: 9px 16px;
+    background: none;
+    border: 1.5px solid var(--sand);
+    border-radius: 20px;
+    font-size: 13.5px; font-weight: 700; color: #A05A2C;
+    cursor: pointer;
+  }
+
+  .profile-bio {
+    font-size: 14px; line-height: 1.6;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .profile-meta {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .meta-item {
+    font-size: 12px; color: var(--text-muted);
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* ── 統計 ── */
+  .stats-row {
+    display: flex;
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(245,203,167,0.2);
+    margin-bottom: 20px;
+  }
+  .stat-item {
+    flex: 1;
+    padding: 14px 0;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-size: 18px; font-weight: 800;
+    display: block; margin-bottom: 3px;
+  }
+  .stat-label {
+    font-size: 11px; color: var(--text-muted); font-weight: 600;
+  }
+
+  /* ── 使用AIタグ ── */
+  .ai-tools {
+    display: flex; flex-wrap: wrap; gap: 7px;
+    margin-bottom: 20px;
+  }
+  .ai-tag {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .ai-gpt { background: rgba(16,163,127,0.12); color: #10A37F; }
+  .ai-mid { background: rgba(122,87,246,0.12); color: #7A57F6; }
+  .ai-claude { background: rgba(241,148,138,0.15); color: #C0392B; }
+  .ai-cursor { background: rgba(174,214,241,0.3); color: #1A6EA8; }
+
+  /* ── コンテンツタブ ── */
+  .content-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 14px;
+  }
+  .ctab {
+    flex: 1; padding: 11px 0;
+    text-align: center;
+    font-size: 13px; font-weight: 600;
+    color: var(--text-muted);
+    border: none; background: none;
+    cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    transition: all 0.2s;
+  }
+  .ctab.active { color: var(--text); border-bottom-color: var(--coral); }
+
+  /* ── 作品グリッド ── */
+  .works-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    margin: 0 -20px;
+    margin-bottom: 100px;
+  }
+  .work-thumb {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    cursor: pointer;
+    position: relative;
+    transition: opacity 0.15s;
+  }
+  .work-thumb:active { opacity: 0.8; }
+  .work-thumb:nth-child(1)  { background: linear-gradient(135deg,#E8F4FD,#AED6F1); }
+  .work-thumb:nth-child(2)  { background: linear-gradient(135deg,#FDF2E9,#F5CBA7); }
+  .work-thumb:nth-child(3)  { background: linear-gradient(135deg,#FDEDEC,#F1948A); }
+  .work-thumb:nth-child(4)  { background: linear-gradient(135deg,#E8F8F5,#A9DFBF); }
+  .work-thumb:nth-child(5)  { background: linear-gradient(135deg,#EBF5FB,#AED6F1); }
+  .work-thumb:nth-child(6)  { background: linear-gradient(135deg,#FEF9E7,#F9E79F); }
+  .work-thumb:nth-child(7)  { background: linear-gradient(135deg,#F5EEF8,#D7BDE2); }
+  .work-thumb:nth-child(8)  { background: linear-gradient(135deg,#FDF2E9,#FBEEE0); }
+  .work-thumb:nth-child(9)  { background: linear-gradient(135deg,#E9F7EF,#A9DFBF); }
+
+  .work-like {
+    position: absolute;
+    bottom: 6px; right: 7px;
+    font-size: 10.5px;
+    background: rgba(0,0,0,0.28);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 700;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ── ボトムナビ ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: rgba(255,248,240,0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 6px 0; cursor: pointer; color: var(--text-muted);
+    font-size: 10px; font-weight: 600; border: none; background: none;
+  }
+  .nav-item.active { color: var(--text); }
+  .nav-icon { font-size: 22px; }
+  .nav-post-btn {
+    flex: 0 0 52px; width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg, #F5CBA7, #F1948A);
+    border: none; display: flex; align-items: center; justify-content: center;
+    font-size: 24px; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(241,148,138,0.45);
+    color: white; margin: 0 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<header class="header">
+  <button class="back-btn">←</button>
+  <span class="header-name">midjourney_fan</span>
+  <button class="more-btn">⋯</button>
+</header>
+
+<!-- カバー -->
+<div class="hero-cover"></div>
+
+<!-- プロフィール -->
+<div class="profile-section">
+
+  <div class="profile-top">
+    <div class="avatar-wrap">
+      <div class="avatar-xl">み</div>
+      <div class="online-dot"></div>
+    </div>
+    <div class="profile-actions">
+      <button class="btn-secondary">メッセージ</button>
+      <button class="btn-primary">フォロー</button>
+    </div>
+  </div>
+
+  <div class="profile-name">midjourney_fan</div>
+  <div class="profile-handle">@midjourney_fan · Xando #1,247</div>
+
+  <div style="height:12px;"></div>
+
+  <p class="profile-bio">
+    AIで都市の情景を切り取る人 🌃<br>
+    Midjourney / DALL-E で遊んでます。<br>
+    作品は全部フォーク歓迎 🍴
+  </p>
+
+  <div class="profile-meta">
+    <span class="meta-item">📍 渋谷区, Tokyo</span>
+    <span class="meta-item">🔗 xando.app/mid_fan</span>
+    <span class="meta-item">📅 2026年3月から</span>
+  </div>
+
+  <!-- 使用AIツール -->
+  <div class="ai-tools">
+    <span class="ai-tag ai-mid">🎨 Midjourney</span>
+    <span class="ai-tag ai-gpt">💬 GPT-4o</span>
+    <span class="ai-tag ai-claude">🤖 Claude</span>
+  </div>
+
+  <!-- 統計 -->
+  <div class="stats-row">
+    <div class="stat-item">
+      <span class="stat-num">42</span>
+      <span class="stat-label">作品</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">1.2k</span>
+      <span class="stat-label">フォロワー</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">184</span>
+      <span class="stat-label">フォロー</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">384</span>
+      <span class="stat-label">フォーク数</span>
+    </div>
+  </div>
+
+  <!-- コンテンツタブ -->
+  <div class="content-tabs">
+    <button class="ctab active" data-tab="works">作品</button>
+    <button class="ctab" data-tab="forks">フォーク元</button>
+    <button class="ctab" data-tab="liked">いいね</button>
+  </div>
+
+  <!-- 作品グリッド -->
+  <div class="works-grid" id="worksGrid">
+    <div class="work-thumb">🌃<span class="work-like">❤️ 284</span></div>
+    <div class="work-thumb">🌆<span class="work-like">❤️ 201</span></div>
+    <div class="work-thumb">🌉<span class="work-like">❤️ 156</span></div>
+    <div class="work-thumb">🗼<span class="work-like">❤️ 134</span></div>
+    <div class="work-thumb">🌌<span class="work-like">❤️ 98</span></div>
+    <div class="work-thumb">🌊<span class="work-like">❤️ 87</span></div>
+    <div class="work-thumb">🌸<span class="work-like">❤️ 72</span></div>
+    <div class="work-thumb">🏙️<span class="work-like">❤️ 65</span></div>
+    <div class="work-thumb">🎆<span class="work-like">❤️ 53</span></div>
+  </div>
+
+</div>
+
+<!-- ボトムナビ -->
+<nav class="bottom-nav">
+  <button class="nav-item">
+    <span class="nav-icon">🏠</span>ホーム
+  </button>
+  <button class="nav-item">
+    <span class="nav-icon">🔍</span>探す
+  </button>
+  <button class="nav-post-btn">＋</button>
+  <button class="nav-item">
+    <span class="nav-icon">🔔</span>通知
+  </button>
+  <button class="nav-item active">
+    <span class="nav-icon">👤</span>マイページ
+  </button>
+</nav>
+
+<script>
+  document.querySelectorAll('.ctab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.ctab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+  document.querySelector('.btn-primary').addEventListener('click', function() {
+    const following = this.textContent === 'フォロー中';
+    this.textContent = following ? 'フォロー' : 'フォロー中';
+    this.style.background = following
+      ? 'linear-gradient(135deg,#F5CBA7,#F1948A)'
+      : 'rgba(245,203,167,0.3)';
+    this.style.color = following ? 'white' : '#A05A2C';
+  });
+</script>
+</body>
+</html>

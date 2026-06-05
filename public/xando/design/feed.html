@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Xando — フィード</title>
+<style>
+  :root {
+    --cream: #FFF8F0;
+    --sand: #F5CBA7;
+    --sky: #AED6F1;
+    --coral: #F1948A;
+    --text: #2D2D2D;
+    --text-muted: #9A8F8A;
+    --card-bg: #FFFFFF;
+    --border: rgba(245,203,167,0.35);
+    --radius: 18px;
+    --radius-sm: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    font-family: -apple-system, 'Hiragino Kaku Gothic ProN', sans-serif;
+    color: var(--text);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ── ヘッダー ── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,248,240,0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 14px 20px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo img {
+    height: 28px;
+    object-fit: contain;
+  }
+  .logo-text {
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #E8A87C, #F1948A);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    background: rgba(245,203,167,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .icon-btn:active { background: var(--sand); }
+
+  /* ── タブ ── */
+  .tabs {
+    display: flex;
+    padding: 12px 20px 0;
+    gap: 4px;
+    background: var(--cream);
+  }
+  .tab {
+    flex: 1;
+    padding: 9px 0;
+    text-align: center;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab.active {
+    color: var(--text);
+    border-bottom-color: var(--coral);
+  }
+
+  /* ── ピックアップバナー ── */
+  .pickup-section {
+    padding: 14px 0 6px 20px;
+  }
+  .pickup-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .pickup-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-right: 20px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .pickup-scroll::-webkit-scrollbar { display: none; }
+
+  .pickup-card {
+    flex: 0 0 240px;
+    height: 140px;
+    border-radius: var(--radius);
+    scroll-snap-align: start;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .pickup-card-bg {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+  }
+  .pickup-card:nth-child(1) .pickup-card-bg {
+    background: linear-gradient(135deg, #AED6F1, #D7BDE2);
+  }
+  .pickup-card:nth-child(2) .pickup-card-bg {
+    background: linear-gradient(135deg, #F5CBA7, #FDEBD0);
+  }
+  .pickup-card:nth-child(3) .pickup-card-bg {
+    background: linear-gradient(135deg, #F1948A, #F5CBA7);
+  }
+  .pickup-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 12px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.35));
+    color: white;
+  }
+  .pickup-title {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .pickup-author {
+    font-size: 11px;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+  .pickup-badge {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    background: var(--coral);
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── フィード ── */
+  .feed {
+    padding: 14px 16px 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 2px 16px rgba(245,203,167,0.3);
+    cursor: pointer;
+    transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .card:active {
+    transform: scale(0.98);
+    box-shadow: 0 1px 8px rgba(245,203,167,0.2);
+  }
+
+  .card-thumb {
+    width: 100%;
+    height: 190px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    position: relative;
+  }
+  .thumb-1 { background: linear-gradient(135deg, #E8F4FD, #AED6F1); }
+  .thumb-2 { background: linear-gradient(135deg, #FDF2E9, #F5CBA7); }
+  .thumb-3 { background: linear-gradient(135deg, #FDEDEC, #F1948A, #F5CBA7); }
+  .thumb-4 { background: linear-gradient(135deg, #E8F8F5, #A9DFBF); }
+
+  .card-type-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 9px;
+    border-radius: 20px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    letter-spacing: 0.04em;
+  }
+  .badge-app { background: rgba(174,214,241,0.75); color: #1A6EA8; }
+  .badge-image { background: rgba(245,203,167,0.75); color: #A05A2C; }
+  .badge-story { background: rgba(241,148,138,0.75); color: #A93226; }
+  .badge-code { background: rgba(169,223,191,0.75); color: #1E8449; }
+
+  .card-body {
+    padding: 13px 15px 14px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 11px;
+  }
+  .tag {
+    font-size: 11px;
+    background: rgba(245,203,167,0.3);
+    color: #A05A2C;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .tag-sky {
+    background: rgba(174,214,241,0.3);
+    color: #1A6EA8;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .av-sand { background: linear-gradient(135deg, #F5CBA7, #E59866); }
+  .av-sky  { background: linear-gradient(135deg, #AED6F1, #5DADE2); }
+  .av-coral{ background: linear-gradient(135deg, #F1948A, #E74C3C); }
+  .av-green{ background: linear-gradient(135deg, #A9DFBF, #27AE60); }
+
+  .author-name {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .author-time {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .card-stats {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .stat-like.active { color: var(--coral); }
+  .stat-fork.active { color: #5DADE2; }
+
+  /* ── ボトムナビ ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: rgba(255,248,240,0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 0;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 600;
+    border: none;
+    background: none;
+    transition: color 0.15s;
+  }
+  .nav-item.active { color: var(--text); }
+  .nav-icon { font-size: 22px; }
+
+  .nav-post-btn {
+    flex: 0 0 52px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #F5CBA7, #F1948A);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(241,148,138,0.45);
+    transition: transform 0.18s, box-shadow 0.18s;
+    color: white;
+    margin: 0 4px;
+  }
+  .nav-post-btn:active {
+    transform: scale(0.93);
+    box-shadow: 0 2px 8px rgba(241,148,138,0.3);
+  }
+
+  /* ── 砂粒エフェクト ── */
+  .sand-grain {
+    position: fixed;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--sand);
+    opacity: 0;
+    pointer-events: none;
+    animation: float-grain 8s ease-in-out infinite;
+  }
+  @keyframes float-grain {
+    0%   { opacity: 0; transform: translateY(100vh) translateX(0); }
+    10%  { opacity: 0.4; }
+    90%  { opacity: 0.2; }
+    100% { opacity: 0; transform: translateY(-10vh) translateX(20px); }
+  }
+</style>
+</head>
+<body>
+
+<!-- 砂粒エフェクト -->
+<div class="sand-grain" style="left:8%;  animation-delay:0s;   animation-duration:9s;"></div>
+<div class="sand-grain" style="left:22%; animation-delay:2s;   animation-duration:11s; background:#AED6F1;"></div>
+<div class="sand-grain" style="left:60%; animation-delay:4s;   animation-duration:8s;"></div>
+<div class="sand-grain" style="left:85%; animation-delay:6.5s; animation-duration:12s; background:#F1948A;"></div>
+
+<!-- ヘッダー -->
+<header class="header">
+  <div class="logo">
+    <img src="../assets/logo.png" alt="Xando" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+    <span class="logo-text" style="display:none">xando</span>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn">🔍</button>
+    <button class="icon-btn" style="position:relative">
+      🔔
+      <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--coral);border-radius:50%;border:2px solid var(--cream);"></span>
+    </button>
+  </div>
+</header>
+
+<!-- タブ -->
+<div class="tabs">
+  <button class="tab active">おすすめ</button>
+  <button class="tab">フォロー中</button>
+  <button class="tab">トレンド</button>
+</div>
+
+<!-- ピックアップ -->
+<section class="pickup-section">
+  <div class="pickup-label">🔥 今週のピックアップ</div>
+  <div class="pickup-scroll">
+    <div class="pickup-card">
+      <div class="pickup-card-bg">🤖</div>
+      <span class="pickup-badge">PICK</span>
+      <div class="pickup-info">
+        <div class="pickup-title">AIが描いた未来都市</div>
+        <div class="pickup-author">@midjourney_fan</div>
+      </div>
+    </div>
+    <div class="pickup-card">
+      <div class="pickup-card-bg">🎮</div>
+      <span class="pickup-badge">HOT</span>
+      <div class="pickup-info">
+        <div class="pickup-title">GPTと作る横スクロールゲーム</div>
+        <div class="pickup-author">@code_sandbox</div>
+      </div>
+    </div>
+    <div class="pickup-card">
+      <div class="pickup-card-bg">🎵</div>
+      <span class="pickup-badge">NEW</span>
+      <div class="pickup-info">
+        <div class="pickup-title">AIと共作した詩集</div>
+        <div class="pickup-author">@haiku_ai</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- フィード -->
+<main class="feed">
+
+  <!-- カード1 -->
+  <article class="card">
+    <div class="card-thumb thumb-1">
+      🌃
+      <span class="card-type-badge badge-image">IMAGE</span>
+    </div>
+    <div class="card-body">
+      <div class="card-title">深夜3時の渋谷をMidjourneyで再現してみた</div>
+      <div class="card-tags">
+        <span class="tag">#Midjourney</span>
+        <span class="tag">#生成AI</span>
+        <span class="tag tag-sky">#写真風</span>
+      </div>
+      <div class="card-footer">
+        <div class="card-author">
+          <div class="avatar av-sand">み</div>
+          <div>
+            <div class="author-name">midjourney_fan</div>
+            <div class="author-time">2時間前</div>
+          </div>
+        </div>
+        <div class="card-stats">
+          <div class="stat stat-like active">❤️ 284</div>
+          <div class="stat stat-fork">🍴 38</div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- カード2 -->
+  <article class="card">
+    <div class="card-thumb thumb-2">
+      🕹️
+      <span class="card-type-badge badge-app">APP</span>
+    </div>
+    <div class="card-body">
+      <div class="card-title">Claude と一緒に作った「感情メモ」アプリ</div>
+      <div class="card-tags">
+        <span class="tag">#Claude</span>
+        <span class="tag">#React</span>
+        <span class="tag tag-sky">#メモ帳</span>
+      </div>
+      <div class="card-footer">
+        <div class="card-author">
+          <div class="avatar av-sky">さ</div>
+          <div>
+            <div class="author-name">sandbox_dev</div>
+            <div class="author-time">5時間前</div>
+          </div>
+        </div>
+        <div class="card-stats">
+          <div class="stat stat-like">❤️ 127</div>
+          <div class="stat stat-fork active">🍴 52</div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- カード3 -->
+  <article class="card">
+    <div class="card-thumb thumb-3">
+      ✨
+      <span class="card-type-badge badge-story">STORY</span>
+    </div>
+    <div class="card-body">
+      <div class="card-title">GPT-4oと書いた短編小説「砂の記憶」</div>
+      <div class="card-tags">
+        <span class="tag">#ChatGPT</span>
+        <span class="tag">#小説</span>
+        <span class="tag tag-sky">#SF</span>
+      </div>
+      <div class="card-footer">
+        <div class="card-author">
+          <div class="avatar av-coral">は</div>
+          <div>
+            <div class="author-name">haiku_ai</div>
+            <div class="author-time">昨日</div>
+          </div>
+        </div>
+        <div class="card-stats">
+          <div class="stat stat-like">❤️ 91</div>
+          <div class="stat stat-fork">🍴 14</div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- カード4 -->
+  <article class="card">
+    <div class="card-thumb thumb-4">
+      🌱
+      <span class="card-type-badge badge-code">CODE</span>
+    </div>
+    <div class="card-body">
+      <div class="card-title">Cursorで30分で作ったTodo PWA（フォーク歓迎）</div>
+      <div class="card-tags">
+        <span class="tag">#Cursor</span>
+        <span class="tag">#PWA</span>
+        <span class="tag tag-sky">#OSS</span>
+      </div>
+      <div class="card-footer">
+        <div class="card-author">
+          <div class="avatar av-green">く</div>
+          <div>
+            <div class="author-name">code_sandbox</div>
+            <div class="author-time">2日前</div>
+          </div>
+        </div>
+        <div class="card-stats">
+          <div class="stat stat-like">❤️ 203</div>
+          <div class="stat stat-fork active">🍴 89</div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+</main>
+
+<!-- ボトムナビ -->
+<nav class="bottom-nav">
+  <button class="nav-item active">
+    <span class="nav-icon">🏠</span>
+    ホーム
+  </button>
+  <button class="nav-item">
+    <span class="nav-icon">🔍</span>
+    探す
+  </button>
+  <button class="nav-post-btn">＋</button>
+  <button class="nav-item">
+    <span class="nav-icon">🔔</span>
+    通知
+  </button>
+  <button class="nav-item">
+    <span class="nav-icon">👤</span>
+    マイページ
+  </button>
+</nav>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.stat-like').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      btn.classList.toggle('active');
+    });
+  });
+</script>
+</body>
+</html>
