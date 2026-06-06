@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>開発計画書 2026 — FocusBurst &amp; Forkbox</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1117; --surface: #161b22; --border: #30363d;
+  --text: #e6edf3; --muted: #7d8590;
+  --accent: #58a6ff; --green: #3fb950; --red: #f85149;
+  --yellow: #d29922; --purple: #bc8cff; --orange: #f0883e;
+  --teal: #39d353;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 15px; line-height: 1.7;
+  max-width: 920px; margin: 0 auto; padding: 40px 24px 80px;
+}
+
+/* ===== Header ===== */
+header { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 40px; }
+header .badge {
+  display: inline-block; background: #1f2c3d; border: 1px solid var(--accent);
+  border-radius: 20px; padding: 4px 14px; font-size: 12px; color: var(--accent);
+  margin-bottom: 16px;
+}
+header h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+header .meta { font-size: 13px; color: var(--muted); }
+header .meta span { margin-right: 20px; }
+
+/* ===== Nav ===== */
+nav {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px 20px; margin-bottom: 40px;
+}
+nav h2 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 10px; }
+nav ol { padding-left: 20px; }
+nav li { margin: 4px 0; }
+nav a { color: var(--accent); text-decoration: none; font-size: 14px; }
+nav a:hover { text-decoration: underline; }
+
+/* ===== Section ===== */
+section { margin-bottom: 56px; }
+h2.section-title {
+  font-size: 22px; font-weight: 700; margin-bottom: 20px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--border);
+}
+h2.section-title .num {
+  display: inline-block; background: var(--accent); color: #0d1117;
+  border-radius: 50%; width: 26px; height: 26px; text-align: center;
+  line-height: 26px; font-size: 13px; margin-right: 10px;
+}
+h3.sub-title {
+  font-size: 17px; font-weight: 700; margin: 28px 0 14px; color: var(--text);
+}
+p { margin-bottom: 12px; }
+p:last-child { margin-bottom: 0; }
+ul, ol { padding-left: 24px; margin-bottom: 12px; }
+li { margin: 5px 0; }
+
+/* ===== Cards ===== */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px 24px; margin-bottom: 16px;
+}
+.card-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+
+/* ===== Phase block ===== */
+.phase {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px 26px; margin-bottom: 20px;
+  border-left: 4px solid var(--accent);
+}
+.phase.green  { border-left-color: var(--green); }
+.phase.yellow { border-left-color: var(--yellow); }
+.phase.purple { border-left-color: var(--purple); }
+.phase.orange { border-left-color: var(--orange); }
+.phase.teal   { border-left-color: var(--teal); }
+.phase-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.phase-header h3 { font-size: 17px; font-weight: 700; }
+.phase-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.phase-meta .tag { font-size: 12px; font-weight: 600; border-radius: 6px; padding: 3px 10px; white-space: nowrap; }
+
+.phase-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+@media (max-width: 640px) { .phase-grid { grid-template-columns: 1fr; } }
+
+.phase-block { }
+.phase-block-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+.phase-block ul { margin: 0; padding-left: 18px; }
+.phase-block li { font-size: 14px; margin: 3px 0; }
+
+/* ===== Tags ===== */
+.tag { display: inline-block; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 600; margin: 2px 2px 2px 0; }
+.tag-green  { background: #1a3a24; color: var(--green);  border: 1px solid #2d6a3e; }
+.tag-yellow { background: #2a2310; color: var(--yellow); border: 1px solid #5a4a10; }
+.tag-red    { background: #3a1a1a; color: var(--red);    border: 1px solid #6a2a2a; }
+.tag-blue   { background: #1a2a3d; color: var(--accent); border: 1px solid #2a4a7d; }
+.tag-orange { background: #2a1e10; color: var(--orange); border: 1px solid #5a3e20; }
+.tag-purple { background: #221833; color: var(--purple); border: 1px solid #4a2a6a; }
+.tag-teal   { background: #0d2214; color: var(--teal);   border: 1px solid #1a5a30; }
+
+/* ===== Timeline summary ===== */
+.timeline-strip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 28px;
+  font-size: 12px;
+}
+.timeline-strip .tm {
+  padding: 10px 8px; text-align: center;
+  border-right: 1px solid var(--border);
+  font-weight: 600; color: var(--muted);
+}
+.timeline-strip .tm:last-child { border-right: none; }
+.timeline-strip .tm.active { background: #1a2a3d; color: var(--accent); }
+.timeline-strip .tm.green  { background: #1a3a24; color: var(--green); }
+.timeline-strip .tm.purple { background: #221833; color: var(--purple); }
+.timeline-strip .tm.orange { background: #2a1e10; color: var(--orange); }
+.timeline-strip .tm.teal   { background: #0d2214; color: var(--teal); }
+
+/* ===== KPI table ===== */
+table {
+  width: 100%; border-collapse: collapse; font-size: 14px;
+  background: var(--surface); border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--border); margin-bottom: 16px;
+}
+th { background: #1c2330; color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+td { padding: 10px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+
+/* ===== Resource grid ===== */
+.resource-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.resource-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 18px;
+}
+.resource-card .name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.resource-card .role { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.resource-card .tags { }
+
+/* ===== Callout ===== */
+.callout {
+  border-left: 3px solid var(--accent); background: #1a2234;
+  border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 16px;
+}
+.callout.goal { border-color: var(--green); background: #111e14; }
+.callout p { margin: 0; }
+
+/* ===== Goal bar ===== */
+.goal-bar-wrap { margin: 16px 0; }
+.goal-bar-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.goal-bar { background: #1c2330; border-radius: 6px; height: 10px; overflow: hidden; }
+.goal-bar-fill { height: 100%; border-radius: 6px; }
+
+/* ===== Footer ===== */
+footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header>
+  <div class="badge">社内計画書</div>
+  <h1>開発計画書 2026 — FocusBurst &amp; Forkbox</h1>
+  <div class="meta">
+    <span>作成: 千葉（2026-06-06）</span>
+    <span>対象期間: 2026年6月〜12月</span>
+    <span>目標: 売上100万円</span>
+  </div>
+</header>
+
+<!-- ========== TOC ========== -->
+<nav>
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#overview">組織目標と戦略概要</a></li>
+    <li><a href="#focusburst">FocusBurst ロードマップ</a></li>
+    <li><a href="#forkbox">Forkbox ロードマップ</a></li>
+    <li><a href="#resources">組織リソース計画</a></li>
+    <li><a href="#milestones">マイルストーン一覧</a></li>
+  </ol>
+</nav>
+
+<!-- ========== 1. 概要 ========== -->
+<section id="overview">
+  <h2 class="section-title"><span class="num">1</span>組織目標と戦略概要</h2>
+
+  <div class="callout goal">
+    <p><strong>組織目標:</strong> 2026年12月までに売上累計 <strong>100万円</strong> を達成する</p>
+  </div>
+
+  <h3 class="sub-title">売上戦略の順序</h3>
+  <div class="card">
+    <ol>
+      <li><strong>FocusBurst（第1弾）</strong> で組織・マーケのサイクルを確立する。収益化実装→ユーザー獲得→次フェーズの順で積み上げる</li>
+      <li><strong>Forkbox</strong> を正式リリースして第2の収益柱を立てる。2026年Q4での正式リリースを目指す</li>
+      <li>上記2本のプロダクト実績を引っ提げて、<strong>Startup Scaffold</strong> のコンサル外部展開を開始する</li>
+    </ol>
+  </div>
+
+  <h3 class="sub-title">タイムライン概観（2026年6月〜12月）</h3>
+  <div class="timeline-strip">
+    <div class="tm active">6月<br>現在</div>
+    <div class="tm green">7月<br>FB収益化</div>
+    <div class="tm green">8月<br>FB成長</div>
+    <div class="tm purple">9月<br>FBα / FKα</div>
+    <div class="tm orange">10月<br>FKβ</div>
+    <div class="tm teal">11月<br>FK正式</div>
+    <div class="tm teal">12月<br>目標達成</div>
+  </div>
+  <p style="font-size:13px;color:var(--muted);">FB = FocusBurst / FK = Forkbox</p>
+</section>
+
+<!-- ========== 2. FocusBurst ========== -->
+<section id="focusburst">
+  <h2 class="section-title"><span class="num">2</span>FocusBurst ロードマップ</h2>
+
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-title">現状サマリー</div>
+    <ul>
+      <li>URL: <strong>focusburst.keyaki-dev.com</strong>（PWA 公開済み）</li>
+      <li>機能: ポモドーロタイマー（5/10/15分）、フリーミアム（1日3回制限）</li>
+      <li>マーケ: X自動投稿 週4本稼働中 / note記事 週5本体制構築中</li>
+      <li>収益化: 課金UI は「準備中」のまま温存中</li>
+    </ul>
+  </div>
+
+  <!-- Phase A -->
+  <div class="phase green">
+    <div class="phase-header">
+      <h3>Phase A — 収益化実装</h3>
+      <div class="phase-meta">
+        <span class="tag tag-green">2026年7月〜8月</span>
+        <span class="tag tag-blue">川上（実装）</span>
+      </div>
+    </div>
+    <p>フリーミアムの収益化を実装し、初回の有料ユーザーを獲得する。</p>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">実装タスク</div>
+        <ul>
+          <li>月額サブスクリプション（300〜500円/月）プラン設計</li>
+          <li>Stripe（またはLemonSqueezy）決済統合</li>
+          <li>プレミアム機能の実装（無制限利用 / セッション統計 / カスタムタイマー）</li>
+          <li>ユーザー認証（NextAuth / Clerk）とアカウント管理画面</li>
+          <li>課金UIの「準備中」から正式リリースへの切り替え</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">KPI（Phase A完了条件）</div>
+        <ul>
+          <li>有料プランのリリース完了</li>
+          <li>初回有料ユーザー 10人獲得</li>
+          <li>月次MRR: 3,000円〜5,000円</li>
+          <li>決済エラー率 1%未満</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase B -->
+  <div class="phase yellow">
+    <div class="phase-header">
+      <h3>Phase B — ユーザー獲得</h3>
+      <div class="phase-meta">
+        <span class="tag tag-yellow">2026年7月〜9月</span>
+        <span class="tag tag-blue">石川（マーケ）</span>
+      </div>
+    </div>
+    <p>SNSマーケ・SEO・アプリストア展開でユーザーベースを拡大する。</p>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">施策</div>
+        <ul>
+          <li>X: 週4本投稿の継続・使用感レポート系コンテンツ強化</li>
+          <li>note: ADHD・集中術関連 SEO 記事の継続執筆（週5本）</li>
+          <li>PWA → iOS/Android アプリストア公開の検討（川上）</li>
+          <li>Product Hunt 掲載（英語圏への展開足がかり）</li>
+          <li>ADHD コミュニティ（X・Reddit）へのアウトリーチ</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">KPI（Phase B目標）</div>
+        <ul>
+          <li>月間アクティブユーザー（MAU）: 1,000人</li>
+          <li>有料転換率: 2〜5%</li>
+          <li>有料ユーザー累計: 50人</li>
+          <li>月次MRR: 15,000〜25,000円</li>
+          <li>note記事 累計20本公開</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase C -->
+  <div class="phase purple">
+    <div class="phase-header">
+      <h3>Phase C — 機能拡張</h3>
+      <div class="phase-meta">
+        <span class="tag tag-purple">2026年9月〜12月</span>
+        <span class="tag tag-blue">川上（実装）/ 石川（GTM）</span>
+      </div>
+    </div>
+    <p>コアユーザーのフィードバックをもとに差別化機能を追加し、解約率低下・LTV向上を図る。</p>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">機能候補</div>
+        <ul>
+          <li><strong>AIボディダブリング</strong>: 音声・映像で「一緒に作業する仲間」を演出するAI機能</li>
+          <li>セッション記録・週次レポート（グラフ表示）</li>
+          <li>カスタムBGM / 集中音（ホワイトノイズ等）</li>
+          <li>Slackインテグレーション（集中モード通知）</li>
+          <li>チーム機能（複数人で一緒に集中）</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">KPI（Phase C目標）</div>
+        <ul>
+          <li>有料ユーザー累計: 150人</li>
+          <li>月次MRR: 50,000〜75,000円</li>
+          <li>月次解約率: 5%以下</li>
+          <li>App Store / Play Store 評価: 4.0以上</li>
+          <li>FocusBurst 累計売上貢献: 30〜40万円</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- FocusBurst KPI summary -->
+  <h3 class="sub-title">FocusBurst 売上貢献試算（〜2026年12月）</h3>
+  <table>
+    <thead>
+      <tr><th>時期</th><th>有料ユーザー数</th><th>MRR（月次売上）</th><th>累計売上</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>2026年8月末</td><td>10人</td><td>〜5,000円</td><td>〜5,000円</td></tr>
+      <tr><td>2026年9月末</td><td>50人</td><td>〜20,000円</td><td>〜45,000円</td></tr>
+      <tr><td>2026年10月末</td><td>100人</td><td>〜40,000円</td><td>〜125,000円</td></tr>
+      <tr><td>2026年11月末</td><td>150人</td><td>〜60,000円</td><td>〜245,000円</td></tr>
+      <tr><td>2026年12月末</td><td>200人</td><td>〜80,000円</td><td>〜385,000円</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:13px;color:var(--muted);">※ 単価400円/月で試算。実際の価格・転換率により変動</p>
+</section>
+
+<!-- ========== 3. Forkbox ========== -->
+<section id="forkbox">
+  <h2 class="section-title"><span class="num">3</span>Forkbox ロードマップ</h2>
+
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-title">現状サマリー</div>
+    <ul>
+      <li>フロントエンドモック完成（frontend-tau-neon-47.vercel.app）</li>
+      <li>Phase 5 着手（川上レビュー済み）</li>
+      <li>コードベース: <code>~/keyaki/xando/frontend/</code>（旧名 Xando）</li>
+      <li>次アクション: 川上レビュー内容の要件定義への反映</li>
+    </ul>
+  </div>
+
+  <!-- Phase 5 -->
+  <div class="phase">
+    <div class="phase-header">
+      <h3>Phase 5 — 設計固め</h3>
+      <div class="phase-meta">
+        <span class="tag tag-blue">2026年6月</span>
+        <span class="tag tag-blue">千葉（PM）/ 川上（レビュー）</span>
+      </div>
+    </div>
+    <p>川上レビューの指摘を要件定義に反映し、バックエンド実装前にアーキテクチャを確定する。</p>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">タスク</div>
+        <ul>
+          <li>川上レビュー結果の要件定義書への反映</li>
+          <li>フォーク体験フロー（UX）の確定</li>
+          <li>DB スキーマ設計（ユーザー / フォーク / コメント等）</li>
+          <li>API エンドポイント設計書の作成</li>
+          <li>技術スタック確定（Next.js + Supabase / PlanetScale 等）</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">完了条件</div>
+        <ul>
+          <li>要件定義書 v2 の山下承認</li>
+          <li>API 設計書の川上レビュー通過</li>
+          <li>Phase 6 着手判断が可能な状態</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 6 -->
+  <div class="phase green">
+    <div class="phase-header">
+      <h3>Phase 6 — バックエンド実装</h3>
+      <div class="phase-meta">
+        <span class="tag tag-green">2026年7月〜8月</span>
+        <span class="tag tag-blue">川上（実装）</span>
+      </div>
+    </div>
+    <p>設計書をもとにバックエンドを構築し、フロントエンドモックと接続する。</p>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">実装スコープ</div>
+        <ul>
+          <li>認証基盤（Clerk / NextAuth）</li>
+          <li>DB セットアップ・マイグレーション</li>
+          <li>コア API（フォーク作成・一覧・詳細・削除）</li>
+          <li>ユーザープロフィール API</li>
+          <li>フロントエンドとの API 結合</li>
+          <li>CI/CD パイプライン整備（GitHub Actions + Vercel）</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">KPI（Phase 6完了条件）</div>
+        <ul>
+          <li>主要 API のユニットテスト通過</li>
+          <li>開発環境でエンドツーエンド動作確認</li>
+          <li>Vercel Preview デプロイで川上・山下確認済み</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 7 -->
+  <div class="phase yellow">
+    <div class="phase-header">
+      <h3>Phase 7 — アルファ版リリース</h3>
+      <div class="phase-meta">
+        <span class="tag tag-yellow">2026年8月〜9月</span>
+        <span class="tag tag-blue">川上（実装）/ 山口（デザイン）</span>
+      </div>
+    </div>
+    <p>クローズドな限定ユーザーにアルファ版を公開し、コアUXの検証を行う。</p>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">タスク</div>
+        <ul>
+          <li>本番環境へのデプロイ（Vercel + 独自ドメイン）</li>
+          <li>山口によるデザイン QA・ポリッシュ</li>
+          <li>アルファテスター 10〜20人の招集（山下ネットワーク活用）</li>
+          <li>フィードバック収集フォームの設置</li>
+          <li>クリティカルバグ修正サイクルの確立</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">KPI（Phase 7完了条件）</div>
+        <ul>
+          <li>アルファテスター 15人以上が実際に使用</li>
+          <li>NPS（推奨度）スコア: 30以上</li>
+          <li>重大バグ（P0/P1）ゼロの状態でベータ移行判断</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 8 -->
+  <div class="phase orange">
+    <div class="phase-header">
+      <h3>Phase 8 — ベータ版・マーケティング開始</h3>
+      <div class="phase-meta">
+        <span class="tag tag-orange">2026年10月</span>
+        <span class="tag tag-blue">石川（GTM）/ 山口（デザイン）/ 川上</span>
+      </div>
+    </div>
+    <p>公開ベータとして一般ユーザーに開放し、マーケティングを本格始動する。</p>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">タスク</div>
+        <ul>
+          <li>ランディングページ完成（山口デザイン）</li>
+          <li>X / note でのティザー・ローンチ発信（石川）</li>
+          <li>ウェイトリスト解放 → ベータ開放</li>
+          <li>収益化モデルの最終確定（月額 / 従量 / フリーミアム）</li>
+          <li>アクセス解析（Vercel Analytics / Mixpanel）導入</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">KPI（Phase 8完了条件）</div>
+        <ul>
+          <li>ベータ登録者: 200人</li>
+          <li>週間アクティブユーザー（WAU）: 100人</li>
+          <li>X フォロワー（Forkbox 専用アカウント想定）: 500人</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 9 -->
+  <div class="phase teal">
+    <div class="phase-header">
+      <h3>Phase 9 — 正式リリース</h3>
+      <div class="phase-meta">
+        <span class="tag tag-teal">2026年11月〜12月</span>
+        <span class="tag tag-blue">全員</span>
+      </div>
+    </div>
+    <p>課金システムを稼働させ正式リリース。2026年Q4の売上柱として確立する。</p>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">タスク</div>
+        <ul>
+          <li>Stripe 決済統合・プレミアムプランのリリース</li>
+          <li>利用規約・プライバシーポリシーの整備</li>
+          <li>正式ローンチ発信（X / note / Product Hunt）</li>
+          <li>カスタマーサポート体制の整備</li>
+          <li>Startup Scaffold の実績紹介コンテンツとしての活用</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">KPI（リリース時目標）</div>
+        <ul>
+          <li>正式リリース当月の新規有料ユーザー: 30人</li>
+          <li>月次MRR: 30,000〜50,000円</li>
+          <li>Forkbox 累計売上貢献: 30〜60万円</li>
+          <li>MAU: 500人</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forkbox KPI summary -->
+  <h3 class="sub-title">Forkbox 売上貢献試算（〜2026年12月）</h3>
+  <table>
+    <thead>
+      <tr><th>時期</th><th>フェーズ</th><th>有料ユーザー数</th><th>累計売上</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>2026年9月末</td><td>アルファ版</td><td>0（テスター）</td><td>—</td></tr>
+      <tr><td>2026年10月末</td><td>ベータ版</td><td>0（無料ベータ）</td><td>—</td></tr>
+      <tr><td>2026年11月末</td><td>正式リリース直後</td><td>30人</td><td>〜60,000円</td></tr>
+      <tr><td>2026年12月末</td><td>成長期</td><td>80〜100人</td><td>〜300,000円</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:13px;color:var(--muted);">※ 単価500〜1,000円/月の中間値で試算。ビジネスモデル確定後に更新</p>
+</section>
+
+<!-- ========== 4. リソース計画 ========== -->
+<section id="resources">
+  <h2 class="section-title"><span class="num">4</span>組織リソース計画</h2>
+
+  <h3 class="sub-title">現行体制</h3>
+  <div class="resource-grid">
+    <div class="resource-card">
+      <div class="name">川上</div>
+      <div class="role">エンジニア（実装・PR）</div>
+      <div class="tags">
+        <span class="tag tag-blue">FocusBurst実装</span>
+        <span class="tag tag-blue">Forkboxバックエンド</span>
+      </div>
+    </div>
+    <div class="resource-card">
+      <div class="name">石川</div>
+      <div class="role">マーケティング</div>
+      <div class="tags">
+        <span class="tag tag-green">X投稿</span>
+        <span class="tag tag-green">note記事</span>
+        <span class="tag tag-green">GTM</span>
+      </div>
+    </div>
+    <div class="resource-card">
+      <div class="name">山口</div>
+      <div class="role">デザイナー（UI/UX）</div>
+      <div class="tags">
+        <span class="tag tag-purple">Forkbox LP</span>
+        <span class="tag tag-purple">ブランディング</span>
+      </div>
+    </div>
+    <div class="resource-card">
+      <div class="name">千葉</div>
+      <div class="role">マネージャー（PM）</div>
+      <div class="tags">
+        <span class="tag tag-orange">進捗管理</span>
+        <span class="tag tag-orange">山下窓口</span>
+      </div>
+    </div>
+    <div class="resource-card">
+      <div class="name">佐藤</div>
+      <div class="role">経理（ローカルLLM検討中）</div>
+      <div class="tags">
+        <span class="tag tag-yellow">収益管理</span>
+        <span class="tag tag-yellow">経費整理</span>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-title">フェーズ別 リソース配分</h3>
+  <table>
+    <thead>
+      <tr><th>期間</th><th>FocusBurst</th><th>Forkbox</th><th>備考</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>6月</td>
+        <td>石川: マーケ継続<br>川上: Forkboxへシフト</td>
+        <td>川上: Phase5 設計固め<br>千葉: PM・要件整理</td>
+        <td>川上はFB収益化準備も並行</td>
+      </tr>
+      <tr>
+        <td>7〜8月</td>
+        <td>川上: Phase A 収益化実装<br>石川: Phase B マーケ強化</td>
+        <td>川上: Phase 6 バックエンド<br>山口: デザインQA</td>
+        <td>川上の稼働を両プロダクトに分散。優先度はFB収益化→FK実装の順</td>
+      </tr>
+      <tr>
+        <td>9月</td>
+        <td>川上: Phase C 機能拡張着手<br>石川: ユーザー獲得継続</td>
+        <td>川上: Phase 7 アルファ<br>全員: テスター確保</td>
+        <td>Forkboxアルファ公開が重なるため川上の負荷が最大。外部エンジニア採用を検討</td>
+      </tr>
+      <tr>
+        <td>10月</td>
+        <td>石川: マーケ継続<br>川上: バグ修正・小改善</td>
+        <td>石川: Phase 8 GTM<br>山口: LP完成<br>川上: ベータ安定化</td>
+        <td>Forkboxマーケ開始でリソースが集中</td>
+      </tr>
+      <tr>
+        <td>11〜12月</td>
+        <td>石川: 両プロダクト横断マーケ<br>川上: 機能拡張継続</td>
+        <td>川上: Phase 9 正式リリース<br>全員: ローンチ対応</td>
+        <td>Forkbox正式リリースで全社横断対応。Scaffold外部展開の準備開始</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout" style="margin-top:16px;">
+    <p><strong>採用検討トリガー:</strong> 川上の稼働が月100時間を超える見込みになった時点（9月目安）で、外部エンジニアの採用・外注を山下に提案する。</p>
+  </div>
+</section>
+
+<!-- ========== 5. マイルストーン ========== -->
+<section id="milestones">
+  <h2 class="section-title"><span class="num">5</span>マイルストーン一覧</h2>
+
+  <table>
+    <thead>
+      <tr><th>時期</th><th>マイルストーン</th><th>プロダクト</th><th>担当</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2026年6月末</td>
+        <td>Forkbox 要件定義 v2 確定・川上の Phase6 着手</td>
+        <td><span class="tag tag-purple">Forkbox</span></td>
+        <td>千葉 / 川上</td>
+      </tr>
+      <tr>
+        <td>2026年7月末</td>
+        <td>FocusBurst 収益化リリース（Stripe 決済稼働）</td>
+        <td><span class="tag tag-green">FocusBurst</span></td>
+        <td>川上</td>
+      </tr>
+      <tr>
+        <td>2026年8月末</td>
+        <td>FocusBurst 有料ユーザー 10人達成</td>
+        <td><span class="tag tag-green">FocusBurst</span></td>
+        <td>石川 / 川上</td>
+      </tr>
+      <tr>
+        <td>2026年8月末</td>
+        <td>Forkbox バックエンド完成・Alpha 準備完了</td>
+        <td><span class="tag tag-purple">Forkbox</span></td>
+        <td>川上</td>
+      </tr>
+      <tr>
+        <td>2026年9月末</td>
+        <td>Forkbox アルファ版公開（クローズドテスター 15人）</td>
+        <td><span class="tag tag-purple">Forkbox</span></td>
+        <td>川上 / 山口</td>
+      </tr>
+      <tr>
+        <td>2026年9月末</td>
+        <td>FocusBurst 有料ユーザー 50人・MRR 20,000円</td>
+        <td><span class="tag tag-green">FocusBurst</span></td>
+        <td>石川</td>
+      </tr>
+      <tr>
+        <td>2026年10月末</td>
+        <td>Forkbox ベータ開放・ベータ登録者 200人</td>
+        <td><span class="tag tag-purple">Forkbox</span></td>
+        <td>石川 / 山口</td>
+      </tr>
+      <tr>
+        <td>2026年11月末</td>
+        <td>Forkbox 正式リリース・Stripe 決済稼働</td>
+        <td><span class="tag tag-purple">Forkbox</span></td>
+        <td>川上 / 全員</td>
+      </tr>
+      <tr>
+        <td>2026年12月末</td>
+        <td><strong>売上累計 100万円 達成</strong></td>
+        <td><span class="tag tag-green">FB</span> <span class="tag tag-purple">FK</span></td>
+        <td>全員</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 class="sub-title">売上到達シナリオ（合算）</h3>
+  <div class="goal-bar-wrap">
+    <div class="goal-bar-label"><span>8月末（5万円見込み）</span><span>目標: 100万円</span></div>
+    <div class="goal-bar"><div class="goal-bar-fill" style="width:5%;background:var(--green);"></div></div>
+  </div>
+  <div class="goal-bar-wrap">
+    <div class="goal-bar-label"><span>10月末（20万円見込み）</span><span>目標: 100万円</span></div>
+    <div class="goal-bar"><div class="goal-bar-fill" style="width:20%;background:var(--yellow);"></div></div>
+  </div>
+  <div class="goal-bar-wrap">
+    <div class="goal-bar-label"><span>12月末（60〜90万円見込み）</span><span>目標: 100万円</span></div>
+    <div class="goal-bar"><div class="goal-bar-fill" style="width:75%;background:var(--orange);"></div></div>
+  </div>
+
+  <div class="callout" style="margin-top:20px;">
+    <p><strong>注:</strong> 現在の試算では12月末時点で 60〜90万円に到達する見込み。100万円達成には Forkbox の正式リリース後の伸びが鍵。Forkboxのビジネスモデル（価格・プラン構成）の早期確定が最重要課題。</p>
+  </div>
+</section>
+
+<footer>
+  作成: 千葉（keyaki マネージャー）/ 2026-06-06 &nbsp;|&nbsp; 次回レビュー: 2026-07-01
+</footer>
+
+</body>
+</html>
