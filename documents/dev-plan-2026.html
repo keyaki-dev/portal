@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>開発計画書 2026 — FocusBurst &amp; Forkbox</title>
+<title>開発計画書 2026 v2 — 7月中リリース戦略</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -18,7 +18,7 @@ body {
   background: var(--bg); color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 15px; line-height: 1.7;
-  max-width: 920px; margin: 0 auto; padding: 40px 24px 80px;
+  max-width: 960px; margin: 0 auto; padding: 40px 24px 80px;
 }
 
 /* ===== Header ===== */
@@ -29,8 +29,13 @@ header .badge {
   margin-bottom: 16px;
 }
 header h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
-header .meta { font-size: 13px; color: var(--muted); }
-header .meta span { margin-right: 20px; }
+header .meta { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 20px; }
+header .meta .version { color: var(--green); font-weight: 700; }
+header .meta .deadline {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #1a3a24; border: 1px solid #2d6a3e; border-radius: 6px;
+  padding: 2px 12px; color: var(--green); font-weight: 700; font-size: 13px;
+}
 
 /* ===== Nav ===== */
 nav {
@@ -44,7 +49,7 @@ nav a { color: var(--accent); text-decoration: none; font-size: 14px; }
 nav a:hover { text-decoration: underline; }
 
 /* ===== Section ===== */
-section { margin-bottom: 56px; }
+section { margin-bottom: 60px; }
 h2.section-title {
   font-size: 22px; font-weight: 700; margin-bottom: 20px;
   padding-bottom: 10px; border-bottom: 1px solid var(--border);
@@ -69,7 +74,68 @@ li { margin: 5px 0; }
 }
 .card-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
 
-/* ===== Phase block ===== */
+/* ===== 2-col status cards ===== */
+.status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+@media (max-width: 640px) { .status-grid { grid-template-columns: 1fr; } }
+.status-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px 22px;
+}
+.status-card .product-name { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+.status-card .product-goal { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.status-card.fb { border-top: 3px solid var(--green); }
+.status-card.fk { border-top: 3px solid var(--purple); }
+
+/* ===== Sprint block ===== */
+.sprint {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 0; margin-bottom: 16px; overflow: hidden;
+}
+.sprint-header {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+  padding: 16px 22px; border-bottom: 1px solid var(--border);
+}
+.sprint-week {
+  font-size: 13px; font-weight: 700; color: var(--muted);
+  background: #1c2330; border-radius: 6px; padding: 3px 10px;
+  white-space: nowrap;
+}
+.sprint-date {
+  font-size: 13px; color: var(--muted);
+}
+.sprint-title {
+  font-size: 16px; font-weight: 700; flex: 1;
+}
+.sprint-milestone {
+  font-size: 12px; font-weight: 700; border-radius: 20px; padding: 4px 12px;
+  white-space: nowrap;
+}
+.sprint-body {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+}
+@media (max-width: 640px) { .sprint-body { grid-template-columns: 1fr; } }
+.sprint-col {
+  padding: 16px 22px;
+}
+.sprint-col + .sprint-col {
+  border-left: 1px solid var(--border);
+}
+@media (max-width: 640px) {
+  .sprint-col + .sprint-col { border-left: none; border-top: 1px solid var(--border); }
+}
+.sprint-col-label {
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+}
+.sprint-col-label .dot {
+  width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+}
+.dot-green  { background: var(--green); }
+.dot-purple { background: var(--purple); }
+.sprint-col ul { margin: 0; padding-left: 18px; }
+.sprint-col li { font-size: 13.5px; margin: 4px 0; }
+
+/* ===== Phase block (for roadmap detail) ===== */
 .phase {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: 12px; padding: 22px 26px; margin-bottom: 20px;
@@ -83,12 +149,8 @@ li { margin: 5px 0; }
 .phase-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .phase-header h3 { font-size: 17px; font-weight: 700; }
 .phase-meta { display: flex; gap: 8px; flex-wrap: wrap; }
-.phase-meta .tag { font-size: 12px; font-weight: 600; border-radius: 6px; padding: 3px 10px; white-space: nowrap; }
-
 .phase-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
 @media (max-width: 640px) { .phase-grid { grid-template-columns: 1fr; } }
-
-.phase-block { }
 .phase-block-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
 .phase-block ul { margin: 0; padding-left: 18px; }
 .phase-block li { font-size: 14px; margin: 3px 0; }
@@ -103,7 +165,7 @@ li { margin: 5px 0; }
 .tag-purple { background: #221833; color: var(--purple); border: 1px solid #4a2a6a; }
 .tag-teal   { background: #0d2214; color: var(--teal);   border: 1px solid #1a5a30; }
 
-/* ===== Timeline summary ===== */
+/* ===== Timeline strip ===== */
 .timeline-strip {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -122,11 +184,12 @@ li { margin: 5px 0; }
 .timeline-strip .tm:last-child { border-right: none; }
 .timeline-strip .tm.active { background: #1a2a3d; color: var(--accent); }
 .timeline-strip .tm.green  { background: #1a3a24; color: var(--green); }
+.timeline-strip .tm.both   { background: #251c34; color: var(--purple); }
 .timeline-strip .tm.purple { background: #221833; color: var(--purple); }
 .timeline-strip .tm.orange { background: #2a1e10; color: var(--orange); }
 .timeline-strip .tm.teal   { background: #0d2214; color: var(--teal); }
 
-/* ===== KPI table ===== */
+/* ===== Table ===== */
 table {
   width: 100%; border-collapse: collapse; font-size: 14px;
   background: var(--surface); border-radius: 10px; overflow: hidden;
@@ -137,21 +200,22 @@ td { padding: 10px 16px; border-bottom: 1px solid var(--border); vertical-align:
 tr:last-child td { border-bottom: none; }
 
 /* ===== Resource grid ===== */
-.resource-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.resource-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
 .resource-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: 10px; padding: 16px 18px;
 }
 .resource-card .name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
 .resource-card .role { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
-.resource-card .tags { }
 
 /* ===== Callout ===== */
 .callout {
   border-left: 3px solid var(--accent); background: #1a2234;
   border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 16px;
 }
-.callout.goal { border-color: var(--green); background: #111e14; }
+.callout.goal  { border-color: var(--green);  background: #111e14; }
+.callout.warn  { border-color: var(--yellow); background: #1e1a0a; }
+.callout.risk  { border-color: var(--red);    background: #1e1010; }
 .callout p { margin: 0; }
 
 /* ===== Goal bar ===== */
@@ -168,12 +232,13 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 13px
 
 <!-- ========== HEADER ========== -->
 <header>
-  <div class="badge">社内計画書</div>
-  <h1>開発計画書 2026 — FocusBurst &amp; Forkbox</h1>
+  <div class="badge">社内計画書 v2</div>
+  <h1>開発計画書 2026 v2 — 7月中リリース戦略</h1>
   <div class="meta">
-    <span>作成: 千葉（2026-06-06）</span>
-    <span>対象期間: 2026年6月〜12月</span>
-    <span>目標: 売上100万円</span>
+    <span class="version">v2.0</span>
+    <span>更新: 2026-06-06（千葉）</span>
+    <span>対象期間: 2026年6月9日〜7月31日（7週間スプリント）</span>
+    <span class="deadline">両サービス 7月31日リリース目標</span>
   </div>
 </header>
 
@@ -181,397 +246,86 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 13px
 <nav>
   <h2>目次</h2>
   <ol>
-    <li><a href="#overview">組織目標と戦略概要</a></li>
-    <li><a href="#focusburst">FocusBurst ロードマップ</a></li>
-    <li><a href="#forkbox">Forkbox ロードマップ</a></li>
-    <li><a href="#resources">組織リソース計画</a></li>
+    <li><a href="#overview">戦略概要・体制</a></li>
+    <li><a href="#sprint">7週間スプリント計画</a></li>
+    <li><a href="#focusburst">FocusBurst 詳細計画</a></li>
+    <li><a href="#forkbox">Forkbox 詳細計画</a></li>
+    <li><a href="#resources">リソース配分</a></li>
     <li><a href="#milestones">マイルストーン一覧</a></li>
   </ol>
 </nav>
 
 <!-- ========== 1. 概要 ========== -->
 <section id="overview">
-  <h2 class="section-title"><span class="num">1</span>組織目標と戦略概要</h2>
+  <h2 class="section-title"><span class="num">1</span>戦略概要・体制</h2>
 
   <div class="callout goal">
-    <p><strong>組織目標:</strong> 2026年12月までに売上累計 <strong>100万円</strong> を達成する</p>
+    <p><strong>v2 最重要目標:</strong> FocusBurst 有料プラン正式ローンチ + Forkbox MVP アルファリリース、両方を <strong>2026年7月31日</strong> までに実現する</p>
   </div>
 
-  <h3 class="sub-title">売上戦略の順序</h3>
-  <div class="card">
-    <ol>
-      <li><strong>FocusBurst（第1弾）</strong> で組織・マーケのサイクルを確立する。収益化実装→ユーザー獲得→次フェーズの順で積み上げる</li>
-      <li><strong>Forkbox</strong> を正式リリースして第2の収益柱を立てる。2026年Q4での正式リリースを目指す</li>
-      <li>上記2本のプロダクト実績を引っ提げて、<strong>Startup Scaffold</strong> のコンサル外部展開を開始する</li>
-    </ol>
-  </div>
-
-  <h3 class="sub-title">タイムライン概観（2026年6月〜12月）</h3>
-  <div class="timeline-strip">
-    <div class="tm active">6月<br>現在</div>
-    <div class="tm green">7月<br>FB収益化</div>
-    <div class="tm green">8月<br>FB成長</div>
-    <div class="tm purple">9月<br>FBα / FKα</div>
-    <div class="tm orange">10月<br>FKβ</div>
-    <div class="tm teal">11月<br>FK正式</div>
-    <div class="tm teal">12月<br>目標達成</div>
-  </div>
-  <p style="font-size:13px;color:var(--muted);">FB = FocusBurst / FK = Forkbox</p>
-</section>
-
-<!-- ========== 2. FocusBurst ========== -->
-<section id="focusburst">
-  <h2 class="section-title"><span class="num">2</span>FocusBurst ロードマップ</h2>
-
-  <div class="card" style="margin-bottom:24px;">
-    <div class="card-title">現状サマリー</div>
-    <ul>
-      <li>URL: <strong>focusburst.keyaki-dev.com</strong>（PWA 公開済み）</li>
-      <li>機能: ポモドーロタイマー（5/10/15分）、フリーミアム（1日3回制限）</li>
-      <li>マーケ: X自動投稿 週4本稼働中 / note記事 週5本体制構築中</li>
-      <li>収益化: 課金UI は「準備中」のまま温存中</li>
-    </ul>
-  </div>
-
-  <!-- Phase A -->
-  <div class="phase green">
-    <div class="phase-header">
-      <h3>Phase A — 収益化実装</h3>
-      <div class="phase-meta">
-        <span class="tag tag-green">2026年7月〜8月</span>
-        <span class="tag tag-blue">川上（実装）</span>
-      </div>
+  <div class="status-grid">
+    <div class="status-card fb">
+      <div class="product-name">FocusBurst</div>
+      <div class="product-goal">7月リリース = 有料プラン実装・正式ローンチ</div>
+      <ul>
+        <li>PWA 完成・公開中（focusburst.keyaki-dev.com）</li>
+        <li>5/10/15分タイマー・フリーミアム（1日3回制限）</li>
+        <li>収益化UI は「準備中」のまま温存中</li>
+        <li>X自動投稿・note記事 稼働中</li>
+      </ul>
     </div>
-    <p>フリーミアムの収益化を実装し、初回の有料ユーザーを獲得する。</p>
-    <div class="phase-grid">
-      <div class="phase-block">
-        <div class="phase-block-label">実装タスク</div>
-        <ul>
-          <li>月額サブスクリプション（300〜500円/月）プラン設計</li>
-          <li>Stripe（またはLemonSqueezy）決済統合</li>
-          <li>プレミアム機能の実装（無制限利用 / セッション統計 / カスタムタイマー）</li>
-          <li>ユーザー認証（NextAuth / Clerk）とアカウント管理画面</li>
-          <li>課金UIの「準備中」から正式リリースへの切り替え</li>
-        </ul>
-      </div>
-      <div class="phase-block">
-        <div class="phase-block-label">KPI（Phase A完了条件）</div>
-        <ul>
-          <li>有料プランのリリース完了</li>
-          <li>初回有料ユーザー 10人獲得</li>
-          <li>月次MRR: 3,000円〜5,000円</li>
-          <li>決済エラー率 1%未満</li>
-        </ul>
-      </div>
+    <div class="status-card fk">
+      <div class="product-name">Forkbox</div>
+      <div class="product-goal">7月リリース = MVP アルファリリース（招待制）</div>
+      <ul>
+        <li>フロントエンドモック完成（frontend-tau-neon-47.vercel.app）</li>
+        <li>バックエンドなし・ダミーデータのみ</li>
+        <li>認証・投稿・フィード・いいね・プロフィールが MVP スコープ</li>
+        <li>系譜ビュー・コレクション・通知は v2 で後回し</li>
+      </ul>
     </div>
   </div>
 
-  <!-- Phase B -->
-  <div class="phase yellow">
-    <div class="phase-header">
-      <h3>Phase B — ユーザー獲得</h3>
-      <div class="phase-meta">
-        <span class="tag tag-yellow">2026年7月〜9月</span>
-        <span class="tag tag-blue">石川（マーケ）</span>
-      </div>
-    </div>
-    <p>SNSマーケ・SEO・アプリストア展開でユーザーベースを拡大する。</p>
-    <div class="phase-grid">
-      <div class="phase-block">
-        <div class="phase-block-label">施策</div>
-        <ul>
-          <li>X: 週4本投稿の継続・使用感レポート系コンテンツ強化</li>
-          <li>note: ADHD・集中術関連 SEO 記事の継続執筆（週5本）</li>
-          <li>PWA → iOS/Android アプリストア公開の検討（川上）</li>
-          <li>Product Hunt 掲載（英語圏への展開足がかり）</li>
-          <li>ADHD コミュニティ（X・Reddit）へのアウトリーチ</li>
-        </ul>
-      </div>
-      <div class="phase-block">
-        <div class="phase-block-label">KPI（Phase B目標）</div>
-        <ul>
-          <li>月間アクティブユーザー（MAU）: 1,000人</li>
-          <li>有料転換率: 2〜5%</li>
-          <li>有料ユーザー累計: 50人</li>
-          <li>月次MRR: 15,000〜25,000円</li>
-          <li>note記事 累計20本公開</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Phase C -->
-  <div class="phase purple">
-    <div class="phase-header">
-      <h3>Phase C — 機能拡張</h3>
-      <div class="phase-meta">
-        <span class="tag tag-purple">2026年9月〜12月</span>
-        <span class="tag tag-blue">川上（実装）/ 石川（GTM）</span>
-      </div>
-    </div>
-    <p>コアユーザーのフィードバックをもとに差別化機能を追加し、解約率低下・LTV向上を図る。</p>
-    <div class="phase-grid">
-      <div class="phase-block">
-        <div class="phase-block-label">機能候補</div>
-        <ul>
-          <li><strong>AIボディダブリング</strong>: 音声・映像で「一緒に作業する仲間」を演出するAI機能</li>
-          <li>セッション記録・週次レポート（グラフ表示）</li>
-          <li>カスタムBGM / 集中音（ホワイトノイズ等）</li>
-          <li>Slackインテグレーション（集中モード通知）</li>
-          <li>チーム機能（複数人で一緒に集中）</li>
-        </ul>
-      </div>
-      <div class="phase-block">
-        <div class="phase-block-label">KPI（Phase C目標）</div>
-        <ul>
-          <li>有料ユーザー累計: 150人</li>
-          <li>月次MRR: 50,000〜75,000円</li>
-          <li>月次解約率: 5%以下</li>
-          <li>App Store / Play Store 評価: 4.0以上</li>
-          <li>FocusBurst 累計売上貢献: 30〜40万円</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- FocusBurst KPI summary -->
-  <h3 class="sub-title">FocusBurst 売上貢献試算（〜2026年12月）</h3>
-  <table>
-    <thead>
-      <tr><th>時期</th><th>有料ユーザー数</th><th>MRR（月次売上）</th><th>累計売上</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>2026年8月末</td><td>10人</td><td>〜5,000円</td><td>〜5,000円</td></tr>
-      <tr><td>2026年9月末</td><td>50人</td><td>〜20,000円</td><td>〜45,000円</td></tr>
-      <tr><td>2026年10月末</td><td>100人</td><td>〜40,000円</td><td>〜125,000円</td></tr>
-      <tr><td>2026年11月末</td><td>150人</td><td>〜60,000円</td><td>〜245,000円</td></tr>
-      <tr><td>2026年12月末</td><td>200人</td><td>〜80,000円</td><td>〜385,000円</td></tr>
-    </tbody>
-  </table>
-  <p style="font-size:13px;color:var(--muted);">※ 単価400円/月で試算。実際の価格・転換率により変動</p>
-</section>
-
-<!-- ========== 3. Forkbox ========== -->
-<section id="forkbox">
-  <h2 class="section-title"><span class="num">3</span>Forkbox ロードマップ</h2>
-
-  <div class="card" style="margin-bottom:24px;">
-    <div class="card-title">現状サマリー</div>
-    <ul>
-      <li>フロントエンドモック完成（frontend-tau-neon-47.vercel.app）</li>
-      <li>Phase 5 着手（川上レビュー済み）</li>
-      <li>コードベース: <code>~/keyaki/xando/frontend/</code>（旧名 Xando）</li>
-      <li>次アクション: 川上レビュー内容の要件定義への反映</li>
-    </ul>
-  </div>
-
-  <!-- Phase 5 -->
-  <div class="phase">
-    <div class="phase-header">
-      <h3>Phase 5 — 設計固め</h3>
-      <div class="phase-meta">
-        <span class="tag tag-blue">2026年6月</span>
-        <span class="tag tag-blue">千葉（PM）/ 川上（レビュー）</span>
-      </div>
-    </div>
-    <p>川上レビューの指摘を要件定義に反映し、バックエンド実装前にアーキテクチャを確定する。</p>
-    <div class="phase-grid">
-      <div class="phase-block">
-        <div class="phase-block-label">タスク</div>
-        <ul>
-          <li>川上レビュー結果の要件定義書への反映</li>
-          <li>フォーク体験フロー（UX）の確定</li>
-          <li>DB スキーマ設計（ユーザー / フォーク / コメント等）</li>
-          <li>API エンドポイント設計書の作成</li>
-          <li>技術スタック確定（Next.js + Supabase / PlanetScale 等）</li>
-        </ul>
-      </div>
-      <div class="phase-block">
-        <div class="phase-block-label">完了条件</div>
-        <ul>
-          <li>要件定義書 v2 の山下承認</li>
-          <li>API 設計書の川上レビュー通過</li>
-          <li>Phase 6 着手判断が可能な状態</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Phase 6 -->
-  <div class="phase green">
-    <div class="phase-header">
-      <h3>Phase 6 — バックエンド実装</h3>
-      <div class="phase-meta">
-        <span class="tag tag-green">2026年7月〜8月</span>
-        <span class="tag tag-blue">川上（実装）</span>
-      </div>
-    </div>
-    <p>設計書をもとにバックエンドを構築し、フロントエンドモックと接続する。</p>
-    <div class="phase-grid">
-      <div class="phase-block">
-        <div class="phase-block-label">実装スコープ</div>
-        <ul>
-          <li>認証基盤（Clerk / NextAuth）</li>
-          <li>DB セットアップ・マイグレーション</li>
-          <li>コア API（フォーク作成・一覧・詳細・削除）</li>
-          <li>ユーザープロフィール API</li>
-          <li>フロントエンドとの API 結合</li>
-          <li>CI/CD パイプライン整備（GitHub Actions + Vercel）</li>
-        </ul>
-      </div>
-      <div class="phase-block">
-        <div class="phase-block-label">KPI（Phase 6完了条件）</div>
-        <ul>
-          <li>主要 API のユニットテスト通過</li>
-          <li>開発環境でエンドツーエンド動作確認</li>
-          <li>Vercel Preview デプロイで川上・山下確認済み</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Phase 7 -->
-  <div class="phase yellow">
-    <div class="phase-header">
-      <h3>Phase 7 — アルファ版リリース</h3>
-      <div class="phase-meta">
-        <span class="tag tag-yellow">2026年8月〜9月</span>
-        <span class="tag tag-blue">川上（実装）/ 山口（デザイン）</span>
-      </div>
-    </div>
-    <p>クローズドな限定ユーザーにアルファ版を公開し、コアUXの検証を行う。</p>
-    <div class="phase-grid">
-      <div class="phase-block">
-        <div class="phase-block-label">タスク</div>
-        <ul>
-          <li>本番環境へのデプロイ（Vercel + 独自ドメイン）</li>
-          <li>山口によるデザイン QA・ポリッシュ</li>
-          <li>アルファテスター 10〜20人の招集（山下ネットワーク活用）</li>
-          <li>フィードバック収集フォームの設置</li>
-          <li>クリティカルバグ修正サイクルの確立</li>
-        </ul>
-      </div>
-      <div class="phase-block">
-        <div class="phase-block-label">KPI（Phase 7完了条件）</div>
-        <ul>
-          <li>アルファテスター 15人以上が実際に使用</li>
-          <li>NPS（推奨度）スコア: 30以上</li>
-          <li>重大バグ（P0/P1）ゼロの状態でベータ移行判断</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Phase 8 -->
-  <div class="phase orange">
-    <div class="phase-header">
-      <h3>Phase 8 — ベータ版・マーケティング開始</h3>
-      <div class="phase-meta">
-        <span class="tag tag-orange">2026年10月</span>
-        <span class="tag tag-blue">石川（GTM）/ 山口（デザイン）/ 川上</span>
-      </div>
-    </div>
-    <p>公開ベータとして一般ユーザーに開放し、マーケティングを本格始動する。</p>
-    <div class="phase-grid">
-      <div class="phase-block">
-        <div class="phase-block-label">タスク</div>
-        <ul>
-          <li>ランディングページ完成（山口デザイン）</li>
-          <li>X / note でのティザー・ローンチ発信（石川）</li>
-          <li>ウェイトリスト解放 → ベータ開放</li>
-          <li>収益化モデルの最終確定（月額 / 従量 / フリーミアム）</li>
-          <li>アクセス解析（Vercel Analytics / Mixpanel）導入</li>
-        </ul>
-      </div>
-      <div class="phase-block">
-        <div class="phase-block-label">KPI（Phase 8完了条件）</div>
-        <ul>
-          <li>ベータ登録者: 200人</li>
-          <li>週間アクティブユーザー（WAU）: 100人</li>
-          <li>X フォロワー（Forkbox 専用アカウント想定）: 500人</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Phase 9 -->
-  <div class="phase teal">
-    <div class="phase-header">
-      <h3>Phase 9 — 正式リリース</h3>
-      <div class="phase-meta">
-        <span class="tag tag-teal">2026年11月〜12月</span>
-        <span class="tag tag-blue">全員</span>
-      </div>
-    </div>
-    <p>課金システムを稼働させ正式リリース。2026年Q4の売上柱として確立する。</p>
-    <div class="phase-grid">
-      <div class="phase-block">
-        <div class="phase-block-label">タスク</div>
-        <ul>
-          <li>Stripe 決済統合・プレミアムプランのリリース</li>
-          <li>利用規約・プライバシーポリシーの整備</li>
-          <li>正式ローンチ発信（X / note / Product Hunt）</li>
-          <li>カスタマーサポート体制の整備</li>
-          <li>Startup Scaffold の実績紹介コンテンツとしての活用</li>
-        </ul>
-      </div>
-      <div class="phase-block">
-        <div class="phase-block-label">KPI（リリース時目標）</div>
-        <ul>
-          <li>正式リリース当月の新規有料ユーザー: 30人</li>
-          <li>月次MRR: 30,000〜50,000円</li>
-          <li>Forkbox 累計売上貢献: 30〜60万円</li>
-          <li>MAU: 500人</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Forkbox KPI summary -->
-  <h3 class="sub-title">Forkbox 売上貢献試算（〜2026年12月）</h3>
-  <table>
-    <thead>
-      <tr><th>時期</th><th>フェーズ</th><th>有料ユーザー数</th><th>累計売上</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>2026年9月末</td><td>アルファ版</td><td>0（テスター）</td><td>—</td></tr>
-      <tr><td>2026年10月末</td><td>ベータ版</td><td>0（無料ベータ）</td><td>—</td></tr>
-      <tr><td>2026年11月末</td><td>正式リリース直後</td><td>30人</td><td>〜60,000円</td></tr>
-      <tr><td>2026年12月末</td><td>成長期</td><td>80〜100人</td><td>〜300,000円</td></tr>
-    </tbody>
-  </table>
-  <p style="font-size:13px;color:var(--muted);">※ 単価500〜1,000円/月の中間値で試算。ビジネスモデル確定後に更新</p>
-</section>
-
-<!-- ========== 4. リソース計画 ========== -->
-<section id="resources">
-  <h2 class="section-title"><span class="num">4</span>組織リソース計画</h2>
-
-  <h3 class="sub-title">現行体制</h3>
+  <h3 class="sub-title">実施体制（7週間）</h3>
   <div class="resource-grid">
     <div class="resource-card">
       <div class="name">川上</div>
-      <div class="role">エンジニア（実装・PR）</div>
+      <div class="role">エンジニア（アーキ・レビュー・統括）</div>
       <div class="tags">
-        <span class="tag tag-blue">FocusBurst実装</span>
-        <span class="tag tag-blue">Forkboxバックエンド</span>
+        <span class="tag tag-green">FB Stripe統合</span>
+        <span class="tag tag-purple">FKレビュー・統括</span>
+      </div>
+    </div>
+    <div class="resource-card">
+      <div class="name">中村</div>
+      <div class="role">FEエンジニア</div>
+      <div class="tags">
+        <span class="tag tag-purple">Forkbox FE実装</span>
+        <span class="tag tag-green">FB LP改善</span>
+      </div>
+    </div>
+    <div class="resource-card">
+      <div class="name">田中</div>
+      <div class="role">BEエンジニア</div>
+      <div class="tags">
+        <span class="tag tag-purple">Forkbox BE実装</span>
+        <span class="tag tag-green">FB 認証・決済BE</span>
       </div>
     </div>
     <div class="resource-card">
       <div class="name">石川</div>
       <div class="role">マーケティング</div>
       <div class="tags">
-        <span class="tag tag-green">X投稿</span>
-        <span class="tag tag-green">note記事</span>
-        <span class="tag tag-green">GTM</span>
+        <span class="tag tag-green">FBローンチ発信</span>
+        <span class="tag tag-purple">FKティザー</span>
       </div>
     </div>
     <div class="resource-card">
       <div class="name">山口</div>
       <div class="role">デザイナー（UI/UX）</div>
       <div class="tags">
-        <span class="tag tag-purple">Forkbox LP</span>
-        <span class="tag tag-purple">ブランディング</span>
+        <span class="tag tag-green">FB LP改善</span>
+        <span class="tag tag-purple">FK UIポリッシュ</span>
       </div>
     </div>
     <div class="resource-card">
@@ -582,147 +336,657 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 13px
         <span class="tag tag-orange">山下窓口</span>
       </div>
     </div>
-    <div class="resource-card">
-      <div class="name">佐藤</div>
-      <div class="role">経理（ローカルLLM検討中）</div>
-      <div class="tags">
-        <span class="tag tag-yellow">収益管理</span>
-        <span class="tag tag-yellow">経費整理</span>
+  </div>
+
+  <h3 class="sub-title">全体タイムライン（6月〜7月）</h3>
+  <div class="timeline-strip">
+    <div class="tm active">W1<br>6/9〜15</div>
+    <div class="tm active">W2<br>6/16〜22</div>
+    <div class="tm active">W3<br>6/23〜29</div>
+    <div class="tm green">W4<br>6/30〜7/6</div>
+    <div class="tm green">W5<br>7/7〜13<br><small>FB🎉</small></div>
+    <div class="tm both">W6<br>7/14〜20<br><small>FKα</small></div>
+    <div class="tm both">W7<br>7/21〜31<br><small>FK🎉</small></div>
+  </div>
+  <p style="font-size:13px;color:var(--muted);">FB = FocusBurst（緑） / FK = Forkbox（紫）。W5で FocusBurst 正式ローンチ → W7で Forkbox MVP リリース</p>
+</section>
+
+<!-- ========== 2. スプリント計画 ========== -->
+<section id="sprint">
+  <h2 class="section-title"><span class="num">2</span>7週間スプリント計画</h2>
+
+  <!-- Week 1 -->
+  <div class="sprint">
+    <div class="sprint-header">
+      <span class="sprint-week">Week 1</span>
+      <span class="sprint-date">6/9（月）〜 6/15（日）</span>
+      <span class="sprint-title">設計・基盤フェーズ</span>
+    </div>
+    <div class="sprint-body">
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-green"></span>
+          FocusBurst — Stripe統合設計
+        </div>
+        <ul>
+          <li><strong>川上:</strong> Stripe 決済フロー設計（月500円プラン）・認証設計（NextAuth or Clerk 選定）</li>
+          <li><strong>田中:</strong> BE 環境構築・Stripe Webhook 受信エンドポイント設計</li>
+          <li><strong>山口:</strong> LP改善 ワイヤーフレーム（価格表・CTA ボタン配置）</li>
+        </ul>
+      </div>
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-purple"></span>
+          Forkbox — バックエンド基盤選定
+        </div>
+        <ul>
+          <li><strong>川上:</strong> Supabase vs Firebase の技術選定・決定</li>
+          <li><strong>田中:</strong> DBスキーマ設計（users / posts / likes / follows テーブル）</li>
+          <li><strong>中村:</strong> モックから API 接続への移行設計・コンポーネント整理</li>
+          <li><strong>石川:</strong> Forkbox ティザー投稿用コンテンツ準備開始</li>
+        </ul>
       </div>
     </div>
   </div>
 
-  <h3 class="sub-title">フェーズ別 リソース配分</h3>
-  <table>
-    <thead>
-      <tr><th>期間</th><th>FocusBurst</th><th>Forkbox</th><th>備考</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>6月</td>
-        <td>石川: マーケ継続<br>川上: Forkboxへシフト</td>
-        <td>川上: Phase5 設計固め<br>千葉: PM・要件整理</td>
-        <td>川上はFB収益化準備も並行</td>
-      </tr>
-      <tr>
-        <td>7〜8月</td>
-        <td>川上: Phase A 収益化実装<br>石川: Phase B マーケ強化</td>
-        <td>川上: Phase 6 バックエンド<br>山口: デザインQA</td>
-        <td>川上の稼働を両プロダクトに分散。優先度はFB収益化→FK実装の順</td>
-      </tr>
-      <tr>
-        <td>9月</td>
-        <td>川上: Phase C 機能拡張着手<br>石川: ユーザー獲得継続</td>
-        <td>川上: Phase 7 アルファ<br>全員: テスター確保</td>
-        <td>Forkboxアルファ公開が重なるため川上の負荷が最大。外部エンジニア採用を検討</td>
-      </tr>
-      <tr>
-        <td>10月</td>
-        <td>石川: マーケ継続<br>川上: バグ修正・小改善</td>
-        <td>石川: Phase 8 GTM<br>山口: LP完成<br>川上: ベータ安定化</td>
-        <td>Forkboxマーケ開始でリソースが集中</td>
-      </tr>
-      <tr>
-        <td>11〜12月</td>
-        <td>石川: 両プロダクト横断マーケ<br>川上: 機能拡張継続</td>
-        <td>川上: Phase 9 正式リリース<br>全員: ローンチ対応</td>
-        <td>Forkbox正式リリースで全社横断対応。Scaffold外部展開の準備開始</td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- Week 2 -->
+  <div class="sprint">
+    <div class="sprint-header">
+      <span class="sprint-week">Week 2</span>
+      <span class="sprint-date">6/16（月）〜 6/22（日）</span>
+      <span class="sprint-title">実装フェーズ①</span>
+    </div>
+    <div class="sprint-body">
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-green"></span>
+          FocusBurst — Stripe実装
+        </div>
+        <ul>
+          <li><strong>川上:</strong> Stripe Checkout / Billing Portal 実装・フリーミアム解除ロジック</li>
+          <li><strong>田中:</strong> 認証 BE 実装（Stripe 顧客 ID との紐付け）・Webhook 実装</li>
+          <li><strong>中村:</strong> フロント決済 UI 実装（価格表コンポーネント・CTA）</li>
+        </ul>
+      </div>
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-purple"></span>
+          Forkbox — 認証・投稿API実装
+        </div>
+        <ul>
+          <li><strong>田中:</strong> Google OAuth 認証 API 実装（Supabase Auth or Firebase Auth）</li>
+          <li><strong>田中:</strong> 投稿 CRUD API（URL・コード・アイデアの3タイプ）</li>
+          <li><strong>中村:</strong> 認証フロー FE 実装（ログイン・セッション管理）</li>
+          <li><strong>中村:</strong> 投稿フォーム FE をダミーデータから API 接続へ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 
-  <div class="callout" style="margin-top:16px;">
-    <p><strong>採用検討トリガー:</strong> 川上の稼働が月100時間を超える見込みになった時点（9月目安）で、外部エンジニアの採用・外注を山下に提案する。</p>
+  <!-- Week 3 -->
+  <div class="sprint">
+    <div class="sprint-header">
+      <span class="sprint-week">Week 3</span>
+      <span class="sprint-date">6/23（月）〜 6/29（日）</span>
+      <span class="sprint-title">実装フェーズ②</span>
+    </div>
+    <div class="sprint-body">
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-green"></span>
+          FocusBurst — LP更新・テスト
+        </div>
+        <ul>
+          <li><strong>中村:</strong> LP 改善実装（山口デザイン通り・価格セクション・FAQ追加）</li>
+          <li><strong>川上:</strong> Stripe E2E テスト（テスト決済 → フリーミアム解除の動線確認）</li>
+          <li><strong>田中:</strong> 決済 BE の負荷・エラーハンドリングテスト</li>
+          <li><strong>山口:</strong> LP デザイン QA・モバイルレスポンシブ確認</li>
+        </ul>
+      </div>
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-purple"></span>
+          Forkbox — フィード・プロフィールAPI実装
+        </div>
+        <ul>
+          <li><strong>田中:</strong> フィード API（タイムライン取得・ページネーション）</li>
+          <li><strong>田中:</strong> いいね API・フォロー/フォロワー API</li>
+          <li><strong>田中:</strong> プロフィール API（取得・更新）</li>
+          <li><strong>中村:</strong> フィード画面・プロフィール画面をダミーデータから API 接続へ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Week 4 -->
+  <div class="sprint">
+    <div class="sprint-header">
+      <span class="sprint-week">Week 4</span>
+      <span class="sprint-date">6/30（月）〜 7/6（日）</span>
+      <span class="sprint-title">ローンチ準備フェーズ</span>
+      <span class="sprint-milestone tag tag-green">FB ローンチ直前</span>
+    </div>
+    <div class="sprint-body">
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-green"></span>
+          FocusBurst — ローンチ準備
+        </div>
+        <ul>
+          <li><strong>川上:</strong> 本番 Stripe キー切り替え・決済フロー最終確認</li>
+          <li><strong>中村:</strong> LP 本番デプロイ・OGP / メタタグ更新</li>
+          <li><strong>石川:</strong> ローンチ告知コンテンツ作成（X投稿・note記事・メール）</li>
+          <li><strong>千葉:</strong> 山下への事前確認・ローンチ GO判定</li>
+          <li><span class="tag tag-green">オプション検討:</span> App Store/Play Store 申請 vs PWA継続の最終判断</li>
+        </ul>
+      </div>
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-purple"></span>
+          Forkbox — FEとAPIの接続
+        </div>
+        <ul>
+          <li><strong>中村:</strong> 全 API を FE に接続（投稿・フィード・いいね・フォロー・プロフィール）</li>
+          <li><strong>田中:</strong> API 結合テスト・エラーハンドリング整備</li>
+          <li><strong>川上:</strong> コードレビュー・統合テスト</li>
+          <li><strong>山口:</strong> Forkbox UI ポリッシュ（モックとの乖離調整）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Week 5 -->
+  <div class="sprint">
+    <div class="sprint-header">
+      <span class="sprint-week">Week 5</span>
+      <span class="sprint-date">7/7（月）〜 7/13（日）</span>
+      <span class="sprint-title">FocusBurst 正式ローンチ週</span>
+      <span class="sprint-milestone tag tag-green">🎉 FB 正式ローンチ</span>
+    </div>
+    <div class="sprint-body">
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-green"></span>
+          FocusBurst — 正式ローンチ
+        </div>
+        <ul>
+          <li><strong>石川:</strong> X・note でローンチ発信（複数投稿・告知記事）</li>
+          <li><strong>川上 / 田中:</strong> ローンチ当日モニタリング・緊急バグ対応体制</li>
+          <li><strong>千葉:</strong> 初期有料ユーザー獲得状況を毎日山下に報告</li>
+          <li>目標: ローンチ週に有料ユーザー 5〜10人確保</li>
+        </ul>
+      </div>
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-purple"></span>
+          Forkbox — バグ修正・α版準備
+        </div>
+        <ul>
+          <li><strong>田中:</strong> 結合テストで発覚したバグの修正</li>
+          <li><strong>中村:</strong> UX 改善（ローディング・エラー表示・空状態）</li>
+          <li><strong>山口:</strong> α版公開前 デザイン最終 QA</li>
+          <li><strong>千葉:</strong> α版テスター候補リスト作成（山下ネットワーク）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Week 6 -->
+  <div class="sprint">
+    <div class="sprint-header">
+      <span class="sprint-week">Week 6</span>
+      <span class="sprint-date">7/14（月）〜 7/20（日）</span>
+      <span class="sprint-title">FB初期対応・Forkbox クローズドα</span>
+      <span class="sprint-milestone tag tag-purple">FK クローズドα開始</span>
+    </div>
+    <div class="sprint-body">
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-green"></span>
+          FocusBurst — 初期ユーザー対応
+        </div>
+        <ul>
+          <li><strong>川上 / 田中:</strong> ユーザーフィードバック対応・バグ修正</li>
+          <li><strong>石川:</strong> ユーザーの声を SNS コンテンツ化（実績投稿）</li>
+          <li><strong>千葉:</strong> 初週 KPI（有料ユーザー数・MRR・解約率）集計・山下報告</li>
+        </ul>
+      </div>
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-purple"></span>
+          Forkbox — クローズドα（招待制）
+        </div>
+        <ul>
+          <li><strong>千葉:</strong> 招待テスター 10〜15人に招待リンク送付</li>
+          <li><strong>田中:</strong> α版モニタリング（エラーログ・レスポンス監視）</li>
+          <li><strong>中村:</strong> テスターからのフィードバック対応・緊急修正</li>
+          <li><strong>石川:</strong> Forkbox ティザー X 投稿開始（α告知）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Week 7 -->
+  <div class="sprint">
+    <div class="sprint-header">
+      <span class="sprint-week">Week 7</span>
+      <span class="sprint-date">7/21（月）〜 7/31（木）</span>
+      <span class="sprint-title">Forkbox MVP 正式リリース</span>
+      <span class="sprint-milestone tag tag-purple">🎉 FK MVP リリース</span>
+    </div>
+    <div class="sprint-body">
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-green"></span>
+          FocusBurst — 継続運用
+        </div>
+        <ul>
+          <li><strong>石川:</strong> マーケ継続（ADHD コミュニティへのアウトリーチ）</li>
+          <li><strong>川上:</strong> 次フェーズ機能（セッション統計・カスタムタイマー）設計着手</li>
+          <li>目標: 7月末時点で有料ユーザー 20〜30人・MRR 10,000〜15,000円</li>
+        </ul>
+      </div>
+      <div class="sprint-col">
+        <div class="sprint-col-label">
+          <span class="dot dot-purple"></span>
+          Forkbox — MVP 正式リリース
+        </div>
+        <ul>
+          <li><strong>田中:</strong> 本番環境への正式デプロイ（独自ドメイン設定）</li>
+          <li><strong>中村:</strong> 最終バグ修正・パフォーマンス最適化</li>
+          <li><strong>石川:</strong> X・note でリリース発信・ウェイトリスト解放</li>
+          <li><strong>千葉:</strong> リリース KPI 集計・山下へ最終報告</li>
+          <li>目標: MVP リリース当週に登録ユーザー 50〜100人</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <p><strong>リスク管理:</strong> Week 4 末（7/6）時点で FocusBurst Stripe テストが通っていない場合 / Forkbox API 結合が 50% 未満の場合は、千葉が翌日朝に山下へエスカレーションし、スコープ調整を判断する。</p>
   </div>
 </section>
 
-<!-- ========== 5. マイルストーン ========== -->
-<section id="milestones">
-  <h2 class="section-title"><span class="num">5</span>マイルストーン一覧</h2>
+<!-- ========== 3. FocusBurst 詳細 ========== -->
+<section id="focusburst">
+  <h2 class="section-title"><span class="num">3</span>FocusBurst 詳細計画</h2>
 
+  <h3 class="sub-title">7月ローンチに必要な実装スコープ</h3>
+
+  <div class="phase green">
+    <div class="phase-header">
+      <h3>実装: Stripe 決済統合</h3>
+      <div class="phase-meta">
+        <span class="tag tag-blue">川上・田中（W1〜W3）</span>
+      </div>
+    </div>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">実装内容</div>
+        <ul>
+          <li>月額500円プランの Stripe Product / Price 設定</li>
+          <li>Stripe Checkout セッション生成 API</li>
+          <li>Stripe Webhook（payment_intent.succeeded / subscription 系イベント）</li>
+          <li>有料ユーザーフラグの DB 管理（Supabase or Prisma）</li>
+          <li>Billing Portal（キャンセル・領収書 DL）</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">完了条件</div>
+        <ul>
+          <li>Stripe テストモードで決済 → 有料フラグ ON → フリーミアム解除の一連動作確認</li>
+          <li>Stripe 本番キー切り替え後に実決済テスト完了</li>
+          <li>Webhook 受信 → DB 更新のレイテンシ 5秒以内</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <h3>実装: フリーミアム解除ロジック</h3>
+      <div class="phase-meta">
+        <span class="tag tag-blue">川上・田中（W2）</span>
+      </div>
+    </div>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">実装内容</div>
+        <ul>
+          <li>ユーザー認証（NextAuth / Clerk）でセッション管理</li>
+          <li>有料ユーザー判定ミドルウェア（API ルートでチェック）</li>
+          <li>フロント側: 「1日3回制限」を有料ユーザーにはスキップ</li>
+          <li>「準備中」バッジ → 実際の価格・CTA ボタンに差し替え</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">完了条件</div>
+        <ul>
+          <li>無料ユーザーは1日3回制限が継続されること</li>
+          <li>有料ユーザーは制限なしでタイマーを使えること</li>
+          <li>セッション切れ後も有料ステータスが正しく復元されること</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase yellow">
+    <div class="phase-header">
+      <h3>実装: LP 改善（山口 + 中村）</h3>
+      <div class="phase-meta">
+        <span class="tag tag-blue">山口（デザイン）・中村（実装）W1〜W3</span>
+      </div>
+    </div>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">追加セクション</div>
+        <ul>
+          <li>価格表セクション（無料プラン vs 有料プラン比較）</li>
+          <li>メイン CTA ボタン（「今すぐはじめる — 月額500円」）</li>
+          <li>FAQ（解約・データ消去・返金ポリシー）</li>
+          <li>OGP / Twitter Card 画像の更新</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">完了条件</div>
+        <ul>
+          <li>モバイル・デスクトップ両方でレスポンシブ表示</li>
+          <li>LP から決済フローへの導線が 2タップ以内</li>
+          <li>山下・千葉による表示確認済み</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase" style="border-left-color: var(--muted);">
+    <div class="phase-header">
+      <h3>オプション: App Store / Google Play 申請</h3>
+      <div class="phase-meta">
+        <span class="tag tag-yellow">Week 4 末に GO/NO GO 判断</span>
+      </div>
+    </div>
+    <p>PWA のまま 7月ローンチを優先する。ネイティブ申請は 8月以降に分離検討。Week 4（7/6）時点でのリリース余裕・有料ユーザー見込みを踏まえ川上・千葉・山下で判断する。</p>
+  </div>
+
+  <h3 class="sub-title">FocusBurst KPI 目標（7月末時点）</h3>
   <table>
     <thead>
-      <tr><th>時期</th><th>マイルストーン</th><th>プロダクト</th><th>担当</th></tr>
+      <tr><th>指標</th><th>目標値</th><th>備考</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>有料ユーザー数</td><td>20〜30人</td><td>ローンチ（7/7）から3週間での累計</td></tr>
+      <tr><td>月次MRR</td><td>10,000〜15,000円</td><td>500円 × 20〜30人</td></tr>
+      <tr><td>決済エラー率</td><td>1%未満</td><td>Stripe ダッシュボードで確認</td></tr>
+      <tr><td>MAU</td><td>500〜1,000人</td><td>無料 + 有料の合計</td></tr>
+      <tr><td>note記事公開数</td><td>累計 10本以上</td><td>石川 週2〜3本継続</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ========== 4. Forkbox 詳細 ========== -->
+<section id="forkbox">
+  <h2 class="section-title"><span class="num">4</span>Forkbox 詳細計画</h2>
+
+  <h3 class="sub-title">MVP スコープ（7月末 α リリース対象）</h3>
+
+  <div class="phase purple">
+    <div class="phase-header">
+      <h3>バックエンド基盤（田中 W1〜W2）</h3>
+      <div class="phase-meta">
+        <span class="tag tag-blue">田中（BE）/ 川上（技術選定）</span>
+      </div>
+    </div>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">技術スタック（W1 確定）</div>
+        <ul>
+          <li><strong>DB + Auth:</strong> Supabase（Row Level Security + Auth で認証と DB を統合）または Firebase</li>
+          <li><strong>API:</strong> Next.js API Routes（既存 FE と同リポジトリ）</li>
+          <li><strong>ORM:</strong> Prisma or Supabase Client</li>
+          <li><strong>ホスティング:</strong> Vercel（FE） + Supabase Cloud（BE）</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">DBスキーマ（主要テーブル）</div>
+        <ul>
+          <li><code>users</code>: id / name / avatar / bio / created_at</li>
+          <li><code>posts</code>: id / user_id / type（url/code/idea）/ content / created_at</li>
+          <li><code>likes</code>: id / user_id / post_id / created_at</li>
+          <li><code>forks</code>: id / user_id / source_post_id / post_id</li>
+          <li><code>follows</code>: follower_id / followee_id</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase purple">
+    <div class="phase-header">
+      <h3>認証（田中 + 中村 W2）</h3>
+      <div class="phase-meta">
+        <span class="tag tag-blue">田中（API） / 中村（FE）</span>
+      </div>
+    </div>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">実装内容</div>
+        <ul>
+          <li>Google OAuth 2.0 ログイン</li>
+          <li>セッション管理（JWT or Supabase Auth）</li>
+          <li>ログイン・ログアウト・未認証リダイレクト</li>
+          <li>初回ログイン時のプロフィール作成フロー</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">完了条件</div>
+        <ul>
+          <li>Google アカウントでログインしてフィードが表示されること</li>
+          <li>未ログイン状態で投稿しようとするとログイン画面へ遷移すること</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase purple">
+    <div class="phase-header">
+      <h3>投稿・フィード・基本インタラクション（田中 + 中村 W2〜W3）</h3>
+      <div class="phase-meta">
+        <span class="tag tag-blue">田中（API） / 中村（FE）</span>
+      </div>
+    </div>
+    <div class="phase-grid">
+      <div class="phase-block">
+        <div class="phase-block-label">MVP 機能</div>
+        <ul>
+          <li><strong>投稿:</strong> URL / コード / アイデア の3種類。タイトル + 内容 + タグ</li>
+          <li><strong>フォーク:</strong> 他人の投稿を自分流に派生させる（source_post_id 紐付け）</li>
+          <li><strong>フィード:</strong> フォロー中のユーザーの投稿 + 全体タイムライン</li>
+          <li><strong>いいね:</strong> トグル式。カウント表示</li>
+          <li><strong>プロフィール:</strong> 投稿一覧・フォロー/フォロワー数表示・アバター変更</li>
+        </ul>
+      </div>
+      <div class="phase-block">
+        <div class="phase-block-label">v2 以降（スコープ外）</div>
+        <ul>
+          <li>系譜ビュー（フォーク ツリー表示）</li>
+          <li>コレクション（ブックマーク機能）</li>
+          <li>通知（いいね・フォーク・フォロー）</li>
+          <li>コメント機能</li>
+          <li>検索・タグ絞り込み</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-title">Forkbox KPI 目標（7月末 α 時点）</h3>
+  <table>
+    <thead>
+      <tr><th>指標</th><th>目標値</th><th>備考</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>α版テスター数</td><td>10〜15人</td><td>招待制。山下ネットワーク中心</td></tr>
+      <tr><td>1人あたり投稿数</td><td>3投稿以上</td><td>α期間中の平均</td></tr>
+      <tr><td>クリティカルバグ（P0）</td><td>0件</td><td>MVP リリース時点で解消済み</td></tr>
+      <tr><td>主要 API レスポンスタイム</td><td>500ms 以内（p95）</td><td>フィード取得・投稿作成</td></tr>
+      <tr><td>テスターからの NPS</td><td>+30 以上</td><td>α後にアンケート実施</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ========== 5. リソース配分 ========== -->
+<section id="resources">
+  <h2 class="section-title"><span class="num">5</span>リソース配分</h2>
+
+  <h3 class="sub-title">週別 担当マトリクス</h3>
+  <table>
+    <thead>
+      <tr><th>週</th><th>川上</th><th>中村（FE）</th><th>田中（BE）</th><th>石川</th><th>山口</th></tr>
     </thead>
     <tbody>
       <tr>
-        <td>2026年6月末</td>
-        <td>Forkbox 要件定義 v2 確定・川上の Phase6 着手</td>
-        <td><span class="tag tag-purple">Forkbox</span></td>
-        <td>千葉 / 川上</td>
+        <td><strong>W1</strong><br>6/9〜15</td>
+        <td>FB Stripe設計<br>FK 技術選定</td>
+        <td>FK FE設計<br>FB LP ワイヤー確認</td>
+        <td>FB BE環境<br>FK DBスキーマ</td>
+        <td>FK ティザー準備</td>
+        <td>FB LP WF</td>
       </tr>
       <tr>
-        <td>2026年7月末</td>
-        <td>FocusBurst 収益化リリース（Stripe 決済稼働）</td>
-        <td><span class="tag tag-green">FocusBurst</span></td>
-        <td>川上</td>
+        <td><strong>W2</strong><br>6/16〜22</td>
+        <td>FB Stripe実装<br>FK レビュー</td>
+        <td>FB 決済UI<br>FK 認証FE</td>
+        <td>FB 認証BE<br>FK 認証・投稿API</td>
+        <td>FB note記事継続</td>
+        <td>FB LP デザイン</td>
       </tr>
       <tr>
-        <td>2026年8月末</td>
-        <td>FocusBurst 有料ユーザー 10人達成</td>
-        <td><span class="tag tag-green">FocusBurst</span></td>
-        <td>石川 / 川上</td>
+        <td><strong>W3</strong><br>6/23〜29</td>
+        <td>FB Stripe E2Eテスト</td>
+        <td>FB LP実装<br>FK フィードFE</td>
+        <td>FB 決済BEテスト<br>FK フィード・プロフAPI</td>
+        <td>FB note継続</td>
+        <td>FB LP QA<br>FK UI確認</td>
       </tr>
       <tr>
-        <td>2026年8月末</td>
-        <td>Forkbox バックエンド完成・Alpha 準備完了</td>
-        <td><span class="tag tag-purple">Forkbox</span></td>
-        <td>川上</td>
+        <td><strong>W4</strong><br>6/30〜7/6</td>
+        <td>FB 本番キー切替<br>FK 統合テスト</td>
+        <td>FB LP本番デプロイ<br>FK 全API接続</td>
+        <td>FK 結合テスト</td>
+        <td>FB ローンチコンテンツ作成</td>
+        <td>FK UIポリッシュ</td>
       </tr>
       <tr>
-        <td>2026年9月末</td>
-        <td>Forkbox アルファ版公開（クローズドテスター 15人）</td>
-        <td><span class="tag tag-purple">Forkbox</span></td>
-        <td>川上 / 山口</td>
+        <td><strong>W5</strong><br>7/7〜13</td>
+        <td>FB ローンチ対応</td>
+        <td>FB バグ修正</td>
+        <td>FK バグ修正</td>
+        <td>FB ローンチ発信<br>FK ティザー開始</td>
+        <td>FK α版 QA</td>
       </tr>
       <tr>
-        <td>2026年9月末</td>
-        <td>FocusBurst 有料ユーザー 50人・MRR 20,000円</td>
-        <td><span class="tag tag-green">FocusBurst</span></td>
-        <td>石川</td>
+        <td><strong>W6</strong><br>7/14〜20</td>
+        <td>FB ユーザー対応</td>
+        <td>FK α フィードバック修正</td>
+        <td>FK α モニタリング</td>
+        <td>FB 実績コンテンツ<br>FK α告知</td>
+        <td>—</td>
       </tr>
       <tr>
-        <td>2026年10月末</td>
-        <td>Forkbox ベータ開放・ベータ登録者 200人</td>
-        <td><span class="tag tag-purple">Forkbox</span></td>
-        <td>石川 / 山口</td>
-      </tr>
-      <tr>
-        <td>2026年11月末</td>
-        <td>Forkbox 正式リリース・Stripe 決済稼働</td>
-        <td><span class="tag tag-purple">Forkbox</span></td>
-        <td>川上 / 全員</td>
-      </tr>
-      <tr>
-        <td>2026年12月末</td>
-        <td><strong>売上累計 100万円 達成</strong></td>
-        <td><span class="tag tag-green">FB</span> <span class="tag tag-purple">FK</span></td>
-        <td>全員</td>
+        <td><strong>W7</strong><br>7/21〜31</td>
+        <td>FB 次フェーズ設計着手</td>
+        <td>FK 最終修正・最適化</td>
+        <td>FK 本番デプロイ</td>
+        <td>FK リリース発信</td>
+        <td>—</td>
       </tr>
     </tbody>
   </table>
 
-  <h3 class="sub-title">売上到達シナリオ（合算）</h3>
-  <div class="goal-bar-wrap">
-    <div class="goal-bar-label"><span>8月末（5万円見込み）</span><span>目標: 100万円</span></div>
-    <div class="goal-bar"><div class="goal-bar-fill" style="width:5%;background:var(--green);"></div></div>
+  <div class="callout">
+    <p><strong>川上の役割:</strong> 7週間を通じて FocusBurst（Stripe 統合・本番切り替え）の主担当を担いつつ、Forkbox は中村・田中の実装を技術面でサポートするアーキテクト役。W4 以降は Forkbox の統合テスト・レビューに比重を移す。</p>
   </div>
-  <div class="goal-bar-wrap">
-    <div class="goal-bar-label"><span>10月末（20万円見込み）</span><span>目標: 100万円</span></div>
-    <div class="goal-bar"><div class="goal-bar-fill" style="width:20%;background:var(--yellow);"></div></div>
-  </div>
-  <div class="goal-bar-wrap">
-    <div class="goal-bar-label"><span>12月末（60〜90万円見込み）</span><span>目標: 100万円</span></div>
-    <div class="goal-bar"><div class="goal-bar-fill" style="width:75%;background:var(--orange);"></div></div>
-  </div>
+</section>
 
-  <div class="callout" style="margin-top:20px;">
-    <p><strong>注:</strong> 現在の試算では12月末時点で 60〜90万円に到達する見込み。100万円達成には Forkbox の正式リリース後の伸びが鍵。Forkboxのビジネスモデル（価格・プラン構成）の早期確定が最重要課題。</p>
+<!-- ========== 6. マイルストーン ========== -->
+<section id="milestones">
+  <h2 class="section-title"><span class="num">6</span>マイルストーン一覧</h2>
+
+  <table>
+    <thead>
+      <tr><th>日程</th><th>マイルストーン</th><th>プロダクト</th><th>担当</th><th>確認方法</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>7/6（日）</td>
+        <td>FB Stripe テスト決済 → フリーミアム解除の動線確認</td>
+        <td><span class="tag tag-green">FocusBurst</span></td>
+        <td>川上・田中</td>
+        <td>テスト決済ログ確認</td>
+      </tr>
+      <tr>
+        <td>7/6（日）</td>
+        <td>FK 全 API の FE 接続完了・Vercel Preview デプロイ確認</td>
+        <td><span class="tag tag-purple">Forkbox</span></td>
+        <td>中村・田中・川上</td>
+        <td>Preview URL で動作確認</td>
+      </tr>
+      <tr>
+        <td><strong>7/7〜13</strong></td>
+        <td><strong>FocusBurst 有料プラン 正式ローンチ</strong></td>
+        <td><span class="tag tag-green">FocusBurst</span></td>
+        <td>全員</td>
+        <td>LP + Stripe 本番決済動作確認・千葉が URL 確認後に山下報告</td>
+      </tr>
+      <tr>
+        <td>7/13（日）</td>
+        <td>FB ローンチ週 有料ユーザー 5人以上確保</td>
+        <td><span class="tag tag-green">FocusBurst</span></td>
+        <td>石川・川上</td>
+        <td>Stripe ダッシュボード</td>
+      </tr>
+      <tr>
+        <td>7/14〜20</td>
+        <td>Forkbox クローズドα 開始（招待テスター 10〜15人）</td>
+        <td><span class="tag tag-purple">Forkbox</span></td>
+        <td>千葉・田中・中村</td>
+        <td>テスター全員が実際にログイン・投稿できることを確認</td>
+      </tr>
+      <tr>
+        <td><strong>7/21〜31</strong></td>
+        <td><strong>Forkbox MVP 正式リリース</strong></td>
+        <td><span class="tag tag-purple">Forkbox</span></td>
+        <td>全員</td>
+        <td>本番 URL アクセス確認・千葉が URL 確認後に山下報告</td>
+      </tr>
+      <tr>
+        <td>7/31（金）</td>
+        <td>7月末 KPI 集計・山下への 7 月総括報告</td>
+        <td><span class="tag tag-green">FB</span> <span class="tag tag-purple">FK</span></td>
+        <td>千葉</td>
+        <td>KPI シートを Slack 報告</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 class="sub-title">7月末 KPI サマリー目標</h3>
+  <table>
+    <thead>
+      <tr><th>指標</th><th>FocusBurst</th><th>Forkbox</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>リリース状態</td><td>有料プラン本番稼働</td><td>α版公開（招待制）</td></tr>
+      <tr><td>ユーザー数</td><td>有料 20〜30人 / MAU 500〜1,000人</td><td>α テスター 10〜15人</td></tr>
+      <tr><td>MRR</td><td>10,000〜15,000円</td><td>—（α 無料）</td></tr>
+      <tr><td>決済 / API エラー率</td><td>1%未満</td><td>P0 バグ 0件</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout goal" style="margin-top:20px;">
+    <p><strong>8月以降への引き継ぎ:</strong> FocusBurst は有料ユーザー拡大フェーズへ。Forkbox は α フィードバックを踏まえた v2 開発（系譜ビュー・通知・収益化設計）へ移行する。詳細は 8月計画書（dev-plan-2026-v3）にて更新予定。</p>
   </div>
 </section>
 
 <footer>
-  作成: 千葉（keyaki マネージャー）/ 2026-06-06 &nbsp;|&nbsp; 次回レビュー: 2026-07-01
+  作成: 千葉（keyaki マネージャー）/ v2.0 更新: 2026-06-06 &nbsp;|&nbsp; 次回レビュー: 2026-07-01（Week 4 完了後）
 </footer>
 
 </body>
