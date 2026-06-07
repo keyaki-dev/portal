@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI組織を自分のサーバーに作る — 再現ガイド</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --ink:#1a1f2e;
+    --sub:#5b6478;
+    --line:#e6e9f0;
+    --card:#f7f9fc;
+    --accent:#2f6df6;
+    --accent2:#12b886;
+    --accent3:#f59f00;
+    --accent-soft:#eaf1ff;
+    --radius:18px;
+    --shadow:0 8px 30px rgba(20,40,90,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP","Segoe UI",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  #deck{height:100vh;width:100vw;position:relative}
+  .slide{
+    position:absolute;inset:0;
+    display:none;
+    flex-direction:column;
+    justify-content:center;
+    padding:5vh 7vw;
+    opacity:0;
+    transform:translateY(14px);
+    transition:opacity .45s ease,transform .45s ease;
+  }
+  .slide.active{display:flex;opacity:1;transform:translateY(0)}
+  .kicker{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:.8rem;font-weight:700;letter-spacing:.06em;
+    color:var(--accent);background:var(--accent-soft);
+    padding:6px 14px;border-radius:999px;width:fit-content;margin-bottom:18px;
+  }
+  .kicker.green{color:#0b7a5b;background:#e6faf3}
+  .kicker.amber{color:#9a6700;background:#fff6e0}
+  h1{font-size:clamp(2rem,4.8vw,3.7rem);line-height:1.12;letter-spacing:-.02em;font-weight:800}
+  h2{font-size:clamp(1.55rem,3.3vw,2.5rem);line-height:1.18;letter-spacing:-.02em;font-weight:800;margin-bottom:6px}
+  .lead{font-size:clamp(.98rem,1.6vw,1.28rem);color:var(--sub);line-height:1.65;margin-top:14px;max-width:60ch}
+  .big-sub{font-size:clamp(1rem,1.9vw,1.4rem);color:var(--sub);margin-top:18px;font-weight:500;line-height:1.6}
+  .grid{display:grid;gap:16px;margin-top:26px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 20px;box-shadow:var(--shadow);
+  }
+  .card h3{font-size:1.08rem;margin-bottom:6px;display:flex;align-items:center;gap:9px}
+  .card p{color:var(--sub);font-size:.92rem;line-height:1.55}
+  .card code{background:#eef1f7;padding:1px 6px;border-radius:6px;font-size:.85em;color:#3b4663}
+  .ico{font-size:1.3rem;line-height:1}
+  .point-num{
+    font-variant-numeric:tabular-nums;font-weight:800;color:var(--accent);
+    font-size:.95rem;background:var(--accent-soft);border-radius:8px;
+    padding:2px 10px;margin-right:6px;
+  }
+  ul.clean{list-style:none;margin-top:20px;display:flex;flex-direction:column;gap:13px}
+  ul.clean li{display:flex;gap:13px;align-items:flex-start;font-size:clamp(.95rem,1.55vw,1.22rem);line-height:1.5}
+  ul.clean li .b{color:var(--accent2);font-weight:800;flex-shrink:0;margin-top:2px}
+  ul.clean code{background:#eef1f7;padding:1px 7px;border-radius:6px;font-size:.86em;color:#3b4663}
+  .tag{display:inline-block;font-size:.82rem;font-weight:700;color:var(--accent2);background:#e6faf3;padding:5px 13px;border-radius:999px;margin-top:14px}
+  .tag.amber{color:#9a6700;background:#fff6e0}
+  .footer{position:absolute;left:7vw;bottom:3.5vh;font-size:.78rem;color:#aab2c4;letter-spacing:.04em}
+  .progress{position:absolute;bottom:0;left:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease;z-index:10}
+  .page{position:absolute;right:7vw;bottom:3.5vh;font-size:.82rem;color:#aab2c4;font-variant-numeric:tabular-nums}
+  .hint{position:absolute;right:7vw;top:4vh;font-size:.76rem;color:#c2c9d6}
+
+  .title-wrap .logo{font-size:.88rem;font-weight:800;letter-spacing:.16em;color:var(--accent);margin-bottom:26px}
+  .title-wrap .emoji{font-size:2.8rem;margin-bottom:16px}
+
+  .members{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px}
+  .member{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;text-align:center;box-shadow:var(--shadow)}
+  .member .av{font-size:2rem;margin-bottom:8px}
+  .member .nm{font-weight:800;font-size:1.08rem}
+  .member .ro{color:var(--sub);font-size:.82rem;margin-top:4px;line-height:1.4}
+  .member .md{margin-top:10px;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:999px;display:inline-block}
+  .md.claude{color:#7048e8;background:#f3effe}
+  .md.local{color:#0c8599;background:#e3fafc}
+
+  .flow{display:flex;flex-direction:column;gap:12px;margin-top:22px;align-items:center}
+  .flow-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
+  .node{background:#fff;border:2px solid var(--line);border-radius:13px;padding:11px 18px;font-weight:700;box-shadow:var(--shadow);font-size:.95rem;text-align:center}
+  .node.accent{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .node.green{border-color:var(--accent2);color:#0b7a5b;background:#e6faf3}
+  .node.amber{border-color:var(--accent3);color:#9a6700;background:#fff6e0}
+  .node small{display:block;font-weight:500;font-size:.74rem;color:var(--sub);margin-top:2px}
+  .arrow{color:var(--sub);font-size:1.2rem;font-weight:800}
+  .stack{display:flex;flex-direction:column;gap:8px;align-items:center}
+
+  .two-col{display:grid;grid-template-columns:1.05fr 1fr;gap:34px;align-items:center;margin-top:18px}
+  .two-col.wide-code{grid-template-columns:1fr 1.15fr}
+  .codeblock{background:#0f1729;color:#d6e0f5;border-radius:14px;padding:18px 22px;font-family:"SFMono-Regular",Consolas,"Courier New",monospace;font-size:.86rem;line-height:1.7;box-shadow:var(--shadow);overflow:auto}
+  .codeblock.tree{font-size:.82rem;line-height:1.55;white-space:pre}
+  .codeblock .c{color:#7c8bb0}
+  .codeblock .k{color:#7bd4ff}
+  .codeblock .g{color:#7ee0a8}
+  .codeblock .y{color:#ffd479}
+  .codeblock .p{color:#c7a6ff}
+
+  .stat{font-size:clamp(2.2rem,5.5vw,4rem);font-weight:800;letter-spacing:-.03em;line-height:1}
+  .stat .u{font-size:.4em;color:var(--sub);font-weight:700}
+  .statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:26px}
+  .statgrid .item{text-align:center}
+  .statgrid .item p{color:var(--sub);margin-top:8px;font-size:.9rem}
+
+  .steps{display:flex;flex-direction:column;gap:12px;margin-top:22px}
+  .step{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px;box-shadow:var(--shadow)}
+  .step .n{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+  .step .t{font-size:.98rem;line-height:1.5}
+  .step .t b{color:var(--ink)}
+  .step .t code{background:#eef1f7;padding:1px 6px;border-radius:6px;font-size:.86em;color:#3b4663}
+
+  .pill-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+  .pill{font-size:.85rem;font-weight:700;padding:7px 15px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--sub)}
+  .pill b{color:var(--accent)}
+</style>
+</head>
+<body>
+<div id="deck">
+
+  <!-- 1: TITLE -->
+  <section class="slide title-wrap">
+    <div class="logo">🌳 BUILD YOUR OWN AI ORGANIZATION</div>
+    <div class="emoji">🏢🤖</div>
+    <h1>AIだけで回る「開発組織」を<br>自分のサーバーに作る</h1>
+    <p class="big-sub">社長は自分ひとり、社員は全員AI。<br>VM上に役割分担したAIチームを常駐させ、寝てる間も開発が進む。<br><b style="color:var(--ink)">この資料はそれを"自分で再現する"ための設計図。</b></p>
+    <div class="hint">→ / Space で次へ</div>
+  </section>
+
+  <!-- 2: 何ができるか -->
+  <section class="slide">
+    <span class="kicker">⚡ 何が起きるか</span>
+    <h2>「AIに手伝ってもらう」から<br>「AIが組織として働く」へ</h2>
+    <ul class="clean">
+      <li><span class="b">課題</span><span>普通のAIチャットは <b>都度起動でコンテキストが消える</b>／<b>PCを閉じたら止まる</b>。</span></li>
+      <li><span class="b">発想</span><span><b>サーバー(VM)にAI社員を常駐</b>させ、役割で分け、ファイルで連携させる＝組織化。</span></li>
+      <li><span class="b">結果</span><span>社長は窓口役に投げるだけ。組織が <b>自分で配って・作って・報告</b>する。</span></li>
+    </ul>
+    <div class="pill-row">
+      <div class="pill"><b>24h</b> 自走</div>
+      <div class="pill">窓口は <b>Slack / chat</b></div>
+      <div class="pill"><b>ローカルLLM</b> も載せられる</div>
+      <div class="pill"><b>cp -r</b> で増員</div>
+    </div>
+  </section>
+
+  <!-- 3: 6つの肝（概要） -->
+  <section class="slide">
+    <span class="kicker">🧩 仕組みの全体像</span>
+    <h2>核となる6つの仕掛け</h2>
+    <div class="grid g3">
+      <div class="card"><h3><span class="point-num">01</span>VM + tmux</h3><p>PCの電源に依存せず<b>24時間稼働</b>。GPUを積めば<b>ローカルLLM</b>も。</p></div>
+      <div class="card"><h3><span class="point-num">02</span>ディレクトリ分離</h3><p>1人=1フォルダ。<code>CLAUDE.md</code>を上位に置かず<b>人格を分離</b>。</p></div>
+      <div class="card"><h3><span class="point-num">03</span>タスクキュー</h3><p><code>inbox→doing→done</code>を<code>mv</code>で受け渡し。<b>アトミック</b>。</p></div>
+      <div class="card"><h3><span class="point-num">04</span>オーケストレーター</h3><p>窓口役が集約し各員を<b>kickで起動</b>。社長は窓口だけ見ればOK。</p></div>
+      <div class="card"><h3><span class="point-num">05</span>tickループ</h3><p>スケジュール機能で<b>約10分ごと自走</b>。一日中リアルタイム。</p></div>
+      <div class="card"><h3><span class="point-num">06</span>DOCS.md 外部記憶</h3><p>進捗をファイルに残す＝<b>いつ落ちても再開</b>できる。</p></div>
+    </div>
+    <span class="tag">この6つを満たすディレクトリを置くだけで、誰でも再現できる ↓</span>
+  </section>
+
+  <!-- 4: 再現① ディレクトリ構成 -->
+  <section class="slide">
+    <span class="kicker green">📁 再現の土台</span>
+    <h2>まずこのディレクトリ構成を作る</h2>
+    <div class="two-col wide-code">
+      <div>
+        <ul class="clean">
+          <li><span class="b">◆</span><span><code>_shared/</code> = 全員共通（会社情報・タスクキュー・起動スクリプト）。</span></li>
+          <li><span class="b">◆</span><span><b>1ロール = 1フォルダ</b>。中身は必ず同じ3点セット。</span></li>
+          <li><span class="b">◆</span><span>これが組織の"オフィス"。増員は<b>フォルダを足すだけ</b>。</span></li>
+        </ul>
+        <span class="tag">役割の数だけフォルダを並べる＝そのまま組織図になる</span>
+      </div>
+      <div class="codeblock tree"><span class="y">org-agents/</span>
+├─ <span class="g">_shared/</span>
+│   ├─ COMPANY.md     <span class="c"># 会社方針・ID・報告先</span>
+│   ├─ WORKFLOWS.md   <span class="c"># git運用などの共通ルール</span>
+│   ├─ kick.sh        <span class="c"># 各員を起動するスクリプト</span>
+│   └─ tasks/
+│       ├─ inbox/  doing/
+│       └─ done/   archive/
+├─ <span class="k">orchestrator/</span>   <span class="c"># 窓口・司令塔</span>
+│   ├─ CLAUDE.md  AGENTS.md  DOCS.md
+├─ <span class="k">pm-xxx/</span>         <span class="c"># プロジェクトPM</span>
+│   ├─ CLAUDE.md  AGENTS.md  DOCS.md
+└─ <span class="k">engineer/</span>       <span class="c"># 実装担当</span>
+    ├─ CLAUDE.md  AGENTS.md  DOCS.md</div>
+    </div>
+  </section>
+
+  <!-- 5: 再現② 3点セット -->
+  <section class="slide">
+    <span class="kicker green">📄 各フォルダの中身</span>
+    <h2>1人ぶんは「3ファイル」でできている</h2>
+    <div class="grid g3">
+      <div class="card"><h3><span class="ico">🪶</span>CLAUDE.md</h3><p><b>薄いローダ</b>。下の3つをimportするだけ。起動時にこれが読まれる入口。</p>
+        <div class="codeblock" style="margin-top:12px;font-size:.8rem;padding:12px 14px"><span class="p">@../_shared/COMPANY.md</span><br><span class="p">@AGENTS.md</span><br><span class="p">@DOCS.md</span></div>
+      </div>
+      <div class="card"><h3><span class="ico">🎭</span>AGENTS.md</h3><p>そのロール固有の<b>役割・やること/やらないこと・tickフロー</b>。人格の本体。</p></div>
+      <div class="card"><h3><span class="ico">🧠</span>DOCS.md</h3><p>セッション間の<b>外部記憶</b>。進捗・決定・確認待ちを書き残す。状態の唯一の正。</p></div>
+    </div>
+    <ul class="clean" style="margin-top:20px">
+      <li><span class="b">!</span><span><b>ペルソナ分離の鉄則</b>：人格定義を上位（<code>~/</code>やグローバル<code>CLAUDE.md</code>）に置かない。cwdから上に遡って読まれるため、混ざると全セッションに漏れる。</span></li>
+    </ul>
+  </section>
+
+  <!-- 6: 再現③ タスクキュー -->
+  <section class="slide">
+    <span class="kicker green">🔁 連携のしくみ</span>
+    <h2>受け渡しは「フォルダ間の mv」だけ</h2>
+    <div class="two-col">
+      <div>
+        <ul class="clean">
+          <li><span class="b">◆</span><span>タスクは1枚のMarkdown。<code>inbox/</code>に投函される。</span></li>
+          <li><span class="b">◆</span><span>担当が<code>doing/</code>へ<code>mv</code>＝着手の合図。<code>mv</code>はアトミックなので<b>ロック代わり</b>。</span></li>
+          <li><span class="b">◆</span><span>終わったら結果を書いて<code>done/</code>へ。窓口役が集約して<code>archive/</code>。</span></li>
+        </ul>
+        <span class="tag">DBもキューサーバーも不要。ただのフォルダで成立する</span>
+      </div>
+      <div class="flow">
+        <div class="node accent">inbox/ <small>投函・未着手</small></div>
+        <div class="arrow">↓ mv</div>
+        <div class="node green">doing/ <small>担当が掴んで作業中</small></div>
+        <div class="arrow">↓ mv</div>
+        <div class="node">done/ <small>完了・報告待ち</small></div>
+        <div class="arrow">↓ mv</div>
+        <div class="node amber">archive/ <small>集約済み保管</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7: 再現④ オーケストレーター + kick -->
+  <section class="slide">
+    <span class="kicker green">🧭 セッション管理をAIに委譲</span>
+    <h2>窓口役が各員のセッションを kick する</h2>
+    <div class="two-col wide-code">
+      <div>
+        <ul class="clean">
+          <li><span class="b">◆</span><span>窓口役(orchestrator)が指示を受け、担当の<code>inbox/</code>に投函。</span></li>
+          <li><span class="b">◆</span><span>そして <code>kick.sh</code> で担当を <b>tmuxの裏で起動</b>（非対話 <code>claude -p</code>）。</span></li>
+          <li><span class="b">◆</span><span>社長が気にするのは<b>窓口役のコンテキストだけ</b>。あとは組織が回す。</span></li>
+        </ul>
+        <span class="tag">「誰をいつ動かすか」までAI側が判断・実行する</span>
+      </div>
+      <div class="codeblock"><span class="c"># orchestrator が実行</span>
+bash _shared/kick.sh engineer
+
+<span class="c"># 中身（要点）</span>
+tmux new-session -d -s <span class="y">kick-engineer</span> \
+  <span class="g">"claude -p '$PROMPT' \
+   --dangerously-skip-permissions \
+   | tee logs/engineer.log"</span>
+
+<span class="c"># → 裏でセッションが立ち上がり</span>
+<span class="c">#   inbox を掴んで自走 → done へ</span></div>
+    </div>
+  </section>
+
+  <!-- 8: 再現⑤ tick + DOCS -->
+  <section class="slide">
+    <span class="kicker green">⏱️ 自走と記憶</span>
+    <h2>10分tick → 進捗をDOCS.mdに残して眠る</h2>
+    <div class="two-col">
+      <div>
+        <ul class="clean">
+          <li><span class="b">◆</span><span>各セッションは tick の最後に <code>ScheduleWakeup(600)</code>＝<b>10分後</b>に自分を再起床。</span></li>
+          <li><span class="b">◆</span><span><b>起床より先に必ず</b><code>DOCS.md</code>を更新するのがルール。</span></li>
+          <li><span class="b">◆</span><span>だから途中で落ちても、次回<code>DOCS.md</code>を読むだけで<b>そのまま再開</b>。</span></li>
+        </ul>
+        <div class="codeblock" style="margin-top:14px;font-size:.8rem;padding:12px 14px"><span class="k">## tick 14:20</span> 完了
+- PR #42 レビュー待ち
+- 経理ロール: 月次突合 <span class="g">done</span>
+- next: CI通ったらmerge
+<span class="c"># ↑ ここから誰でも再開できる</span></div>
+      </div>
+      <div class="statgrid">
+        <div class="item"><div class="stat">10<span class="u">分</span></div><p>ごとに自走tick</p></div>
+        <div class="item"><div class="stat">24<span class="u">h</span></div><p>稼働（窓口役）</p></div>
+        <div class="item"><div class="stat">0<span class="u">回</span></div><p>人が起こす手間</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9: インフラ層 -->
+  <section class="slide">
+    <span class="kicker amber">🖥️ 土台のインフラ</span>
+    <h2>なぜ"VM"なのか — 3つの効き目</h2>
+    <div class="grid g3">
+      <div class="card"><h3><span class="ico">🔌</span>電源非依存</h3><p>tmux常駐だからSSHを切ってもPCを閉じても<b>サーバー側で生き続ける</b>。24h稼働の前提。</p></div>
+      <div class="card"><h3><span class="ico">🧮</span>ローカルLLM</h3><p>GPUを積めば<code>Ollama</code>で<b>自前モデルをサーバー内推論</b>。API従量課金→固定費へ。</p></div>
+      <div class="card"><h3><span class="ico">💬</span>MCPで窓口</h3><p>Slack / LINE WORKS のMCPを挿せば<b>いつものチャットが窓口</b>に。専用UI不要。</p></div>
+    </div>
+    <ul class="clean" style="margin-top:18px">
+      <li><span class="b">→</span><span>将来ローカルLLMの精度が上がれば、組織まるごとローカル化＝<b>「AI使い放題」</b>が射程に入る（使うほど一回あたりが安くなる）。</span></li>
+    </ul>
+  </section>
+
+  <!-- 10: 実例A 小さく始める -->
+  <section class="slide">
+    <span class="kicker">🟢 構成例A（小さく始める）</span>
+    <h2>4ロールのフラット編成</h2>
+    <p class="lead">まずは少人数で。1ロールだけ<b>ローカルLLM</b>に載せて「脱クラウド課金」を検証する、といった始め方ができる。</p>
+    <div class="members">
+      <div class="member"><div class="av">🧭</div><div class="nm">マネージャー</div><div class="ro">窓口/司令塔</div><div class="md claude">クラウドLLM</div></div>
+      <div class="member"><div class="av">👨‍💻</div><div class="nm">エンジニア</div><div class="ro">実装・PR</div><div class="md claude">クラウドLLM</div></div>
+      <div class="member"><div class="av">📣</div><div class="nm">マーケ</div><div class="ro">広報・分析</div><div class="md claude">クラウドLLM</div></div>
+      <div class="member"><div class="av">🧮</div><div class="nm">経理</div><div class="ro">定型・低リスク</div><div class="md local">ローカルLLM</div></div>
+    </div>
+    <span class="tag">窓口=チャットのMCP連携。少人数でも「窓口役＋実働」の形は同じ</span>
+  </section>
+
+  <!-- 11: 実例B 3階層 -->
+  <section class="slide">
+    <span class="kicker">🔵 構成例B（スケールした編成）</span>
+    <h2>3階層・プロジェクト別PM編成</h2>
+    <p class="lead">同じ仕組みを<b>役割を増やして拡張</b>。窓口役の下にプロジェクト別PMを並べ、実装/レビューを横断で共有する。実運用で数日間の自走ログが積み上がっている成熟構成。</p>
+    <div class="flow">
+      <div class="node amber">社長 <small>指示・連絡（チャットMCP）</small></div>
+      <div class="arrow">↓</div>
+      <div class="node green">🧭 orchestrator <small>唯一の窓口・振り分け・報告集約</small></div>
+      <div class="arrow">↓ inbox投函 + kick</div>
+      <div class="flow-row">
+        <div class="node accent">pm-A <small>プロジェクト①</small></div>
+        <div class="node accent">pm-B <small>プロジェクト②</small></div>
+        <div class="node accent">pm-C <small>プロジェクト③</small></div>
+      </div>
+      <div class="arrow">↓ inbox投函 + kick</div>
+      <div class="flow-row">
+        <div class="node">engineer <small>横断実装</small></div>
+        <div class="node">engineer-spot <small>スポット</small></div>
+        <div class="node">reviewer <small>PRレビュー</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12: スケール手順 -->
+  <section class="slide">
+    <span class="kicker green">📈 増員のしかた</span>
+    <h2>新メンバー追加 = フォルダをコピーするだけ</h2>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div class="t">既存ロールを丸ごとコピー：<code>cp -r pm-loan pm-new</code></div></div>
+      <div class="step"><div class="n">2</div><div class="t"><b>AGENTS.md</b> を新しい役割・担当プロジェクトに書き換え（<code>CLAUDE.md</code>はローダなので無修正でOK）</div></div>
+      <div class="step"><div class="n">3</div><div class="t"><b>DOCS.md</b> にそのロールの初期コンテキストを記入</div></div>
+      <div class="step"><div class="n">4</div><div class="t">窓口役(orchestrator)の<b>担当一覧と kick.sh</b> に新ロールを追記</div></div>
+    </div>
+    <span class="tag">構成が"フォルダの集合"だから、組織の拡大＝コピペで完結する</span>
+  </section>
+
+  <!-- 13: まとめ -->
+  <section class="slide">
+    <span class="kicker">✅ まとめ</span>
+    <h2>あなたのサーバーにも、同じ組織が作れる</h2>
+    <div class="grid g3">
+      <div class="card"><h3><span class="point-num">01</span>VM+tmux</h3><p>24h稼働＋GPUでローカルLLM。</p></div>
+      <div class="card"><h3><span class="point-num">02</span>1人1フォルダ</h3><p>CLAUDE/AGENTS/DOCSの3点セット。</p></div>
+      <div class="card"><h3><span class="point-num">03</span>mvキュー</h3><p>inbox→doing→done で連携。</p></div>
+      <div class="card"><h3><span class="point-num">04</span>窓口役+kick</h3><p>セッション管理ごとAIに委譲。</p></div>
+      <div class="card"><h3><span class="point-num">05</span>10分tick</h3><p>一日中リアルタイム自走。</p></div>
+      <div class="card"><h3><span class="point-num">06</span>DOCS.md</h3><p>記憶を永続化・即再開。</p></div>
+    </div>
+    <p class="big-sub" style="margin-top:24px"><b style="color:var(--ink)">はじめの一歩：</b>VMを1台立て、<code style="background:#eef1f7;padding:2px 8px;border-radius:6px;font-size:.85em">orchestrator/</code> と <code style="background:#eef1f7;padding:2px 8px;border-radius:6px;font-size:.85em">engineer/</code> の2フォルダから始める。あとは増やすだけ。🌳</p>
+  </section>
+
+</div>
+
+<div class="progress" id="bar"></div>
+<div class="page" id="page"></div>
+<div class="footer">Build Your Own AI Organization</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const bar=document.getElementById('bar');
+  const page=document.getElementById('page');
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    page.textContent=(i+1)+' / '+slides.length;
+  }
+  function next(){show(i+1)}
+  function prev(){show(i-1)}
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();next()}
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();prev()}
+    else if(e.key==='Home'){show(0)}
+    else if(e.key==='End'){show(slides.length-1)}
+  });
+  document.addEventListener('click',e=>{
+    if(e.clientX < window.innerWidth*0.25) prev(); else next();
+  });
+  show(0);
+</script>
+</body>
+</html>
