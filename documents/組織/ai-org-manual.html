@@ -122,7 +122,7 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
     <h1 class="anim d1">AI組織<span class="at">運用</span>マニュアル</h1>
     <p class="sub anim d2">
       GCE VM 上で 24 時間稼働する AI 組織の構成・起動・運用を記録したリファレンス。<br>
-      川上・千葉・石川・佐藤の 4 ペルソナが tmux 常駐セッションで自律的に動く。
+      engineer・orchestrator・marketing・designer・accounting・frontend・backend・legal の 8 ペルソナが tmux 常駐セッションで自律的に動く。
     </p>
     <div style="margin-top:28px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" class="anim d3">
       <span class="tag">Claude Code 直結</span>
@@ -137,50 +137,86 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
 <div class="slide">
   <div class="full" style="max-width:900px;">
     <div class="mono-label anim">Organization</div>
-    <h2 class="anim d1">4ペルソナの<span class="at">役割分担</span></h2>
-    <div class="grid-2" style="margin-top:24px;">
-      <div class="card anim d2">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <span class="tag">川上 / kawakami</span>
+    <h2 class="anim d1">8ペルソナの<span class="at">役割分担</span></h2>
+    <div class="grid-4" style="margin-top:20px;">
+      <div class="card anim d2" style="padding:14px 16px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span class="tag">engineer</span>
         </div>
-        <h3 style="margin-bottom:8px;">エンジニア</h3>
-        <ul class="fl">
-          <li>実装・コーディング・PR レビュー</li>
-          <li>portal / portfolio 等リポジトリの保守</li>
-          <li>reatex 業務を兼務（オンデマンド）</li>
+        <h3 style="margin-bottom:6px;font-size:13px;">エンジニア</h3>
+        <ul class="fl" style="gap:4px;">
+          <li style="font-size:11px;">実装・コーディング・PR レビュー</li>
+          <li style="font-size:11px;">portal / portfolio 等の保守</li>
         </ul>
       </div>
-      <div class="card anim d3">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <span class="tag green">千葉 / chiba</span>
+      <div class="card anim d3" style="padding:14px 16px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span class="tag green">orchestrator</span>
         </div>
-        <h3 style="margin-bottom:8px;">マネージャー / オーケストレーター</h3>
-        <ul class="fl">
-          <li>タスクキューへの投函・進捗管理</li>
-          <li>完了タスクを集約して山下に Slack 報告</li>
-          <li>組織全体のオーケストレーション</li>
+        <h3 style="margin-bottom:6px;font-size:13px;">マネージャー</h3>
+        <ul class="fl" style="gap:4px;">
+          <li style="font-size:11px;">タスクキュー管理・進捗集約</li>
+          <li style="font-size:11px;">Slack で山下に報告</li>
         </ul>
       </div>
-      <div class="card anim d4">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <span class="tag blue">石川 / ishikawa</span>
+      <div class="card anim d4" style="padding:14px 16px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span class="tag blue">marketing</span>
         </div>
-        <h3 style="margin-bottom:8px;">マーケティング</h3>
-        <ul class="fl">
-          <li>コンテンツ企画・執筆</li>
-          <li>マーケティング戦略の立案・分析</li>
-          <li>プロダクトプロモーション素材作成</li>
+        <h3 style="margin-bottom:6px;font-size:13px;">マーケティング</h3>
+        <ul class="fl" style="gap:4px;">
+          <li style="font-size:11px;">コンテンツ企画・執筆</li>
+          <li style="font-size:11px;">GTM 戦略・プロモーション</li>
         </ul>
       </div>
-      <div class="card anim d5">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <span class="tag yellow">佐藤 / sato</span>
+      <div class="card anim d5" style="padding:14px 16px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span class="tag">designer</span>
         </div>
-        <h3 style="margin-bottom:8px;">経理</h3>
-        <ul class="fl">
-          <li>経費・請求書の管理</li>
-          <li>財務データの集計・分析</li>
-          <li>将来: ローカル LLM に移行予定</li>
+        <h3 style="margin-bottom:6px;font-size:13px;">デザイナー</h3>
+        <ul class="fl" style="gap:4px;">
+          <li style="font-size:11px;">UI/UX・ブランディング</li>
+          <li style="font-size:11px;">デザインモックアップ作成</li>
+        </ul>
+      </div>
+      <div class="card anim d2" style="padding:14px 16px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span class="tag yellow">accounting</span>
+        </div>
+        <h3 style="margin-bottom:6px;font-size:13px;">経理</h3>
+        <ul class="fl" style="gap:4px;">
+          <li style="font-size:11px;">財務データの集計・分析</li>
+          <li style="font-size:11px;">将来: ローカル LLM に移行予定</li>
+        </ul>
+      </div>
+      <div class="card anim d3" style="padding:14px 16px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span class="tag blue">frontend</span>
+        </div>
+        <h3 style="margin-bottom:6px;font-size:13px;">フロントエンド</h3>
+        <ul class="fl" style="gap:4px;">
+          <li style="font-size:11px;">Forkbox フロント担当</li>
+          <li style="font-size:11px;">React / Next.js 実装</li>
+        </ul>
+      </div>
+      <div class="card anim d4" style="padding:14px 16px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span class="tag green">backend</span>
+        </div>
+        <h3 style="margin-bottom:6px;font-size:13px;">バックエンド</h3>
+        <ul class="fl" style="gap:4px;">
+          <li style="font-size:11px;">Forkbox バックエンド担当</li>
+          <li style="font-size:11px;">API・インフラ実装</li>
+        </ul>
+      </div>
+      <div class="card anim d5" style="padding:14px 16px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span class="tag yellow">legal</span>
+        </div>
+        <h3 style="margin-bottom:6px;font-size:13px;">法務</h3>
+        <ul class="fl" style="gap:4px;">
+          <li style="font-size:11px;">著作権・規約・コンプライアンス</li>
+          <li style="font-size:11px;">契約書レビュー</li>
         </ul>
       </div>
     </div>
@@ -255,10 +291,14 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
           │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="f">COMPANY.md</span> <span class="c">会社方針・名簿・Slack</span><br>
           │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="f">WORKFLOWS.md</span> <span class="c">git 運用</span><br>
           │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="d">tasks/</span> <span class="c">inbox/doing/done/archive</span><br>
-          │&nbsp;&nbsp;&nbsp;├── <span class="d">kawakami/</span> <span class="c">川上（エンジニア）</span><br>
-          │&nbsp;&nbsp;&nbsp;├── <span class="d">chiba/</span> <span class="c">千葉（マネージャー）</span><br>
-          │&nbsp;&nbsp;&nbsp;├── <span class="d">ishikawa/</span> <span class="c">石川（マーケ）</span><br>
-          │&nbsp;&nbsp;&nbsp;└── <span class="d">sato/</span> <span class="c">佐藤（経理）</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">engineer/</span> <span class="c">エンジニア</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">orchestrator/</span> <span class="c">マネージャー</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">marketing/</span> <span class="c">マーケティング</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">designer/</span> <span class="c">デザイナー</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">accounting/</span> <span class="c">経理</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">frontend/</span> <span class="c">フロントエンド（Forkbox）</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">backend/</span> <span class="c">バックエンド（Forkbox）</span><br>
+          │&nbsp;&nbsp;&nbsp;└── <span class="d">legal/</span> <span class="c">法務</span><br>
           ├── <span class="d">keyaki/</span> <span class="c">← 作業リポジトリ群</span><br>
           ├── <span class="d">reatex/</span> <span class="c">← reatex 兼務（オンデマンド）</span><br>
           └── <span class="d">.claude/</span><br>
@@ -291,35 +331,35 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
     <div class="grid-2" style="gap:12px;">
       <div class="card anim d2" style="display:flex;flex-direction:column;gap:6px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <h3>川上（エンジニア）</h3>
+          <h3>engineer（エンジニア）</h3>
           <span class="tag">keyaki</span>
         </div>
         <code style="font-size:13px;display:block;padding:8px 12px;">make cli</code>
-        <p style="font-size:11px;color:var(--fg-muted);">tmux: kawakami セッション。DOCS.md を読んで前回の文脈を把握してから待機。</p>
+        <p style="font-size:11px;color:var(--fg-muted);">tmux: engineer セッション。DOCS.md を読んで前回の文脈を把握してから待機。</p>
       </div>
       <div class="card anim d3" style="display:flex;flex-direction:column;gap:6px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <h3>千葉（マネージャー）</h3>
+          <h3>orchestrator（マネージャー）</h3>
           <span class="tag green">keyaki</span>
         </div>
-        <code style="font-size:13px;display:block;padding:8px 12px;">make cli-chiba</code>
-        <p style="font-size:11px;color:var(--fg-muted);">tmux: chiba セッション。done/ を集約して Slack 報告・inbox/ を監視。</p>
+        <code style="font-size:13px;display:block;padding:8px 12px;">make cli-orchestrator</code>
+        <p style="font-size:11px;color:var(--fg-muted);">tmux: orchestrator セッション。done/ を集約して Slack 報告・inbox/ を監視。</p>
       </div>
       <div class="card anim d4" style="display:flex;flex-direction:column;gap:6px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <h3>石川（マーケ）</h3>
+          <h3>marketing（マーケ）</h3>
           <span class="tag blue">keyaki</span>
         </div>
-        <code style="font-size:13px;display:block;padding:8px 12px;">make cli-ishikawa</code>
-        <p style="font-size:11px;color:var(--fg-muted);">tmux: ishikawa セッション。inbox/ 確認 → コンテンツ・マーケ作業。</p>
+        <code style="font-size:13px;display:block;padding:8px 12px;">make cli-marketing</code>
+        <p style="font-size:11px;color:var(--fg-muted);">tmux: marketing セッション。inbox/ 確認 → コンテンツ・マーケ作業。</p>
       </div>
       <div class="card anim d5" style="display:flex;flex-direction:column;gap:6px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <h3>川上（reatex 兼務）</h3>
+          <h3>engineer（reatex 兼務）</h3>
           <span class="tag yellow">reatex</span>
         </div>
         <code style="font-size:13px;display:block;padding:8px 12px;">make cli-reatex</code>
-        <p style="font-size:11px;color:var(--fg-muted);">tmux: kawakami-reatex。オンデマンド起動。LINE WORKS 報告・rtx-yamashita アカウント。</p>
+        <p style="font-size:11px;color:var(--fg-muted);">tmux: engineer-reatex。オンデマンド起動。LINE WORKS 報告・rtx-yamashita アカウント。</p>
       </div>
     </div>
     <div class="card-sm anim d6" style="margin-top:12px;">
@@ -423,9 +463,9 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
         <h3 style="margin-bottom:10px;">タスクファイル形式</h3>
         <div style="font-family:var(--font-mono);font-size:11px;background:var(--bg-muted);border:1px solid var(--border);border-radius:8px;padding:12px;line-height:1.8;color:var(--fg);">
           <span style="color:var(--fg-muted);"># ファイル名</span><br>
-          YYYYMMDD-kawakami-fix-login.md<br><br>
+          YYYYMMDD-engineer-fix-login.md<br><br>
           <span style="color:var(--fg-muted);"># 内容</span><br>
-          担当: 川上　依頼者: 千葉<br>
+          担当: engineer　依頼者: orchestrator<br>
           優先度: 高<br>
           完了条件: PR がマージされること
         </div>
@@ -433,8 +473,8 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
       <div class="card anim d4">
         <h3 style="margin-bottom:10px;">報告経路</h3>
         <ul class="fl">
-          <li><strong style="color:var(--fg);">普段:</strong> 千葉が集約 → Slack で山下へ報告</li>
-          <li><strong style="color:var(--fg);">名指し・緊急:</strong> 各メンバーが直接 Slack 報告</li>
+          <li><strong style="color:var(--fg);">報告:</strong> orchestrator が集約 → Slack で山下へ報告</li>
+          <li><strong style="color:var(--fg);">Slack 投稿権限:</strong> orchestrator のみ（他メンバーは done/ に記録のみ）</li>
           <li>状態遷移は <code>mv</code>（アトミック = ロック代わり）</li>
           <li>パス: <code>~/agent/_shared/tasks/</code></li>
         </ul>
