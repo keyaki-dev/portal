@@ -1,9 +1,11 @@
+import Image from "next/image";
 import { ExternalLink } from "lucide-react";
 
 const products = [
   {
     name: "FocusBurst",
     description: "ADHD脳専用の集中サポートアプリ。超短ポモドーロタイマーとAIボディダブリング機能を搭載。",
+    logo: null as string | null,
     links: [
       { label: "LP を見る", url: "https://focusburst.keyaki-dev.com" },
       { label: "アプリを開く", url: "https://focusburst.keyaki-dev.com/app", primary: true },
@@ -14,6 +16,7 @@ const products = [
   {
     name: "Forkbox（フォークボックス）",
     description: "アイデアをフォークして進化させるSNS型プラットフォーム。AIで作った未完成の成果物を共有し、フォークされることが評価になる。",
+    logo: "/forkbox-logo.svg" as string | null,
     links: [
       { label: "モックを見る", url: "https://frontend-tau-neon-47.vercel.app", primary: true },
       { label: "デザインを見る", url: "https://portal.keyaki-dev.com/xando/design" },
@@ -38,7 +41,18 @@ export default function ProductsPage() {
             className="rounded-xl border border-border bg-card p-5 flex flex-col gap-4"
           >
             <div className="flex items-start justify-between gap-3">
-              <h2 className="font-serif text-xl font-medium">{p.name}</h2>
+              <div className="flex items-center gap-2.5">
+                {p.logo && (
+                  <Image
+                    src={p.logo}
+                    alt={`${p.name} logo`}
+                    width={40}
+                    height={40}
+                    className="rounded-lg flex-shrink-0"
+                  />
+                )}
+                <h2 className="font-serif text-xl font-medium">{p.name}</h2>
+              </div>
               <span className={`text-xs font-medium px-2 py-0.5 rounded-full bg-muted ${p.statusColor} flex-shrink-0`}>
                 {p.status}
               </span>
