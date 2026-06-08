@@ -3,7 +3,7 @@ import { ExternalLink } from "lucide-react";
 
 const products = [
   {
-    name: "FocusBurst",
+    name: "kodou flow",
     description: "ADHD脳専用の集中サポートアプリ。超短ポモドーロタイマーとAIボディダブリング機能を搭載。",
     logo: null as string | null,
     links: [
