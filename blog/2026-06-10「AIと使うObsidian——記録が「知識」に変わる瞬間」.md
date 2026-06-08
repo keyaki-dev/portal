@@ -8,9 +8,16 @@ blog_tag:
   - Claude
   - 生産性
 image: 2026-06-04.png
+slide: https://portal.keyaki-dev.com/documents/c2xpZGVzLzIwMjYtMDYtMTAtb2JzaWRpYW4tYWkuaHRtbA
 ---
 
 # AIと使うObsidian——記録が「知識」に変わる瞬間
+
+この記事の内容をスライドにまとめました。ビジュアルで先に把握したい方はこちらからどうぞ。
+
+👉 **[スライドで見る](https://portal.keyaki-dev.com/documents/c2xpZGVzLzIwMjYtMDYtMTAtb2JzaWRpYW4tYWkuaHRtbA)**（← → キーまたはスワイプで操作できます）
+
+---
 
 Obsidianはノートツールです。書いたことを保存して、見返すためのもの。
 

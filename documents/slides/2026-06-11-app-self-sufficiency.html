@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アプリを自給自足する時代が来ている — ケ開発</title>
+<style>
+:root {
+  --bg:          #F8F5F1;
+  --bg-card:     #FDFAF7;
+  --bg-muted:    #F2EDE8;
+  --fg:          #2C2C2C;
+  --fg-muted:    #6B6560;
+  --border:      #E5DDD6;
+  --accent:      #C45E3E;
+  --accent-soft: #F5E1D6;
+  --green:       #4A7C6F;
+  --green-soft:  #E6F0EE;
+  --blue:        #3A5F8A;
+  --blue-soft:   #DDE8F5;
+  --font-sans:   'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Segoe UI', system-ui, sans-serif;
+  --font-serif:  'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --font-mono:   'Fira Code', 'Geist Mono', monospace;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: var(--font-sans); background: var(--bg); color: var(--fg); overflow: hidden; -webkit-font-smoothing: antialiased; }
+.deck { width: 100%; height: 100vh; position: relative; }
+.slide { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 56px 72px; overflow: hidden; }
+.slide.active { display: flex; }
+.slide::after { content: ''; position: absolute; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); opacity: 0.025; pointer-events: none; }
+#nav { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 14px; z-index: 200; background: var(--bg-card); border: 1px solid var(--border); border-radius: 40px; padding: 9px 20px; box-shadow: 0 4px 24px rgba(196,94,62,0.06); }
+#nav button { background: none; border: none; color: var(--fg-muted); cursor: pointer; font-size: 16px; padding: 4px 10px; border-radius: 20px; transition: all 0.15s; font-family: var(--font-sans); }
+#nav button:hover { background: var(--bg-muted); color: var(--fg); }
+#counter { color: var(--fg-muted); font-size: 12px; min-width: 44px; text-align: center; font-family: var(--font-mono); }
+.dot-row { display: flex; gap: 5px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); cursor: pointer; transition: all 0.2s; }
+.dot.active { background: var(--accent); transform: scale(1.4); }
+.mono-label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+h1 { font-family: var(--font-serif); font-size: clamp(36px, 5.5vw, 68px); font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; color: var(--fg); }
+h2 { font-family: var(--font-serif); font-size: clamp(26px, 3.8vw, 48px); font-weight: 500; line-height: 1.15; letter-spacing: -0.02em; color: var(--fg); }
+h3 { font-size: 18px; font-weight: 600; color: var(--fg); line-height: 1.3; }
+.sub { font-size: clamp(14px, 1.6vw, 17px); color: var(--fg-muted); line-height: 1.75; margin-top: 14px; }
+.accent-text { color: var(--accent); }
+.muted { color: var(--fg-muted); }
+.center { text-align: center; }
+.full { width: 100%; }
+.row { display: flex; gap: 24px; width: 100%; }
+.col { flex: 1; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+.card-sm { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; }
+.tag { display: inline-block; padding: 3px 11px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--border); }
+.tag.green { background: var(--green-soft); color: var(--green); }
+.tag.blue { background: var(--blue-soft); color: var(--blue); }
+.feature-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.feature-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--fg-muted); line-height: 1.6; }
+.feature-list li::before { content: '—'; color: var(--accent); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.divider { width: 40px; height: 2px; background: var(--accent); border-radius: 1px; margin: 18px 0; }
+.slide-title-bg::before { content: ''; position: absolute; top: -120px; right: -120px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(196,94,62,0.07) 0%, transparent 70%); pointer-events: none; }
+.slide.active .anim { animation: fadeInUp 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.d1 { animation-delay: 0.05s !important; } .d2 { animation-delay: 0.10s !important; } .d3 { animation-delay: 0.15s !important; } .d4 { animation-delay: 0.20s !important; }
+@media (max-width: 640px) { .slide { padding: 32px 20px 72px; } .row { flex-direction: column; gap: 14px; } }
+@media (max-width: 400px) { .slide { padding: 24px 16px 72px; } .grid-2 { grid-template-columns: 1fr; gap: 10px; } }
+@media (prefers-reduced-motion: reduce) { .slide.active .anim { animation: none; } }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <div class="slide slide-title-bg active">
+    <div class="center" style="max-width: 700px;">
+      <div class="mono-label anim">keyaki — 2026-06-11</div>
+      <h1 class="anim d1">アプリを<span class="accent-text">自給自足</span>する<br>時代が来ている</h1>
+      <p class="sub anim d2">「欲しいものがなければ作る」という選択肢が、<br>今は現実的なものとして手の届くところにある。</p>
+      <div style="margin-top: 32px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;" class="anim d3">
+        <span class="tag">個人開発</span>
+        <span class="tag blue">生成AI</span>
+        <span class="tag green">生産性</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <div class="full" style="max-width: 820px;">
+      <div class="mono-label anim">変化</div>
+      <h2 class="anim d1">「作る人」のハードルが<span class="accent-text">下がった</span></h2>
+      <div class="row" style="margin-top: 28px; align-items: flex-start;">
+        <div class="col anim d2">
+          <div class="card" style="height: 100%;">
+            <h3 style="margin-bottom: 14px; color: var(--fg-muted);">少し前まで</h3>
+            <ul class="feature-list">
+              <li>プログラミングを学んで技術を身につけて</li>
+              <li>環境を整えて、やっと「作れる人」に</li>
+              <li>なければ諦めるか、頼むか、お金を払うか</li>
+            </ul>
+          </div>
+        </div>
+        <div class="col anim d3">
+          <div class="card" style="height: 100%; border-color: var(--accent-soft);">
+            <h3 style="margin-bottom: 14px; color: var(--accent);">今は</h3>
+            <ul class="feature-list">
+              <li>「こういうものが欲しい」を言葉にできれば</li>
+              <li>AIが一緒に形にしてくれる</li>
+              <li>完璧でなくていい。自分しか使わなくていい</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <div class="full" style="max-width: 760px;">
+      <div class="mono-label anim">例えば</div>
+      <h2 class="anim d1">困ったから、<span class="accent-text">作った</span></h2>
+      <div class="card anim d2" style="margin-top: 28px; padding: 28px 32px;">
+        <p style="font-family: var(--font-serif); font-size: clamp(15px, 1.8vw, 19px); line-height: 1.9; color: var(--fg-muted);">
+          AIコーディングツールを複数使い始めたとき、「全体のコストが見えない」問題に気づいた。<br>
+          だから可視化ツールを作った。Claude Codeに頼んで、1時間もかからずに動くものができた。<br>
+          世の中に同じようなツールがあるかどうかも確認していない。自分が欲しかったから作った、それだけ。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <div class="center" style="max-width: 680px;">
+      <div class="mono-label anim">まとめ</div>
+      <h2 class="anim d1">「<span class="accent-text">作る</span>」という選択肢</h2>
+      <div class="card anim d2" style="margin-top: 28px; padding: 28px 32px; text-align: left;">
+        <p style="font-family: var(--font-serif); font-size: clamp(15px, 1.8vw, 19px); line-height: 1.9; color: var(--fg-muted);">
+          農業で言えば、食料を「買う」時代から「育てる」を選べる時代になってきた感覚。<br>
+          全部自給自足する必要はない。でも「欲しいものがなければ作る」が、現実的な選択肢として手の届くところにある。
+        </p>
+      </div>
+      <div class="card-sm anim d3" style="margin-top: 16px; border-color: var(--accent-soft); text-align: center;">
+        <span class="muted" style="font-size: 14px;">アプリを自給自足する時代は、もうそこまで来ている。</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div id="nav">
+  <button onclick="prev()" title="前へ">←</button>
+  <div class="dot-row" id="dots"></div>
+  <span id="counter">1 / 1</span>
+  <button onclick="next()" title="次へ">→</button>
+</div>
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  const counterEl = document.getElementById('counter');
+  slides.forEach((_, i) => { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); d.onclick = () => go(i); dotsEl.appendChild(d); });
+  counterEl.textContent = '1 / ' + slides.length;
+  function go(n) { slides[cur].classList.remove('active'); dotsEl.children[cur].classList.remove('active'); cur = (n + slides.length) % slides.length; slides[cur].classList.add('active'); dotsEl.children[cur].classList.add('active'); counterEl.textContent = (cur + 1) + ' / ' + slides.length; }
+  function next() { go(cur + 1); } function prev() { go(cur - 1); }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); } if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); } });
+  let ts = 0;
+  document.addEventListener('touchstart', e => { ts = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => { const dx = e.changedTouches[0].clientX - ts; if (Math.abs(dx) > 50) dx < 0 ? next() : prev(); });
+</script>
+</body>
+</html>
