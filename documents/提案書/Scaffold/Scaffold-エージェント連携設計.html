@@ -216,13 +216,13 @@ tr:hover td { background: var(--accent-soft); }
         エージェント<span class="accent-text">連携設計</span>
       </h1>
       <p class="sub anim d2">
-        4名体制（川上・千葉・石川・佐藤）が一つのオフィスで協働するための、<br>
+        プロジェクト縦割り（PM制）の AI 組織が一つのオフィスで協働するための、<br>
         タスク受け渡し・報告経路の設計。<span style="color:var(--accent)">ファイルキュー方式。</span>
       </p>
       <div style="margin-top: 32px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;" class="anim d3">
         <span class="tag">社内限定</span>
-        <span class="tag blue">設計案 v0</span>
-        <span class="tag green">内部開発計画の続編</span>
+        <span class="tag blue">設計 v1（PM制）</span>
+        <span class="tag green">2026-06-08 更新</span>
       </div>
     </div>
   </div>
@@ -250,17 +250,17 @@ tr:hover td { background: var(--accent-soft); }
           <tbody>
             <tr>
               <td><strong>A</strong> tmux send-keys</td>
-              <td>千葉が各ペインに直接プロンプト送信</td>
+              <td>orchestrator が各ペインに直接プロンプト送信</td>
               <td><span class="muted">即時だが割り込みが雑。作業中に競合</span></td>
             </tr>
             <tr style="background: var(--green-soft);">
               <td><strong>B</strong> ファイルキュー <span class="tag green">採用</span></td>
               <td><code style="font-family:var(--font-mono);font-size:12px;">_shared/tasks/</code> に依頼 .md を置き各自が tick で拾う</td>
-              <td><strong style="color:var(--green);">疎結合・履歴が残る・dormant と相性良</strong></td>
+              <td><strong style="color:var(--green);">疎結合・履歴が残る・kick と相性良</strong></td>
             </tr>
             <tr>
-              <td><strong>C</strong> 千葉が単一窓口</td>
-              <td>Slack を千葉だけが受け Task ツールで子起動</td>
+              <td><strong>C</strong> 単一プロセスが全部受ける</td>
+              <td>Slack を1プロセスだけが受け Task ツールで子起動</td>
               <td><span class="muted">常駐セッション方針と二重管理になり矛盾</span></td>
             </tr>
           </tbody>
@@ -290,10 +290,10 @@ tr:hover td { background: var(--accent-soft); }
       <h2 class="anim d1">ステータス＝<span class="accent-text">物理ディレクトリ</span></h2>
       <div class="dir-tree anim d2" style="margin-top: 20px;">
 <span class="hl-green">~/agent/_shared/tasks/</span><br>
-├── <span class="hl">inbox/</span>      <span class="comment"># 千葉が依頼を投函（担当未着手）</span><br>
+├── <span class="hl">inbox/</span>      <span class="comment"># orchestrator→PM→実装 の順に依頼を投函</span><br>
 ├── <span class="hl">doing/</span>      <span class="comment"># 担当が着手時に mv（掴んだ印）</span><br>
 ├── <span class="hl">done/</span>       <span class="comment"># 担当が完了時に mv（結果を追記済み）</span><br>
-└── <span class="hl-blue">archive/</span>    <span class="comment"># 千葉が山下へ報告済みにしたもの</span>
+└── <span class="hl-blue">archive/</span>    <span class="comment"># orchestrator が山下へ報告済みにしたもの</span>
       </div>
       <div class="card-sm anim d3" style="margin-top: 18px;">
         <span style="color: var(--accent); font-weight: 600;">なぜ mv か：</span>
@@ -310,15 +310,15 @@ tr:hover td { background: var(--accent-soft); }
       <p class="sub anim d1" style="margin-top:10px;">命名: <code style="font-family:var(--font-mono);font-size:13px;">YYYY-MM-DD-HHMMSS__&lt;assignee&gt;__&lt;slug&gt;.md</code></p>
       <div class="dir-tree anim d2" style="margin-top: 18px;">
 <span class="comment">--- frontmatter ---</span><br>
-<span class="key">id</span>:        2026-06-02-103000<br>
-<span class="key">assignee</span>:  <span class="str">ishikawa</span>   <span class="comment"># kawakami / chiba / ishikawa / sato</span><br>
-<span class="key">from</span>:      <span class="str">chiba</span><br>
+<span class="key">id</span>:        2026-06-08-103000<br>
+<span class="key">assignee</span>:  <span class="str">marketing</span>  <span class="comment"># engineer / frontend / backend / designer / marketing / reviewer</span><br>
+<span class="key">from</span>:      <span class="str">pm-focusburst</span> <span class="comment"># orchestrator / pm-*</span><br>
 <span class="key">priority</span>:  <span class="str">normal</span>     <span class="comment"># urgent / normal / low</span><br>
 <span class="key">status</span>:    <span class="str">inbox</span><br>
-<span class="key">title</span>:     Focus for ADHD ティザー投稿の作成<br>
+<span class="key">title</span>:     FocusBurst ティザー投稿の作成<br>
 <span class="comment">-------------------</span><br>
 <br>
-<span class="hl">## 依頼内容</span>     <span class="comment"># 千葉が記述</span><br>
+<span class="hl">## 依頼内容</span>     <span class="comment"># 依頼元（orchestrator / PM）が記述</span><br>
 <span class="hl">## 完了報告</span>     <span class="comment"># 担当が完了時に追記（成果物URL・PR・所感）</span>
       </div>
     </div>
@@ -332,7 +332,7 @@ tr:hover td { background: var(--accent-soft); }
       <div class="flow anim d2" style="margin-top: 28px;">
         <div class="flow-step">
           <div class="fname" style="color:var(--accent);">inbox</div>
-          <div class="fdesc">千葉が担当を決めて投函</div>
+          <div class="fdesc">orchestrator/PM が担当を決めて投函</div>
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-step">
@@ -342,16 +342,16 @@ tr:hover td { background: var(--accent-soft); }
         <div class="flow-arrow">→</div>
         <div class="flow-step">
           <div class="fname" style="color:var(--green);">done</div>
-          <div class="fdesc">完了報告を追記し mv</div>
+          <div class="fdesc">完了報告を追記し mv（PM が集約）</div>
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-step">
           <div class="fname" style="color:var(--blue);">archive</div>
-          <div class="fdesc">千葉が山下報告後に mv</div>
+          <div class="fdesc">orchestrator が山下報告後に mv</div>
         </div>
       </div>
       <div class="card-sm anim d3" style="margin-top: 22px;">
-        <span class="muted" style="font-size: 14px;">担当は <code style="font-family:var(--font-mono);">__&lt;自分&gt;__</code> 宛のファイルだけを拾う。assignee がファイル名で固定されるため、別ペルソナが同じタスクを掴むことは起きない。</span>
+        <span class="muted" style="font-size: 14px;">担当は <code style="font-family:var(--font-mono);">__&lt;自分&gt;__</code> 宛のファイルだけを拾う。assignee がファイル名で固定されるため、別ロールが同じタスクを掴むことは起きない。</span>
       </div>
     </div>
   </div>
@@ -363,20 +363,19 @@ tr:hover td { background: var(--accent-soft); }
       <h2 class="anim d1">各ロールの<span class="accent-text">tick 動作</span></h2>
       <div class="grid-2" style="margin-top: 28px; align-items: start;">
         <div class="card anim d2" style="border-left: 3px solid var(--green);">
-          <h3 style="margin-bottom: 14px;">千葉（オーケストレーター）</h3>
+          <h3 style="margin-bottom: 14px;">管理層（orchestrator・PM）</h3>
           <ul class="feature-list green">
-            <li>Slack/自判断でタスクを分解 → 担当を決め <code style="font-family:var(--font-mono);font-size:12px;">inbox/</code> に投函</li>
-            <li><code style="font-family:var(--font-mono);font-size:12px;">done/</code> を巡回 → 山下へ集約報告 → <code style="font-family:var(--font-mono);font-size:12px;">archive/</code> へ</li>
-            <li><code style="font-family:var(--font-mono);font-size:12px;">doing/</code> の滞留（24h超など）を監視</li>
+            <li><strong>orchestrator</strong>: Slack を受け、担当 PM の <code style="font-family:var(--font-mono);font-size:12px;">inbox/</code> に投函。<code style="font-family:var(--font-mono);font-size:12px;">done/</code> を集約 → 山下へ報告 → <code style="font-family:var(--font-mono);font-size:12px;">archive/</code></li>
+            <li><strong>PM</strong>: タスクを分解し実装ロールの <code style="font-family:var(--font-mono);font-size:12px;">inbox/</code> に投函。DOCS.md を常に最新化</li>
+            <li><code style="font-family:var(--font-mono);font-size:12px;">doing/</code> の滞留を監視</li>
           </ul>
         </div>
         <div class="card anim d3" style="border-left: 3px solid var(--accent);">
-          <h3 style="margin-bottom: 14px;">各員（川上・石川・佐藤）</h3>
+          <h3 style="margin-bottom: 14px;">実働層（engineer / frontend / backend / designer / marketing / reviewer）</h3>
           <ul class="feature-list">
-            <li><code style="font-family:var(--font-mono);font-size:12px;">inbox/</code> から自分宛を拾う（urgent 優先）</li>
-            <li><code style="font-family:var(--font-mono);font-size:12px;">doing/</code> へ mv＝掴んだ宣言</li>
+            <li><code style="font-family:var(--font-mono);font-size:12px;">inbox/</code> から自分宛を拾う（urgent 優先）→ <code style="font-family:var(--font-mono);font-size:12px;">doing/</code> へ mv</li>
             <li>実行 → 完了報告を追記 → <code style="font-family:var(--font-mono);font-size:12px;">done/</code> へ mv</li>
-            <li>自発タスク（lint修正等）はキュー外で実行してOK</li>
+            <li><strong>指示待ち徹底</strong>: 指示なしの自主改善・PR は出さない（気づきは DOCS.md に記録し PM へ）</li>
           </ul>
         </div>
       </div>
@@ -387,22 +386,22 @@ tr:hover td { background: var(--accent-soft); }
   <div class="slide">
     <div class="full" style="max-width: 900px;">
       <div class="mono-label anim">Reporting Path</div>
-      <h2 class="anim d1">報告は<span class="accent-text">千葉に集約</span></h2>
+      <h2 class="anim d1">報告は<span class="accent-text">orchestrator に一元化</span></h2>
       <div class="grid-2" style="margin-top: 28px; align-items: start;">
         <div class="card anim d2" style="border-left: 3px solid var(--green);">
-          <h3 style="margin-bottom: 14px;">普段：千葉経由</h3>
+          <h3 style="margin-bottom: 14px;">経路：実働 → PM → orchestrator</h3>
           <ul class="feature-list green">
-            <li>各員の「報告」は <code style="font-family:var(--font-mono);font-size:12px;">done/</code> への書き戻し</li>
-            <li>千葉がまとめて山下へ Slack 報告</li>
-            <li>マネージャーが対外窓口になる</li>
+            <li>実働層の「報告」は <code style="font-family:var(--font-mono);font-size:12px;">done/</code> への書き戻し</li>
+            <li>PM が集約して DOCS.md を更新</li>
+            <li>orchestrator がまとめて山下へ Slack 報告</li>
           </ul>
         </div>
         <div class="card anim d3" style="border-left: 3px solid var(--accent);">
-          <h3 style="margin-bottom: 14px;">例外：名指し・緊急は直接</h3>
+          <h3 style="margin-bottom: 14px;">Slack 発言は orchestrator のみ</h3>
           <ul class="feature-list">
-            <li>山下が名指し DM した場合は当人が直接返信</li>
-            <li>緊急時も当人が直接 Slack 返信OK</li>
-            <li>Slack 設定は <code style="font-family:var(--font-mono);font-size:12px;">_shared/COMPANY.md</code> で全員保持</li>
+            <li>山下は orchestrator とだけ対話すればよい</li>
+            <li>PM・実働・reviewer は Slack に投稿しない（done/ と DOCS で報告）</li>
+            <li>Slack 設定は <code style="font-family:var(--font-mono);font-size:12px;">_shared/COMPANY.md</code> が保持</li>
           </ul>
         </div>
       </div>
@@ -413,20 +412,21 @@ tr:hover td { background: var(--accent-soft); }
   <div class="slide">
     <div class="full" style="max-width: 900px;">
       <div class="mono-label anim">Edge Cases</div>
-      <h2 class="anim d1">即時性と<span class="accent-text">夜間・衝突</span></h2>
+      <h2 class="anim d1">即時性と<span class="accent-text">稼働・衝突</span></h2>
       <div class="grid-2" style="margin-top: 28px; align-items: start;">
         <div class="card anim d2" style="border-left: 3px solid var(--blue);">
           <h3 style="margin-bottom: 14px;">即時性の補完（B の弱点対策）</h3>
           <ul class="feature-list">
             <li>B は tick 間隔ぶんの遅延が出る</li>
-            <li><code style="font-family:var(--font-mono);font-size:12px;">priority: urgent</code> のときだけ、千葉が投函後 tmux send-keys で「inbox確認して」と一言突く（A 併用）</li>
+            <li>投函後に <code style="font-family:var(--font-mono);font-size:12px;">kick.sh &lt;役割&gt;</code> で担当を即起動できる（tick 待ちを短縮）</li>
             <li>通常タスクは tick 待ちで十分</li>
           </ul>
         </div>
         <div class="card anim d3" style="border-left: 3px solid var(--yellow);">
-          <h3 style="margin-bottom: 14px;">dormant / 衝突</h3>
+          <h3 style="margin-bottom: 14px;">稼働 / 衝突</h3>
           <ul class="feature-list">
-            <li>JST 22:00–07:59 は誰も拾わない → <code style="font-family:var(--font-mono);font-size:12px;">inbox/</code> に溜め翌朝処理</li>
+            <li>VM はオンデマンド起動。起動中は dormant なし・24h 稼働（2026-06-07〜）</li>
+            <li>legal / accounting / reviewer は常駐せず必要時に kick</li>
             <li>assignee 固定 + mv のアトミック性で二重着手を防止</li>
           </ul>
         </div>
@@ -445,17 +445,17 @@ tr:hover td { background: var(--accent-soft); }
           <ul class="feature-list green">
             <li>連携方式＝ファイルキュー（B）</li>
             <li>ステータス＝物理ディレクトリ + mv</li>
-            <li>報告＝普段千葉経由・名指し/緊急は直接</li>
+            <li>報告＝orchestrator に一元化（Slack 発言は orchestrator のみ）</li>
             <li>3点セットの役割分担（CLAUDE=ローダ / AGENTS=役割 / DOCS=記憶）</li>
           </ul>
         </div>
         <div class="card anim d3">
-          <h3 style="margin-bottom: 14px; color: var(--blue);">実装フェーズで着手</h3>
+          <h3 style="margin-bottom: 14px; color: var(--blue);">実装済み（2026-06）</h3>
           <ul class="feature-list">
-            <li><code style="font-family:var(--font-mono);font-size:11px;">_shared/</code>（COMPANY.md / WORKFLOWS.md / tasks/）作成</li>
-            <li>川上を <code style="font-family:var(--font-mono);font-size:11px;">kawakami/</code> へ非破壊移行</li>
-            <li>千葉・石川・佐藤の AGENTS.md 整備</li>
-            <li>千葉の tick に inbox 投函/done 集約フローを実装</li>
+            <li><code style="font-family:var(--font-mono);font-size:11px;">_shared/</code>（COMPANY.md / WORKFLOWS.md / kick.sh / tasks/）整備</li>
+            <li>プロジェクト縦割り（PM制）へ再構成：orchestrator + pm-focusburst / pm-forkbox + 実装プール + reviewer</li>
+            <li>佐藤（accounting）をローカル LLM（Gemma 4 / opencode）へ移行</li>
+            <li>orchestrator / PM の tick に投函・集約フローを実装、kick.sh で起動</li>
           </ul>
         </div>
       </div>

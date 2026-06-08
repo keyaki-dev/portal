@@ -199,61 +199,61 @@ tr:hover td { background: var(--accent-soft); }
         keyaki <span class="accent-text">組織図</span>
       </h1>
       <p class="sub anim d2">
-        権限・役割・報告経路・コンテンツフローのリファレンス
+        権限・役割・報告経路・コンテンツフローのリファレンス<br>
+        プロジェクト縦割り（PM制）・窓口は orchestrator
       </p>
       <div style="margin-top: 32px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;" class="anim d3">
         <span class="tag">内部資料</span>
         <span class="tag blue">ガバナンス</span>
-        <span class="tag green">2026-06-02 確定</span>
+        <span class="tag green">2026-06-08 更新</span>
       </div>
     </div>
   </div>
 
   <!-- Slide 2: 権限階層 -->
   <div class="slide">
-    <div class="full" style="max-width: 800px;">
+    <div class="full" style="max-width: 880px;">
       <div class="mono-label anim">Authority</div>
-      <h2 class="anim d1">権限<span class="accent-text">階層</span></h2>
-      <div style="margin-top: 32px;" class="anim d2">
-        <div class="org-tree">
+      <h2 class="anim d1">権限<span class="accent-text">階層</span> — プロジェクト縦割り（PM制）</h2>
+      <div style="margin-top: 22px;" class="anim d2">
+        <div class="org-tree" style="gap: 0;">
           <!-- 山下 -->
           <div class="org-node top">
             <div class="org-node-name" style="color: var(--accent);">山下 健太</div>
             <div class="org-node-role">代表 / 最終承認者</div>
           </div>
-          <div class="org-connector"></div>
-          <!-- 千葉 -->
+          <div class="org-connector" style="height: 18px;"></div>
+          <!-- orchestrator -->
           <div class="org-node mid">
-            <div class="org-node-name" style="color: var(--blue);">千葉</div>
-            <div class="org-node-role">執行役員 / マネージャー<br>前段決定権・ガバナンス担当</div>
+            <div class="org-node-name" style="color: var(--blue);">orchestrator（千葉）</div>
+            <div class="org-node-role">唯一の窓口・PM振分・報告集約。詳細は持たない</div>
           </div>
-          <div class="org-connector"></div>
-          <!-- 3メンバー -->
-          <div style="display: flex; gap: 20px; position: relative;">
-            <!-- 横線 -->
-            <div style="position: absolute; top: 0; left: 90px; right: 90px; height: 2px; background: var(--border);"></div>
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 0;">
-              <div style="width: 2px; height: 20px; background: var(--border);"></div>
-              <div class="org-node" style="min-width: 140px;">
-                <div class="org-node-name">川上</div>
-                <div class="org-node-role">エンジニア</div>
-              </div>
+          <div class="org-connector" style="height: 18px;"></div>
+          <!-- PM層 -->
+          <div style="display: flex; gap: 16px;">
+            <div class="org-node" style="border-color: var(--accent); background: var(--accent-soft); min-width: 180px;">
+              <div class="org-node-name">pm-focusburst</div>
+              <div class="org-node-role">FocusBurst 専任 PM</div>
             </div>
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 0;">
-              <div style="width: 2px; height: 20px; background: var(--border);"></div>
-              <div class="org-node" style="min-width: 140px;">
-                <div class="org-node-name">石川</div>
-                <div class="org-node-role">マーケティング</div>
-              </div>
-            </div>
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 0;">
-              <div style="width: 2px; height: 20px; background: var(--border);"></div>
-              <div class="org-node" style="min-width: 140px;">
-                <div class="org-node-name">佐藤</div>
-                <div class="org-node-role">経理</div>
-              </div>
+            <div class="org-node" style="border-color: var(--accent); background: var(--accent-soft); min-width: 180px;">
+              <div class="org-node-name">pm-forkbox</div>
+              <div class="org-node-role">Forkbox 専任 PM</div>
             </div>
           </div>
+          <div class="org-connector" style="height: 18px;"></div>
+          <!-- 実装・専門プール -->
+          <div style="display: flex; gap: 9px; flex-wrap: wrap; justify-content: center; max-width: 720px;">
+            <div class="org-node" style="min-width: 0; padding: 9px 16px;"><div class="org-node-name" style="font-size: 14px;">engineer</div><div class="org-node-role">実装/川上</div></div>
+            <div class="org-node" style="min-width: 0; padding: 9px 16px;"><div class="org-node-name" style="font-size: 14px;">frontend</div><div class="org-node-role">FE/中村</div></div>
+            <div class="org-node" style="min-width: 0; padding: 9px 16px;"><div class="org-node-name" style="font-size: 14px;">backend</div><div class="org-node-role">BE/田中</div></div>
+            <div class="org-node" style="min-width: 0; padding: 9px 16px;"><div class="org-node-name" style="font-size: 14px;">designer</div><div class="org-node-role">UI/山口</div></div>
+            <div class="org-node" style="min-width: 0; padding: 9px 16px;"><div class="org-node-name" style="font-size: 14px;">marketing</div><div class="org-node-role">GTM/石川</div></div>
+            <div class="org-node" style="min-width: 0; padding: 9px 16px; border-color: var(--green); background: var(--green-soft);"><div class="org-node-name" style="font-size: 14px;">reviewer</div><div class="org-node-role">PRレビュー</div></div>
+          </div>
+        </div>
+        <div class="card-sm anim d3" style="margin-top: 16px; border-color: var(--yellow-soft);">
+          <span style="color: var(--yellow); font-weight: 600; font-size: 13px;">オンデマンド：</span>
+          <span class="muted" style="font-size: 13px;">legal（大久保・法務）/ accounting（佐藤・経理、ローカルLLM）は常駐せず、必要時に orchestrator・PM が kick で起動する。</span>
         </div>
       </div>
     </div>
@@ -263,39 +263,39 @@ tr:hover td { background: var(--accent-soft); }
   <div class="slide">
     <div class="full" style="max-width: 920px;">
       <div class="mono-label anim">Members</div>
-      <h2 class="anim d1">メンバー<span class="accent-text">役割</span></h2>
-      <div class="grid-3" style="margin-top: 28px;">
+      <h2 class="anim d1">役割<span class="accent-text">分担</span></h2>
+      <div class="grid-3" style="margin-top: 24px;">
         <div class="card anim d2">
-          <div style="margin-bottom: 10px;"><span class="tag blue">Engineer</span></div>
-          <h3 style="margin-bottom: 12px;">川上</h3>
+          <div style="margin-bottom: 10px;"><span class="tag blue">窓口</span></div>
+          <h3 style="margin-bottom: 10px;">orchestrator（千葉）</h3>
           <ul class="feature-list">
-            <li>実装・PR レビュー</li>
-            <li>インフラ・デプロイ</li>
-            <li>技術選定の実行</li>
+            <li>山下の唯一の窓口・Slack 報告</li>
+            <li>各 PM へのタスク振分</li>
+            <li>実装・詳細把握はしない</li>
           </ul>
         </div>
         <div class="card anim d3">
-          <div style="margin-bottom: 10px;"><span class="tag green">Marketing</span></div>
-          <h3 style="margin-bottom: 12px;">石川</h3>
+          <div style="margin-bottom: 10px;"><span class="tag">PM</span></div>
+          <h3 style="margin-bottom: 10px;">pm-focusburst / pm-forkbox</h3>
           <ul class="feature-list">
-            <li>コンテンツ企画・執筆</li>
-            <li>GTM 戦略・分析</li>
-            <li>プロモーション素材</li>
+            <li>各プロダクトの進捗を所有</li>
+            <li>DOCS.md を常に最新化（最重要）</li>
+            <li>実装プールへタスクを分解・投函</li>
           </ul>
         </div>
         <div class="card anim d4">
-          <div style="margin-bottom: 10px;"><span class="tag yellow">Accounting</span></div>
-          <h3 style="margin-bottom: 12px;">佐藤</h3>
+          <div style="margin-bottom: 10px;"><span class="tag green">実装・専門プール</span></div>
+          <h3 style="margin-bottom: 10px;">engineer / frontend / backend / designer / marketing</h3>
           <ul class="feature-list">
-            <li>経理・財務管理</li>
-            <li>（ローカルLLM 構築予定）</li>
-            <li>売上・費用トラッキング</li>
+            <li>PM の指示で実装・制作（指示待ち徹底）</li>
+            <li>PR は発行のみ・マージは山下</li>
+            <li>reviewer が PR をコメントレビュー</li>
           </ul>
         </div>
       </div>
-      <div class="card-sm anim d5" style="margin-top: 18px; border-color: var(--accent-soft);">
-        <span style="color: var(--accent); font-weight: 600;">千葉（執行役員）：</span>
-        <span class="muted" style="font-size: 14px;">各メンバーへの指示・進捗集約・山下への報告・ガバナンス。実務は行わない。</span>
+      <div class="card-sm anim d5" style="margin-top: 16px; border-color: var(--yellow-soft);">
+        <span style="color: var(--yellow); font-weight: 600;">オンデマンド：</span>
+        <span class="muted" style="font-size: 14px;">legal（法務）/ accounting（経理・ローカルLLM）は常駐せず、必要時に kick で起動。Slack 発言は orchestrator のみ。</span>
       </div>
     </div>
   </div>
@@ -311,40 +311,46 @@ tr:hover td { background: var(--accent-soft); }
             <tr>
               <th>操作</th>
               <th>山下</th>
-              <th>千葉</th>
-              <th>川上・石川・佐藤</th>
+              <th>orchestrator</th>
+              <th>PM</th>
+              <th>実装・専門プール</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>自分の AGENTS.md を変更</td>
-              <td>―</td>
-              <td><span class="tag yellow">山下合意時のみ</span></td>
+              <td>AGENTS.md / COMPANY.md を変更</td>
+              <td><span class="tag green">○</span></td>
+              <td><span class="tag yellow">山下合意時</span></td>
               <td><span class="tag" style="background:var(--bg-muted);color:var(--fg-muted);">不可</span></td>
-            </tr>
-            <tr>
-              <td>他メンバーの AGENTS.md を変更</td>
-              <td><span class="tag green">○</span></td>
-              <td><span class="tag green">○</span></td>
-              <td><span class="tag" style="background:var(--bg-muted);color:var(--fg-muted);">不可</span></td>
-            </tr>
-            <tr>
-              <td>COMPANY.md を変更</td>
-              <td><span class="tag green">○</span></td>
-              <td><span class="tag green">○</span></td>
               <td><span class="tag" style="background:var(--bg-muted);color:var(--fg-muted);">不可</span></td>
             </tr>
             <tr>
               <td>inbox/ にタスクを投函</td>
               <td><span class="tag green">○</span></td>
-              <td><span class="tag green">○</span></td>
+              <td><span class="tag green">○ → PM</span></td>
+              <td><span class="tag green">○ → 実装</span></td>
               <td><span class="tag" style="background:var(--bg-muted);color:var(--fg-muted);">不可</span></td>
             </tr>
             <tr>
               <td>doing/ done/ の状態遷移</td>
               <td>―</td>
-              <td><span class="tag green">○</span></td>
+              <td><span class="tag green">集約</span></td>
+              <td><span class="tag green">集約</span></td>
               <td><span class="tag green">自分のタスクのみ</span></td>
+            </tr>
+            <tr>
+              <td>Slack で山下に発言</td>
+              <td>―</td>
+              <td><span class="tag green">○（唯一）</span></td>
+              <td><span class="tag" style="background:var(--bg-muted);color:var(--fg-muted);">不可</span></td>
+              <td><span class="tag" style="background:var(--bg-muted);color:var(--fg-muted);">不可</span></td>
+            </tr>
+            <tr>
+              <td>PR をマージ</td>
+              <td><span class="tag green">○</span></td>
+              <td>―</td>
+              <td>―</td>
+              <td><span class="tag yellow">発行のみ</span></td>
             </tr>
           </tbody>
         </table>
@@ -360,13 +366,13 @@ tr:hover td { background: var(--accent-soft); }
       <div class="flow-steps anim d2" style="margin-top: 36px;">
         <div class="flow-step">
           <div class="flow-step-num">STEP 01</div>
-          <div class="flow-step-label">石川が<br>初稿作成</div>
+          <div class="flow-step-label">marketing が<br>初稿作成</div>
           <div class="flow-step-sub">done/ に書き戻し</div>
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-step highlight">
           <div class="flow-step-num">STEP 02</div>
-          <div class="flow-step-label">千葉が<br>レビュー</div>
+          <div class="flow-step-label">orchestrator が<br>レビュー</div>
           <div class="flow-step-sub">内容・品質チェック</div>
         </div>
         <div class="flow-arrow">→</div>
@@ -384,7 +390,7 @@ tr:hover td { background: var(--accent-soft); }
       </div>
       <div class="card-sm anim d3" style="margin-top: 24px;">
         <span style="color: var(--green); font-weight: 600;">X（短文）：</span>
-        <span class="muted" style="font-size: 14px;">千葉チェック不要。石川が自律判断で投稿してよい。</span>
+        <span class="muted" style="font-size: 14px;">orchestrator チェック不要。marketing が自律判断で投稿してよい。</span>
       </div>
     </div>
   </div>

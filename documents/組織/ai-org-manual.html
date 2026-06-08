@@ -117,76 +117,98 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
 
 <!-- S1: Title -->
 <div class="slide title-bg active">
-  <div class="center" style="max-width:700px;">
+  <div class="center" style="max-width:720px;">
     <div class="mono-label anim">keyaki-development — 2026</div>
     <h1 class="anim d1">AI組織<span class="at">運用</span>マニュアル</h1>
     <p class="sub anim d2">
-      GCE VM 上で 24 時間稼働する AI 組織の構成・起動・運用を記録したリファレンス。<br>
-      川上・千葉・石川・佐藤の 4 ペルソナが tmux 常駐セッションで自律的に動く。
+      GCE VM 上で動く、プロジェクト縦割り・PM 制の AI 組織の構成・起動・運用リファレンス。<br>
+      唯一の窓口 <span class="at">orchestrator（千葉）</span> の下に各プロダクト専任 PM を置き、実装・専門職の共有プールが作業する。
     </p>
     <div style="margin-top:28px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" class="anim d3">
       <span class="tag">Claude Code 直結</span>
       <span class="tag green">tmux 常駐</span>
-      <span class="tag blue">GCE e2-standard-2</span>
-      <span class="tag yellow">~$50 / 月</span>
+      <span class="tag blue">GCE g2-standard-4 (L4 GPU)</span>
+      <span class="tag yellow">オンデマンド ~$0.7/hr</span>
     </div>
   </div>
 </div>
 
 <!-- S2: 組織概要 -->
 <div class="slide">
-  <div class="full" style="max-width:900px;">
+  <div class="full" style="max-width:960px;">
     <div class="mono-label anim">Organization</div>
-    <h2 class="anim d1">4ペルソナの<span class="at">役割分担</span></h2>
-    <div class="grid-2" style="margin-top:24px;">
+    <h2 class="anim d1">プロジェクト縦割り・<span class="at">PM 制</span>の役割分担</h2>
+    <div class="grid-3" style="margin-top:22px;">
       <div class="card anim d2">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <span class="tag">川上 / kawakami</span>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="tag green">orchestrator / 千葉</span>
         </div>
-        <h3 style="margin-bottom:8px;">エンジニア</h3>
+        <h3 style="margin-bottom:8px;">窓口・統括</h3>
         <ul class="fl">
-          <li>実装・コーディング・PR レビュー</li>
-          <li>portal / portfolio 等リポジトリの保守</li>
-          <li>reatex 業務を兼務（オンデマンド）</li>
+          <li>山下の唯一の窓口（Slack 発言はここのみ）</li>
+          <li>各 PM へのタスク振分・報告集約</li>
+          <li>PM 未設置案件（portal 等）の直轄</li>
         </ul>
       </div>
       <div class="card anim d3">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <span class="tag green">千葉 / chiba</span>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="tag">pm-focusburst</span>
         </div>
-        <h3 style="margin-bottom:8px;">マネージャー / オーケストレーター</h3>
+        <h3 style="margin-bottom:8px;">FocusBurst 専任 PM</h3>
         <ul class="fl">
-          <li>タスクキューへの投函・進捗管理</li>
-          <li>完了タスクを集約して山下に Slack 報告</li>
-          <li>組織全体のオーケストレーション</li>
+          <li>進捗・スケジュールを所有</li>
+          <li>実装プールへ inbox で指示</li>
+          <li>DOCS.md を常に最新化</li>
         </ul>
       </div>
       <div class="card anim d4">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <span class="tag blue">石川 / ishikawa</span>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="tag">pm-forkbox</span>
         </div>
-        <h3 style="margin-bottom:8px;">マーケティング</h3>
+        <h3 style="margin-bottom:8px;">Forkbox 専任 PM</h3>
         <ul class="fl">
-          <li>コンテンツ企画・執筆</li>
-          <li>マーケティング戦略の立案・分析</li>
-          <li>プロダクトプロモーション素材作成</li>
+          <li>MVP（7/31 目標）を所有</li>
+          <li>frontend/backend/designer へ指示</li>
+          <li>legal レポートの反映管理</li>
+        </ul>
+      </div>
+      <div class="card anim d4">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="tag blue">実装・専門プール</span>
+        </div>
+        <h3 style="margin-bottom:8px;">共有プール</h3>
+        <ul class="fl">
+          <li>engineer（川上）/ frontend（中村）/ backend（田中）</li>
+          <li>designer（山口）/ marketing（石川）</li>
+          <li>PM の inbox 指示で実装・PR（マージはしない）</li>
         </ul>
       </div>
       <div class="card anim d5">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <span class="tag yellow">佐藤 / sato</span>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="tag blue">reviewer</span>
         </div>
-        <h3 style="margin-bottom:8px;">経理</h3>
+        <h3 style="margin-bottom:8px;">PR レビュー専任</h3>
         <ul class="fl">
-          <li>経費・請求書の管理</li>
-          <li>財務データの集計・分析</li>
-          <li>将来: ローカル LLM に移行予定</li>
+          <li>コメントのみ（承認・変更要求ボタンは押さない）</li>
+          <li>「マージは山下本人が確認の上行います。」を付記</li>
+          <li>実装・マージ・デプロイはしない</li>
+        </ul>
+      </div>
+      <div class="card anim d6" style="border-color:var(--yellow-soft);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="tag yellow">legal / accounting</span>
+        </div>
+        <h3 style="margin-bottom:8px;">オンデマンド</h3>
+        <ul class="fl">
+          <li>legal（大久保）: 著作権・規約・モデレーション</li>
+          <li>accounting（佐藤）: 経理。ローカル LLM 駆動</li>
+          <li>常駐 tick なし。必要時に kick で起動</li>
         </ul>
       </div>
     </div>
     <div class="card-sm anim d6" style="margin-top:14px;border-color:var(--accent-soft);">
-      <span style="color:var(--accent);font-weight:600;font-size:12px;">稼働時間：</span>
-      <span style="font-size:12px;color:var(--fg-muted);">Active JST 08:00–21:59 　Dormant JST 22:00–07:59（自律 tick は行わない）</span>
+      <span style="color:var(--accent);font-weight:600;font-size:12px;">稼働：</span>
+      <span style="font-size:12px;color:var(--fg-muted);">VM はオンデマンド起動（使う時だけ <code>make start</code> → 終わったら <code>make stop</code>）。起動中は dormant 時間帯なしで 24h 稼働（2026-06-07 dormant 廃止）。orchestrator は起動中ずっと窓口。</span>
     </div>
   </div>
 </div>
@@ -195,19 +217,19 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
 <div class="slide">
   <div class="full" style="max-width:860px;">
     <div class="mono-label anim">Architecture</div>
-    <h2 class="anim d1">VM = <span class="at">常時起動のリモート Claude 端末</span></h2>
+    <h2 class="anim d1">VM = <span class="at">オンデマンド起動のリモート Claude 端末</span></h2>
     <div class="row" style="margin-top:24px;align-items:stretch;">
       <div class="col anim d2" style="flex:0 0 auto;width:180px;">
         <div class="card" style="height:100%;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:8px;">
           <div style="font-size:28px;">👤</div>
           <h3>山下</h3>
-          <p style="font-size:11px;color:var(--fg-muted);">PC / スマホ</p>
+          <p style="font-size:11px;color:var(--fg-muted);">orchestrator とだけ対話</p>
         </div>
       </div>
       <div style="display:flex;align-items:center;color:var(--border);font-size:22px;flex-shrink:0;" class="anim d2">→</div>
       <div class="col anim d3">
         <div class="card" style="height:100%;">
-          <div style="font-size:11px;font-weight:600;color:var(--accent);font-family:var(--font-mono);margin-bottom:10px;">make cli / make cli-chiba …</div>
+          <div style="font-size:11px;font-weight:600;color:var(--accent);font-family:var(--font-mono);margin-bottom:10px;">make cli / make cli-engineer …</div>
           <h3 style="margin-bottom:10px;">SSH → tmux 常駐セッション</h3>
           <ul class="fl">
             <li>起動ディレクトリの CLAUDE.md が COMPANY・AGENTS・DOCS をロード</li>
@@ -221,11 +243,11 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
         <div class="card" style="height:100%;display:flex;flex-direction:column;gap:10px;">
           <div>
             <div style="font-size:10px;color:var(--fg-muted);font-family:var(--font-mono);margin-bottom:4px;">BRAIN FILES</div>
-            <div style="font-size:12px;">AGENTS.md · DOCS.md</div>
+            <div style="font-size:12px;">org.md · AGENTS.md · DOCS.md</div>
           </div>
           <div style="border-top:1px solid var(--border);padding-top:10px;">
             <div style="font-size:10px;color:var(--fg-muted);font-family:var(--font-mono);margin-bottom:4px;">WORKSPACE</div>
-            <div style="font-size:12px;">~/keyaki/portal 等</div>
+            <div style="font-size:12px;">~/keyaki/focusburst · forkbox 等</div>
           </div>
           <div style="border-top:1px solid var(--border);padding-top:10px;">
             <div style="font-size:10px;color:var(--fg-muted);font-family:var(--font-mono);margin-bottom:4px;">TASK QUEUE</div>
@@ -236,14 +258,14 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
     </div>
     <div class="card-sm anim d5" style="margin-top:14px;border-color:var(--accent-soft);">
       <span style="color:var(--accent);font-weight:600;font-size:12px;">ペルソナ分離：</span>
-      <span style="font-size:12px;color:var(--fg-muted);">起動ディレクトリで人格が切り替わる。グローバル <code>~/.claude/CLAUDE.md</code> は空のまま維持する（全セッションへの混入防止）。</span>
+      <span style="font-size:12px;color:var(--fg-muted);">起動ディレクトリで人格（ロール）が切り替わる。グローバル <code>~/.claude/CLAUDE.md</code> は空のまま維持し、<code>agent/AGENTS.md</code> も置かない（全セッションへの混入防止）。</span>
     </div>
   </div>
 </div>
 
 <!-- S4: ディレクトリ構成 -->
 <div class="slide">
-  <div class="full" style="max-width:860px;">
+  <div class="full" style="max-width:880px;">
     <div class="mono-label anim">File Structure</div>
     <h2 class="anim d1" style="margin-bottom:20px;">サーバーの<span class="at">ファイル配置</span></h2>
     <div class="row" style="align-items:flex-start;gap:20px;">
@@ -251,23 +273,26 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
         <div class="dir-tree">
           <span class="c">~/  (VM: /home/yamashita/)</span><br>
           ├── <span class="d">agent/</span> <span class="c">← AI組織のオフィス</span><br>
-          │&nbsp;&nbsp;&nbsp;├── <span class="d">_shared/</span><br>
-          │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="f">COMPANY.md</span> <span class="c">会社方針・名簿・Slack</span><br>
-          │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="f">WORKFLOWS.md</span> <span class="c">git 運用</span><br>
-          │&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="d">tasks/</span> <span class="c">inbox/doing/done/archive</span><br>
-          │&nbsp;&nbsp;&nbsp;├── <span class="d">kawakami/</span> <span class="c">川上（エンジニア）</span><br>
-          │&nbsp;&nbsp;&nbsp;├── <span class="d">chiba/</span> <span class="c">千葉（マネージャー）</span><br>
-          │&nbsp;&nbsp;&nbsp;├── <span class="d">ishikawa/</span> <span class="c">石川（マーケ）</span><br>
-          │&nbsp;&nbsp;&nbsp;└── <span class="d">sato/</span> <span class="c">佐藤（経理）</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="f">org.md</span> <span class="c">役割定義 SSoT</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="f">MANUAL.md</span> <span class="c">運用手順</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">_shared/</span> <span class="c">COMPANY/WORKFLOWS/kick.sh/tasks</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">orchestrator/</span> <span class="c">窓口（千葉）</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">pm-focusburst/</span> <span class="c">FocusBurst PM</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">pm-forkbox/</span> <span class="c">Forkbox PM</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">engineer/</span> <span class="c">川上（実装・reatex 兼務）</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">frontend/</span> <span class="c">中村</span> &nbsp;├── <span class="d">backend/</span> <span class="c">田中</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">designer/</span> <span class="c">山口</span> &nbsp;├── <span class="d">marketing/</span> <span class="c">石川</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">reviewer/</span> <span class="c">PR レビュー</span><br>
+          │&nbsp;&nbsp;&nbsp;├── <span class="d">legal/</span> <span class="c">大久保（オンデマンド）</span><br>
+          │&nbsp;&nbsp;&nbsp;└── <span class="d">accounting/</span> <span class="c">佐藤（オンデマンド・ローカル LLM）</span><br>
           ├── <span class="d">keyaki/</span> <span class="c">← 作業リポジトリ群</span><br>
           ├── <span class="d">reatex/</span> <span class="c">← reatex 兼務（オンデマンド）</span><br>
-          └── <span class="d">.claude/</span><br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="f">CLAUDE.md</span> <span class="c">← 空（必須）</span>
+          └── <span class="d">.claude/</span>/<span class="f">CLAUDE.md</span> <span class="c">← 空（必須）</span>
         </div>
       </div>
       <div class="col anim d3" style="display:flex;flex-direction:column;gap:12px;">
         <div class="card">
-          <div style="font-size:11px;font-weight:600;color:var(--fg-muted);margin-bottom:8px;font-family:var(--font-mono);">各ペルソナ共通</div>
+          <div style="font-size:11px;font-weight:600;color:var(--fg-muted);margin-bottom:8px;font-family:var(--font-mono);">各ロール共通</div>
           <ul class="fl">
             <li><code>CLAUDE.md</code> — ローダ（@import のみ）</li>
             <li><code>AGENTS.md</code> — 役割・tick フロー定義</li>
@@ -278,6 +303,9 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
           <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:8px;font-family:var(--font-mono);">DOCS.md の扱い</div>
           <p style="font-size:12px;color:var(--fg-muted);line-height:1.6;">git（<code>keyaki-org-workdir</code>）で管理。ローカルとサーバーが分岐したら、黙って上書きせず git のコンフリクトとして検知・解決する。</p>
         </div>
+        <div class="card-sm" style="border-color:var(--green-soft);">
+          <p style="font-size:11px;color:var(--fg-muted);line-height:1.6;">新プロジェクトは <code>pm-&lt;name&gt;/</code> を作り、<code>org.md</code>・<code>orchestrator/AGENTS.md</code>・<code>kick.sh</code> に追記するだけ。</p>
+        </div>
       </div>
     </div>
   </div>
@@ -285,45 +313,69 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
 
 <!-- S5: 接続方法 -->
 <div class="slide">
-  <div class="full" style="max-width:820px;">
+  <div class="full" style="max-width:880px;">
     <div class="mono-label anim">How to Connect</div>
-    <h2 class="anim d1" style="margin-bottom:22px;">ペルソナへの<span class="at">接続</span></h2>
-    <div class="grid-2" style="gap:12px;">
+    <h2 class="anim d1" style="margin-bottom:22px;">ロールへの<span class="at">接続</span></h2>
+    <div class="grid-3" style="gap:12px;">
       <div class="card anim d2" style="display:flex;flex-direction:column;gap:6px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <h3>川上（エンジニア）</h3>
-          <span class="tag">keyaki</span>
+          <h3>orchestrator（窓口）</h3>
+          <span class="tag green">基本入口</span>
         </div>
         <code style="font-size:13px;display:block;padding:8px 12px;">make cli</code>
-        <p style="font-size:11px;color:var(--fg-muted);">tmux: kawakami セッション。DOCS.md を読んで前回の文脈を把握してから待機。</p>
+        <p style="font-size:11px;color:var(--fg-muted);">tmux: orchestrator。山下の基本入口。done/ と各 PM の DOCS を読んで Slack 報告。</p>
       </div>
       <div class="card anim d3" style="display:flex;flex-direction:column;gap:6px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <h3>千葉（マネージャー）</h3>
-          <span class="tag green">keyaki</span>
+          <h3>engineer（川上）</h3>
+          <span class="tag">keyaki</span>
         </div>
-        <code style="font-size:13px;display:block;padding:8px 12px;">make cli-chiba</code>
-        <p style="font-size:11px;color:var(--fg-muted);">tmux: chiba セッション。done/ を集約して Slack 報告・inbox/ を監視。</p>
+        <code style="font-size:13px;display:block;padding:8px 12px;">make cli-engineer</code>
+        <p style="font-size:11px;color:var(--fg-muted);">tmux: engineer。横断実装・PR・CI。PM の inbox 指示で作業。</p>
       </div>
       <div class="card anim d4" style="display:flex;flex-direction:column;gap:6px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <h3>石川（マーケ）</h3>
-          <span class="tag blue">keyaki</span>
+          <h3>FocusBurst PM</h3>
+          <span class="tag">PM</span>
         </div>
-        <code style="font-size:13px;display:block;padding:8px 12px;">make cli-ishikawa</code>
-        <p style="font-size:11px;color:var(--fg-muted);">tmux: ishikawa セッション。inbox/ 確認 → コンテンツ・マーケ作業。</p>
+        <code style="font-size:13px;display:block;padding:8px 12px;">make cli-pm-focusburst</code>
+        <p style="font-size:11px;color:var(--fg-muted);">tmux: pm-focusburst。進捗を所有し実装プールへ inbox 投函。</p>
+      </div>
+      <div class="card anim d4" style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <h3>Forkbox PM</h3>
+          <span class="tag">PM</span>
+        </div>
+        <code style="font-size:13px;display:block;padding:8px 12px;">make cli-pm-forkbox</code>
+        <p style="font-size:11px;color:var(--fg-muted);">tmux: pm-forkbox。MVP スケジュールを所有。</p>
       </div>
       <div class="card anim d5" style="display:flex;flex-direction:column;gap:6px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <h3>川上（reatex 兼務）</h3>
+          <h3>marketing（石川）</h3>
+          <span class="tag blue">keyaki</span>
+        </div>
+        <code style="font-size:13px;display:block;padding:8px 12px;">make cli-marketing</code>
+        <p style="font-size:11px;color:var(--fg-muted);">tmux: marketing。コンテンツ・GTM。inbox 指示で作業。</p>
+      </div>
+      <div class="card anim d5" style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <h3>accounting（佐藤）</h3>
+          <span class="tag yellow">opencode</span>
+        </div>
+        <code style="font-size:13px;display:block;padding:8px 12px;">make cli-sato</code>
+        <p style="font-size:11px;color:var(--fg-muted);">tmux: sato。<strong>claude ではなく opencode</strong>（Ollama + gemma ローカル LLM）。</p>
+      </div>
+      <div class="card anim d6" style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <h3>engineer（reatex 兼務）</h3>
           <span class="tag yellow">reatex</span>
         </div>
         <code style="font-size:13px;display:block;padding:8px 12px;">make cli-reatex</code>
-        <p style="font-size:11px;color:var(--fg-muted);">tmux: kawakami-reatex。オンデマンド起動。LINE WORKS 報告・rtx-yamashita アカウント。</p>
+        <p style="font-size:11px;color:var(--fg-muted);">tmux: engineer-reatex。オンデマンド。LINE WORKS 報告・rtx-yamashita アカウント。</p>
       </div>
     </div>
     <div class="card-sm anim d6" style="margin-top:12px;">
-      <span style="font-size:12px;color:var(--fg-muted);">既存セッションがあれば自動で再接続。　切り離し: <code>Ctrl+B → D</code>　スクロール: <code>Ctrl+B → [</code>（Q で終了）</span>
+      <span style="font-size:12px;color:var(--fg-muted);">既存セッションがあれば自動で再接続。　切り離し: <code>Ctrl+B → D</code>　スクロール: <code>Ctrl+B → [</code>（Q で終了）　非対話起動: <code>_shared/kick.sh &lt;role&gt;</code></span>
     </div>
   </div>
 </div>
@@ -338,7 +390,7 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
         <h3 style="margin-bottom:12px;color:var(--fg-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.06em;">VM 管理</h3>
         <table style="font-size:12px;">
           <tbody>
-            <tr><td><code>make start</code></td><td style="color:var(--fg-muted);">VM を起動する</td></tr>
+            <tr><td><code>make start</code></td><td style="color:var(--fg-muted);">VM を起動する（オンデマンド）</td></tr>
             <tr><td><code>make stop</code></td><td style="color:var(--fg-muted);">VM を停止（課金停止）</td></tr>
             <tr><td><code>make status</code></td><td style="color:var(--fg-muted);">稼働状態・ディスク確認</td></tr>
             <tr><td><code>make backup-status</code></td><td style="color:var(--fg-muted);">日次スナップショット一覧</td></tr>
@@ -350,19 +402,19 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
         <h3 style="margin-bottom:12px;color:var(--fg-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.06em;">デプロイ</h3>
         <table style="font-size:12px;">
           <tbody>
-            <tr><td><code>make deploy-agent</code></td><td style="color:var(--fg-muted);">脳ファイル（CLAUDE/AGENTS）を VM へ反映</td></tr>
             <tr><td><code>make deploy</code></td><td style="color:var(--fg-muted);">skills を VM へ反映</td></tr>
             <tr><td><code>make deploy-reatex</code></td><td style="color:var(--fg-muted);">reatex の脳を反映</td></tr>
             <tr><td><code>make push-secrets-reatex</code></td><td style="color:var(--fg-muted);">gws / google-drive 認証情報転送</td></tr>
           </tbody>
         </table>
+        <p style="font-size:11px;color:var(--fg-muted);margin-top:8px;opacity:0.8;">※ AI 組織の脳（CLAUDE/AGENTS/DOCS）の反映は <code>make push</code>（git: keyaki-org-workdir）に一本化。旧 <code>make deploy-agent</code> は廃止。</p>
       </div>
       <div class="card anim d4">
         <h3 style="margin-bottom:12px;color:var(--fg-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.06em;">ワークディレクトリ同期（git）</h3>
         <table style="font-size:12px;">
           <tbody>
             <tr><td><code>make pull</code></td><td style="color:var(--fg-muted);">サーバーの最新を git pull で取り込む（作業前に必ず）</td></tr>
-            <tr><td><code>make push</code></td><td style="color:var(--fg-muted);">自動コミット → git push → サーバーで git pull まで実行（反映完結）</td></tr>
+            <tr><td><code>make push</code></td><td style="color:var(--fg-muted);">自動コミット → git push → サーバーで git pull まで実行（脳の反映もこれ）</td></tr>
             <tr><td><code>make pull-dry / push-dry</code></td><td style="color:var(--fg-muted);">未取得コミット / 未コミット変更のプレビュー</td></tr>
           </tbody>
         </table>
@@ -394,13 +446,16 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
 
 <!-- S7: エージェント間連携 -->
 <div class="slide">
-  <div class="full" style="max-width:860px;">
+  <div class="full" style="max-width:880px;">
     <div class="mono-label anim">Collaboration</div>
-    <h2 class="anim d1" style="margin-bottom:20px;">タスクキューで<span class="at">連携する</span></h2>
+    <h2 class="anim d1" style="margin-bottom:14px;">タスクキューで<span class="at">連携する</span></h2>
+    <div class="card-sm anim d2" style="margin-bottom:6px;">
+      <span style="font-size:12px;color:var(--fg-muted);">orchestrator → PM の inbox に投函 → PM が分解して実装ロールの inbox に投函 → 担当が doing/done → PM が集約・DOCS 更新 → orchestrator が集約 → <strong style="color:var(--accent);">Slack 報告は orchestrator のみ</strong></span>
+    </div>
     <div class="queue anim d2">
       <div class="queue-box">
         <div class="queue-label">inbox/</div>
-        <div class="queue-desc">千葉が投函<br>担当者が掴む</div>
+        <div class="queue-desc">orchestrator/PM が投函<br>担当者が掴む</div>
       </div>
       <div class="queue-arrow">→</div>
       <div class="queue-box">
@@ -410,12 +465,12 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
       <div class="queue-arrow">→</div>
       <div class="queue-box">
         <div class="queue-label">done/</div>
-        <div class="queue-desc">完了後に書き戻す<br>千葉が集約</div>
+        <div class="queue-desc">完了後に書き戻す<br>PM が集約</div>
       </div>
       <div class="queue-arrow">→</div>
       <div class="queue-box">
         <div class="queue-label" style="color:var(--green);">archive/</div>
-        <div class="queue-desc">千葉が Slack 報告後<br>に保管</div>
+        <div class="queue-desc">orchestrator が Slack 報告<br>後に保管</div>
       </div>
     </div>
     <div class="grid-2" style="margin-top:16px;gap:14px;">
@@ -423,18 +478,18 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
         <h3 style="margin-bottom:10px;">タスクファイル形式</h3>
         <div style="font-family:var(--font-mono);font-size:11px;background:var(--bg-muted);border:1px solid var(--border);border-radius:8px;padding:12px;line-height:1.8;color:var(--fg);">
           <span style="color:var(--fg-muted);"># ファイル名</span><br>
-          YYYYMMDD-kawakami-fix-login.md<br><br>
+          20260608-frontend-forkbox-feed-ui.md<br><br>
           <span style="color:var(--fg-muted);"># 内容</span><br>
-          担当: 川上　依頼者: 千葉<br>
-          優先度: 高<br>
-          完了条件: PR がマージされること
+          担当: frontend　依頼元: pm-forkbox<br>
+          完了条件: PR 発行（マージは山下）<br>
+          背景 / 実施内容 / 完了報告
         </div>
       </div>
       <div class="card anim d4">
         <h3 style="margin-bottom:10px;">報告経路</h3>
         <ul class="fl">
-          <li><strong style="color:var(--fg);">普段:</strong> 千葉が集約 → Slack で山下へ報告</li>
-          <li><strong style="color:var(--fg);">名指し・緊急:</strong> 各メンバーが直接 Slack 報告</li>
+          <li><strong style="color:var(--fg);">Slack 発言は orchestrator のみ。</strong>山下は orchestrator とだけ対話</li>
+          <li>PM・実装・専門職は done/ と自分の DOCS.md で返す</li>
           <li>状態遷移は <code>mv</code>（アトミック = ロック代わり）</li>
           <li>パス: <code>~/agent/_shared/tasks/</code></li>
         </ul>
@@ -453,7 +508,7 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
         <div class="flow-num">1</div>
         <div class="flow-body">
           <h4>VM 上でセットアップスクリプトを実行</h4>
-          <p><code>bash scripts/setup.sh</code> — Node.js・claude CLI・gh・gcloud・gws をインストール。ペルソナディレクトリ（kawakami/ chiba/ ishikawa/ sato/）を初期化。</p>
+          <p><code>bash scripts/setup.sh</code> — claude CLI・gh・gcloud・gws、および GPU ドライバ・Ollama・opencode を導入。各ロールのディレクトリ（orchestrator/ pm-focusburst/ … accounting/）を初期化。</p>
         </div>
       </div>
       <div class="flow-step">
@@ -466,22 +521,22 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
       <div class="flow-step">
         <div class="flow-num green">3</div>
         <div class="flow-body">
-          <h4>AI組織の脳をデプロイする（ローカルから）</h4>
-          <p><code>make deploy-agent</code> — 各ペルソナの CLAUDE.md・AGENTS.md と _shared/ をサーバーへ転送（DOCS.md は初回 setup.sh で seed 済み）。</p>
+          <h4>佐藤（accounting）のローカル LLM を用意する</h4>
+          <p>Ollama に <code>gemma</code> 系モデルを pull し、num_ctx 拡張派生（<code>gemma4-sato</code>）を生成。佐藤は claude ではなく opencode → Ollama で駆動する。</p>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num green">4</div>
         <div class="flow-body">
-          <h4>skills をデプロイする</h4>
-          <p><code>make deploy</code> — blog スキル等を <code>~/.claude/skills/</code> へ転送。</p>
+          <h4>AI組織の脳と skills を反映する（ローカルから）</h4>
+          <p><code>make push</code> — 脳（CLAUDE/AGENTS/DOCS・org.md・_shared）を git（keyaki-org-workdir）でサーバーへ反映。<code>make deploy</code> で skills を <code>~/.claude/skills/</code> へ転送。</p>
         </div>
       </div>
       <div class="flow-step">
         <div class="flow-num blue">5</div>
         <div class="flow-body">
-          <h4>川上に接続して動作確認</h4>
-          <p><code>make cli</code> — tmux セッションに接続。川上が DOCS.md を読んで文脈を把握し待機状態になれば完了。</p>
+          <h4>orchestrator に接続して動作確認</h4>
+          <p><code>make cli</code> — tmux: orchestrator に接続。org.md / DOCS.md を読んで全体の文脈を把握し待機状態になれば完了。</p>
         </div>
       </div>
     </div>
@@ -497,11 +552,11 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
       <div class="phase-row">
         <div class="phase-dot now">1</div>
         <div class="phase-body">
-          <h3>Phase 1 — SSH 直接セッション <span class="tag green" style="margin-left:8px;vertical-align:middle;">現在</span></h3>
+          <h3>Phase 1 — プロジェクト縦割り・PM 制 <span class="tag green" style="margin-left:8px;vertical-align:middle;">現在</span></h3>
           <ul class="fl" style="margin-top:8px;">
-            <li>make cli → SSH → claude 対話。DOCS.md でセッション間の記憶を引き継ぎ</li>
-            <li>PC を閉じても VM 上の tmux セッションは動き続ける</li>
-            <li>tick は各セッション内で <code>/schedule</code> / <code>/loop</code> を手動設定</li>
+            <li>orchestrator 窓口 → PM → 実装/専門プールの階層で稼働</li>
+            <li>佐藤（accounting）をローカル LLM（Ollama + opencode）へ移行済み（2026-06-06）</li>
+            <li>VM はオンデマンド起動。起動中は dormant なし 24h 稼働（2026-06-07 dormant 廃止）</li>
           </ul>
         </div>
       </div>
@@ -512,18 +567,18 @@ code{font-family:var(--font-mono);font-size:12px;background:var(--bg-muted);bord
           <ul class="fl" style="margin-top:8px;">
             <li>起動スクリプトが tmux + claude を自動起動し tick を登録</li>
             <li>VM 再起動後もセッションが自動復旧する</li>
-            <li>千葉が inbox 確認・done 集約・Slack 報告を定期自走</li>
+            <li>orchestrator が inbox 確認・done 集約・Slack 報告を定期自走</li>
           </ul>
         </div>
       </div>
       <div class="phase-row">
         <div class="phase-dot future">3</div>
         <div class="phase-body">
-          <h3>Phase 3 — 完全自律稼働 <span class="tag yellow" style="margin-left:8px;vertical-align:middle;">将来</span></h3>
+          <h3>Phase 3 — 脱 Claude・フルローカル組織 <span class="tag yellow" style="margin-left:8px;vertical-align:middle;">将来</span></h3>
           <ul class="fl" style="margin-top:8px;">
-            <li>systemd で全ペルソナのセッションを管理。介入なしで自律稼働</li>
-            <li>Slack を受信口に、必要時のみ山下が介入する形態</li>
-            <li>佐藤をローカル LLM に移行（コスト最適化）</li>
+            <li>佐藤での配管検証を踏まえ、engineer 等もローカル LLM へ段階移行</li>
+            <li>従量課金せずサーバーに固定投資、使うほど得な構造へ</li>
+            <li>常時稼働の価値が見合えばフル 24h 稼働へ戻す</li>
           </ul>
         </div>
       </div>
