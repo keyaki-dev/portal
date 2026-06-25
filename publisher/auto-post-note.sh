@@ -29,7 +29,7 @@ if [ -z "$NOTE_SESSION" ]; then
 fi
 
 PUBLISHER_DIR="$(cd "$(dirname "$0")" && pwd)"
-BLOG_DIR="${PUBLISHER_DIR}/../blog"
+BLOG_DIR="${PUBLISHER_DIR}/blog"
 
 # 投稿ファイルの決定（NOTE_FILE 環境変数 > 引数 > 日付自動検索）
 if [ -n "$NOTE_FILE" ]; then
