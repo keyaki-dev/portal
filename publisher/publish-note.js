@@ -44,11 +44,12 @@ async function publishToNote(filename) {
 
   const raw = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(raw);
-  const title = extractTitle(content);
-  const body = removeH1(content);
-  const tags = Array.isArray(data.blog_tag) ? data.blog_tag : [];
+  const h1Title = extractTitle(content);
+  const title = h1Title || data.title || "";
+  const body = h1Title ? removeH1(content) : content;
+  const tags = Array.isArray(data.blog_tag) ? data.blog_tag : (Array.isArray(data.tags) ? data.tags : []);
 
-  if (!title) throw new Error("タイトル (H1) が見つかりません");
+  if (!title) throw new Error("タイトルが見つかりません（H1 または front matter の title が必要）");
   if (!NOTE_SESSION) throw new Error("NOTE_SESSION が未設定です");
 
   // AUTO_HEADER=1 かつ COVER_IMAGE 未指定の場合はヘッダー画像を自動生成
@@ -101,14 +102,30 @@ async function publishToNote(filename) {
     console.log("タイトル入力完了");
     await page.waitForTimeout(300);
 
-    // 本文入力（ProseMirrorエディタ）
+    // 本文入力（ProseMirrorエディタ）— paste イベント経由で確実に挿入
     const proseMirror = page.locator("div.ProseMirror").first();
     await proseMirror.waitFor({ timeout: 10000 });
     await proseMirror.click();
-    await page.waitForTimeout(300);
-    await page.keyboard.type(body, { delay: 0 });
-    console.log("本文入力完了");
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(500);
+    // ProseMirror は paste イベントを処理するため ClipboardEvent で挿入
+    const inserted = await page.evaluate((text) => {
+      const el = document.querySelector("div.ProseMirror");
+      if (!el) return false;
+      el.focus();
+      const data = new DataTransfer();
+      data.setData("text/plain", text);
+      el.dispatchEvent(new ClipboardEvent("paste", {
+        clipboardData: data,
+        bubbles: true,
+        cancelable: true,
+      }));
+      return true;
+    }, body);
+    if (!inserted) throw new Error("ProseMirror エディタが見つかりませんでした");
+    console.log("本文入力完了（オートセーブ待機中...）");
+    // note.com のオートセーブが完了するまで待機（約10秒）
+    // オートセーブ前に「公開に進む」を押すと「タイトル、本文を入力してください」エラーが発生する
+    await page.waitForTimeout(10000);
 
     // カバー画像のアップロード（2段階フロー）
     // Step1: カバー画像アイコン → Step2: 「画像をアップロード」メニュー → file input
@@ -142,10 +159,13 @@ async function publishToNote(filename) {
           await page.waitForTimeout(3000);
 
           // クロップダイアログの「保存」ボタンをクリックして確定
-          const cropSaveBtn = page.locator('button:has-text("保存")').first();
-          if (await cropSaveBtn.count() > 0) {
-            await cropSaveBtn.click();
-            await page.waitForTimeout(1000);
+          // ReactModal__Overlay がオーバーレイするため .ReactModal__Content 内を検索 + force: true
+          const cropSaveBtn = page.locator('.ReactModal__Content button:has-text("保存")').first();
+          const cropSaveBtnFallback = page.locator('button:has-text("保存")').first();
+          const btn = (await cropSaveBtn.count() > 0) ? cropSaveBtn : cropSaveBtnFallback;
+          if (await btn.count() > 0) {
+            await btn.click({ force: true });
+            await page.waitForTimeout(1500);
             console.log("カバー画像を保存しました");
           }
         } else {
@@ -160,7 +180,7 @@ async function publishToNote(filename) {
     await page.waitForSelector("button:has-text('公開に進む')", { timeout: 10000 });
     await page.click("button:has-text('公開に進む')");
     console.log("「公開に進む」クリック");
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3500);
 
     // ハッシュタグを設定
     if (tags.length > 0) {
@@ -203,15 +223,39 @@ async function publishToNote(filename) {
         console.warn("予約投稿の設定に失敗しました:", e.message);
       }
     } else {
-      // 即時公開：「投稿する」ボタンをクリック
-      await page.waitForSelector("button:has-text('投稿する')", { timeout: 10000 });
-      await page.click("button:has-text('投稿する')");
-      console.log("「投稿する」クリック");
+      // 即時公開：「投稿する」ボタンをクリック（複数バリアント対応）
+      const publishLabels = ["投稿する", "公開する", "更新する", "投稿して公開", "公開設定を保存"];
+      let publishClicked = false;
+      for (const label of publishLabels) {
+        const btn = page.locator(`button:has-text("${label}")`).first();
+        if (await btn.count() > 0) {
+          await btn.click();
+          console.log(`「${label}」クリック`);
+          publishClicked = true;
+          break;
+        }
+      }
+      if (!publishClicked) {
+        // デバッグ: 利用可能なボタン一覧を出力
+        const btns = await page.locator("button").all();
+        const btnTexts = await Promise.all(btns.map(b => b.textContent()));
+        console.log("利用可能なボタン:", btnTexts.filter(t => t && t.trim()).join(" / "));
+        await page.screenshot({ path: "/tmp/note-publish-debug.png" });
+        console.log("デバッグスクリーンショット: /tmp/note-publish-debug.png");
+        throw new Error("投稿ボタンが見つかりませんでした");
+      }
       await page.waitForTimeout(3000);
 
-      // 「記事が公開されました」モーダルを待つ
-      await page.waitForSelector("text=記事が公開されました", { timeout: 15000 });
-      console.log("投稿成功！");
+      // 「記事が公開されました」モーダルを待つ（なければURLから判定）
+      const successMsg = await page.waitForSelector(
+        "text=記事が公開されました, text=投稿しました",
+        { timeout: 15000 }
+      ).catch(() => null);
+      if (successMsg) {
+        console.log("投稿成功！");
+      } else {
+        console.log("成功モーダルなし（URLから判定）");
+      }
 
       // editorのURLからnoteIDを取得して公開URLを構築
       const currentUrl = page.url();

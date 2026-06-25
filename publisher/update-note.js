@@ -30,11 +30,12 @@ async function updateNote(noteId, filePath) {
   if (!NOTE_SESSION) throw new Error("NOTE_SESSION が未設定です");
 
   const raw = fs.readFileSync(filePath, "utf-8");
-  const { content } = matter(raw);
-  const title = extractTitle(content);
-  const body = removeH1(content);
+  const { data, content } = matter(raw);
+  const h1Title = extractTitle(content);
+  const title = h1Title || data.title || "";
+  const body = h1Title ? removeH1(content) : content;
 
-  if (!title) throw new Error("タイトル (H1) が見つかりません");
+  if (!title) throw new Error("タイトルが見つかりません（H1 または front matter の title が必要）");
 
   // AUTO_HEADER=1 かつ COVER_IMAGE 未指定の場合はヘッダー画像を自動生成
   if (AUTO_HEADER && !COVER_IMAGE) {
