@@ -1,17 +1,22 @@
-// Note.com へ記事を投稿するスクリプト（ドラフトモード）
-// 環境変数: NOTE_SESSION, BLOG_DIR, COVER_IMAGE, SCHEDULED_AT
+// Note.com へ記事を投稿するスクリプト
+// 環境変数: NOTE_SESSION, BLOG_DIR, COVER_IMAGE, SCHEDULED_AT, AUTO_HEADER
 // 引数: filename (blog/ディレクトリ内のファイル名)
 // 出力: GitHub Actions の output として note_url を設定（公開設定ページのURL）
+//
+// AUTO_HEADER=1 を設定すると generate-note-header.js でヘッダー画像を自動生成して
+// カバー画像としてセットする（COVER_IMAGE 未指定時）。
 
 const { chromium } = require("playwright");
 const matter = require("gray-matter");
 const fs = require("fs");
 const path = require("path");
+const { execSync } = require("child_process");
 
 const BLOG_DIR = process.env.BLOG_DIR || path.join(__dirname, "../blog");
 const NOTE_SESSION = process.env.NOTE_SESSION;
-const COVER_IMAGE = process.env.COVER_IMAGE || "";
+let COVER_IMAGE = process.env.COVER_IMAGE || "";
 const SCHEDULED_AT = process.env.SCHEDULED_AT || "";
+const AUTO_HEADER = process.env.AUTO_HEADER === "1";
 
 function extractTitle(content) {
   const match = content.match(/^#\s+(.+)$/m);
@@ -45,6 +50,21 @@ async function publishToNote(filename) {
 
   if (!title) throw new Error("タイトル (H1) が見つかりません");
   if (!NOTE_SESSION) throw new Error("NOTE_SESSION が未設定です");
+
+  // AUTO_HEADER=1 かつ COVER_IMAGE 未指定の場合はヘッダー画像を自動生成
+  if (AUTO_HEADER && !COVER_IMAGE) {
+    try {
+      const headerPath = `/tmp/note-header-${Date.now()}.png`;
+      const genScript = path.join(__dirname, "generate-note-header.js");
+      execSync(`node "${genScript}" "${title.replace(/"/g, '\\"')}" "${headerPath}"`, { stdio: "inherit" });
+      if (fs.existsSync(headerPath)) {
+        COVER_IMAGE = headerPath;
+        console.log(`ヘッダー画像を自動生成しました: ${headerPath}`);
+      }
+    } catch (e) {
+      console.warn("ヘッダー画像の自動生成に失敗しました（続行）:", e.message);
+    }
+  }
 
   console.log(`投稿開始: ${title}`);
 
@@ -90,14 +110,30 @@ async function publishToNote(filename) {
     console.log("本文入力完了");
     await page.waitForTimeout(1000);
 
-    // カバー画像のアップロード（エディタ内の file input）
+    // カバー画像のアップロード（「カバー画像を追加」ボタン経由）
     if (COVER_IMAGE && fs.existsSync(COVER_IMAGE)) {
       try {
-        const fileInput = await page.$('input[type="file"][accept*="image"]');
+        // 「カバー画像を追加」ボタンをクリックして専用 file input を出現させる
+        const addCoverBtn = page.locator(
+          'button:has-text("カバー画像を追加"), [aria-label*="カバー画像"], label:has-text("カバー画像")'
+        ).first();
+        const btnExists = await addCoverBtn.count() > 0;
+        if (btnExists) {
+          await addCoverBtn.click();
+          await page.waitForTimeout(500);
+          console.log("「カバー画像を追加」ボタンをクリックしました");
+        }
+
+        // ボタン操作後に出現した file input、またはエディタ内の最初の image input を使う
+        const fileInput = await page.waitForSelector(
+          'input[type="file"][accept*="image"]',
+          { timeout: 5000 }
+        ).catch(() => null);
+
         if (fileInput) {
           await fileInput.setInputFiles(COVER_IMAGE);
           console.log("カバー画像をアップロードしました");
-          await page.waitForTimeout(2000);
+          await page.waitForTimeout(3000);
         } else {
           console.warn("カバー画像の入力欄が見つかりませんでした（スキップ）");
         }
