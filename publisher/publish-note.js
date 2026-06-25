@@ -110,30 +110,44 @@ async function publishToNote(filename) {
     console.log("本文入力完了");
     await page.waitForTimeout(1000);
 
-    // カバー画像のアップロード（「カバー画像を追加」ボタン経由）
+    // カバー画像のアップロード（2段階フロー）
+    // Step1: カバー画像アイコン → Step2: 「画像をアップロード」メニュー → file input
     if (COVER_IMAGE && fs.existsSync(COVER_IMAGE)) {
       try {
-        // 「カバー画像を追加」ボタンをクリックして専用 file input を出現させる
-        const addCoverBtn = page.locator(
-          'button:has-text("カバー画像を追加"), [aria-label*="カバー画像"], label:has-text("カバー画像")'
-        ).first();
-        const btnExists = await addCoverBtn.count() > 0;
-        if (btnExists) {
-          await addCoverBtn.click();
-          await page.waitForTimeout(500);
-          console.log("「カバー画像を追加」ボタンをクリックしました");
+        // Step1: タイトル上のカバー画像アイコン（aria-label="画像を追加"）をクリック
+        const coverIconBtn = page.locator('[aria-label="画像を追加"]').first();
+        if (await coverIconBtn.count() > 0) {
+          await coverIconBtn.click();
+          await page.waitForTimeout(800);
+          console.log("カバー画像アイコンをクリックしました");
+
+          // Step2: 展開されたメニューの「画像をアップロード」をクリック
+          const uploadMenuItem = page.locator('button:has-text("画像をアップロード")').first();
+          if (await uploadMenuItem.count() > 0) {
+            await uploadMenuItem.click();
+            await page.waitForTimeout(1000);
+            console.log("「画像をアップロード」をクリックしました");
+          }
         }
 
-        // ボタン操作後に出現した file input、またはエディタ内の最初の image input を使う
+        // file input を待機（hidden 状態でも DOM 上に存在すれば取得）
         const fileInput = await page.waitForSelector(
-          'input[type="file"][accept*="image"]',
-          { timeout: 5000 }
+          '#note-editor-eyecatch-input, input[type="file"][accept*="image"]',
+          { timeout: 5000, state: "attached" }
         ).catch(() => null);
 
         if (fileInput) {
           await fileInput.setInputFiles(COVER_IMAGE);
           console.log("カバー画像をアップロードしました");
           await page.waitForTimeout(3000);
+
+          // クロップダイアログの「保存」ボタンをクリックして確定
+          const cropSaveBtn = page.locator('button:has-text("保存")').first();
+          if (await cropSaveBtn.count() > 0) {
+            await cropSaveBtn.click();
+            await page.waitForTimeout(1000);
+            console.log("カバー画像を保存しました");
+          }
         } else {
           console.warn("カバー画像の入力欄が見つかりませんでした（スキップ）");
         }
