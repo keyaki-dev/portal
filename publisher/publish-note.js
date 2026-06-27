@@ -123,9 +123,19 @@ async function publishToNote(filename) {
     }, body);
     if (!inserted) throw new Error("ProseMirror エディタが見つかりませんでした");
     console.log("本文入力完了（オートセーブ待機中...）");
-    // note.com のオートセーブが完了するまで待機（約10秒）
+    // ProseMirror の内容が反映されるまで待つ（最大20秒）
     // オートセーブ前に「公開に進む」を押すと「タイトル、本文を入力してください」エラーが発生する
-    await page.waitForTimeout(10000);
+    try {
+      await page.waitForFunction(() => {
+        const pm = document.querySelector("div.ProseMirror");
+        return pm && pm.textContent.trim().length > 10;
+      }, { timeout: 15000 });
+      console.log("ProseMirror に本文が反映されました");
+      await page.waitForTimeout(8000); // オートセーブ完了の追加待機
+    } catch (e) {
+      console.warn("ProseMirror 反映確認タイムアウト（続行）");
+      await page.waitForTimeout(20000);
+    }
 
     // カバー画像のアップロード（2段階フロー）
     // Step1: カバー画像アイコン → Step2: 「画像をアップロード」メニュー → file input
@@ -165,7 +175,8 @@ async function publishToNote(filename) {
           const btn = (await cropSaveBtn.count() > 0) ? cropSaveBtn : cropSaveBtnFallback;
           if (await btn.count() > 0) {
             await btn.click({ force: true });
-            await page.waitForTimeout(1500);
+            // カバー画像保存後に十分待機（直後に「公開に進む」を押すとバリデーションエラーになる）
+            await page.waitForTimeout(5000);
             console.log("カバー画像を保存しました");
           }
         } else {
@@ -176,11 +187,36 @@ async function publishToNote(filename) {
       }
     }
 
-    // 「公開に進む」→ 公開設定ページへ
-    await page.waitForSelector("button:has-text('公開に進む')", { timeout: 10000 });
-    await page.click("button:has-text('公開に進む')");
-    console.log("「公開に進む」クリック");
-    await page.waitForTimeout(3500);
+    // 「公開に進む」→ 公開設定ページへ（バリデーションエラー時はリトライ）
+    let proceedSuccess = false;
+    for (let retry = 0; retry < 3; retry++) {
+      await page.waitForSelector("button:has-text('公開に進む')", { timeout: 10000 });
+      await page.click("button:has-text('公開に進む')");
+      console.log(`「公開に進む」クリック（試行 ${retry + 1}）`);
+      await page.waitForTimeout(3500);
+
+      // バリデーションエラーモーダルの検出
+      const validationError = page.locator("text=タイトル、本文を入力してください").first();
+      if (await validationError.count() > 0) {
+        console.warn(`バリデーションエラーを検出（試行 ${retry + 1}）。リトライします...`);
+        // モーダルを閉じる
+        for (const sel of ['button:has-text("閉じる")', 'button[aria-label="閉じる"]']) {
+          const closeBtn = page.locator(sel).first();
+          if (await closeBtn.count() > 0) {
+            await closeBtn.click();
+            break;
+          }
+        }
+        await page.waitForTimeout(8000); // 追加のオートセーブ待機
+        continue;
+      }
+      proceedSuccess = true;
+      break;
+    }
+    if (!proceedSuccess) {
+      await page.screenshot({ path: "/tmp/note-publish-debug.png" });
+      throw new Error("「公開に進む」後のバリデーションエラーが解消されませんでした");
+    }
 
     // ハッシュタグを設定
     if (tags.length > 0) {
