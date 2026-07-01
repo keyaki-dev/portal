@@ -5,7 +5,7 @@ hashtags: "#edanet #AI創作 #フォーク文化 #BuildingInPublic #AIツール"
 
 まず、edanet の具体的な使い方をスライドにまとめました。読み飛ばしていただいても大丈夫です。
 
-<!-- slide: https://keyaki-dev.com/slides/2026-06-28-edanet-how-to-use.html -->
+スライド（2分）: https://keyaki-dev.com/slides/2026-06-28-edanet-how-to-use.html
 
 ---
 

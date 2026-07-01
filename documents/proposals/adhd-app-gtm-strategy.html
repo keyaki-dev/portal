@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>フォーカス for ADHD — ロードマップ 2026 | ケ開発</title>
+<style>
+:root {
+  --bg:#F8F5F1;--bg-card:#FDFAF7;--bg-muted:#F2EDE8;
+  --fg:#2C2C2C;--fg-muted:#6B6560;--border:#E5DDD6;
+  --accent:#C45E3E;--accent-soft:#F5E1D6;
+  --green:#4A7C6F;--green-soft:#E6F0EE;
+  --yellow:#8A6A2E;--yellow-soft:#F5EDD6;
+  --blue:#3A5F8A;--blue-soft:#DDE8F5;
+  --font-sans:'Hiragino Kaku Gothic ProN','Yu Gothic','Segoe UI',system-ui,sans-serif;
+  --font-serif:'Hiragino Mincho ProN','Yu Mincho',Georgia,serif;
+  --font-mono:'Fira Code','Geist Mono',monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:var(--font-sans);background:var(--bg);color:var(--fg);overflow:hidden;-webkit-font-smoothing:antialiased;}
+.deck{width:100%;height:100vh;position:relative;}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;align-items:center;padding:50px 66px;overflow:hidden;}
+.slide.active{display:flex;}
+.slide::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:0.025;pointer-events:none;}
+#nav{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;z-index:200;background:var(--bg-card);border:1px solid var(--border);border-radius:40px;padding:9px 20px;box-shadow:0 4px 24px rgba(196,94,62,0.06);}
+#nav button{background:none;border:none;color:var(--fg-muted);cursor:pointer;font-size:16px;padding:4px 10px;border-radius:20px;transition:all 0.15s;}
+#nav button:hover{background:var(--bg-muted);color:var(--fg);}
+#counter{color:var(--fg-muted);font-size:12px;min-width:44px;text-align:center;font-family:var(--font-mono);}
+.dot-row{display:flex;gap:5px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border);cursor:pointer;transition:all 0.2s;}
+.dot.active{background:var(--accent);transform:scale(1.4);}
+.mono-label{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+h1{font-family:var(--font-serif);font-size:clamp(32px,4.8vw,60px);font-weight:500;line-height:1.1;letter-spacing:-0.02em;}
+h2{font-family:var(--font-serif);font-size:clamp(22px,3.4vw,42px);font-weight:500;line-height:1.15;letter-spacing:-0.02em;}
+h3{font-size:15px;font-weight:600;line-height:1.3;}
+.sub{font-size:clamp(13px,1.5vw,16px);color:var(--fg-muted);line-height:1.75;margin-top:14px;}
+.at{color:var(--accent);}
+.full{width:100%;}
+.center{text-align:center;}
+.row{display:flex;gap:18px;width:100%;}
+.col{flex:1;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;width:100%;}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;width:100%;}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:18px;}
+.card-sm{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;}
+.stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;text-align:center;}
+.stat-num{font-family:var(--font-serif);font-size:clamp(24px,3.5vw,44px);font-weight:500;line-height:1;color:var(--accent);}
+.stat-label{font-size:11px;color:var(--fg-muted);margin-top:5px;}
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:600;background:var(--accent-soft);color:var(--accent);border:1px solid var(--border);}
+.tag.green{background:var(--green-soft);color:var(--green);}
+.tag.yellow{background:var(--yellow-soft);color:var(--yellow);}
+.tag.blue{background:var(--blue-soft);color:var(--blue);}
+.fl{list-style:none;display:flex;flex-direction:column;gap:7px;}
+.fl li{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--fg-muted);line-height:1.6;}
+.fl li::before{content:'—';color:var(--accent);font-weight:700;flex-shrink:0;}
+.formula{font-family:var(--font-mono);font-size:11px;background:var(--bg-muted);border:1px solid var(--border);border-radius:7px;padding:8px 12px;line-height:1.7;color:var(--fg);}
+table{width:100%;border-collapse:collapse;font-size:11.5px;}
+th{text-align:left;padding:8px 12px;color:var(--fg-muted);font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--bg-muted);}
+td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--accent-soft);}
+
+/* ── Phase timeline ── */
+.phase-strip{display:flex;width:100%;gap:0;margin-top:20px;}
+.phase-block{flex:1;position:relative;padding:0 6px;}
+.phase-block+.phase-block::before{content:'';position:absolute;left:0;top:18px;bottom:0;width:1px;background:var(--border);}
+.ph-num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--font-mono);flex-shrink:0;border:1.5px solid var(--border);margin-bottom:10px;}
+.ph-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+.ph-period{font-size:10px;color:var(--fg-muted);font-family:var(--font-mono);margin-bottom:10px;}
+
+/* ── AARRR badge ── */
+.aarrr{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;font-family:var(--font-mono);background:var(--bg-muted);color:var(--fg-muted);border:1px solid var(--border);}
+.aarrr.a1{background:var(--accent-soft);color:var(--accent);border-color:transparent;}
+.aarrr.a2{background:var(--blue-soft);color:var(--blue);border-color:transparent;}
+.aarrr.ret{background:var(--green-soft);color:var(--green);border-color:transparent;}
+.aarrr.rev{background:var(--yellow-soft);color:var(--yellow);border-color:transparent;}
+.aarrr.ref{background:var(--bg-muted);color:var(--fg-muted);border-color:var(--border);}
+
+/* ── Funnel visual ── */
+.funnel-v{display:flex;flex-direction:column;gap:3px;align-items:stretch;}
+.fv{border-radius:7px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);}
+.fv-l{font-size:12px;font-weight:600;}
+.fv-r{font-size:11px;color:var(--fg-muted);}
+.fv-arr{text-align:center;font-size:10px;color:var(--border);margin:0;}
+
+/* ── Gantt-style bar ── */
+.gantt{display:flex;flex-direction:column;gap:6px;width:100%;}
+.g-row{display:flex;align-items:center;gap:8px;}
+.g-label{font-size:11px;color:var(--fg-muted);width:110px;flex-shrink:0;text-align:right;}
+.g-track{flex:1;height:20px;background:var(--bg-muted);border-radius:4px;position:relative;overflow:hidden;}
+.g-bar{position:absolute;top:0;height:100%;border-radius:4px;display:flex;align-items:center;padding:0 8px;}
+.g-bar-text{font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;}
+
+/* ── KPI table highlight ── */
+.kpi-green{color:var(--green);font-weight:600;}
+.kpi-yellow{color:var(--yellow);}
+
+/* ── Revenue model ── */
+.plan-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;}
+.plan-badge{position:absolute;top:-10px;left:16px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;font-family:var(--font-mono);}
+
+.slide.active .anim{animation:fadeUp 0.42s cubic-bezier(0.2,0.8,0.2,1) both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.d1{animation-delay:0.05s!important}.d2{animation-delay:0.10s!important}
+.d3{animation-delay:0.15s!important}.d4{animation-delay:0.20s!important}
+.d5{animation-delay:0.25s!important}.d6{animation-delay:0.30s!important}
+#s0::before{content:'';position:absolute;top:-100px;right:-100px;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(196,94,62,0.08) 0%,transparent 70%);pointer-events:none;}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- ══ 0: Title ══ -->
+<div class="slide" id="s0">
+  <div class="center" style="max-width:700px;">
+    <div class="mono-label anim">ケ開発 — 事業ロードマップ 2026年6月〜</div>
+    <h1 class="anim d1"><span class="at">フォーカス for ADHD</span><br>広報・開発・収益化<br>完全ロードマップ</h1>
+    <p class="sub anim d2">
+      Building in Public で信頼を先に積み、<br>
+      PMFを確認しながら収益化まで最短で到達する。
+    </p>
+    <div style="margin-top:26px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;" class="anim d3">
+      <span class="tag">6ヶ月計画</span>
+      <span class="tag green">MRR ¥50,000+ 目標</span>
+      <span class="tag blue">keyaki @keyaki_dev</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 1: 全体像 ══ -->
+<div class="slide">
+  <div class="full" style="max-width:980px;">
+    <div class="mono-label anim">Overview</div>
+    <h2 class="anim d1">6ヶ月の全体像</h2>
+
+    <div class="phase-strip anim d2">
+      <div class="phase-block">
+        <div class="ph-num" style="background:var(--accent-soft);border-color:var(--accent);color:var(--accent);">1</div>
+        <div class="ph-title">広報・仕込み</div>
+        <div class="ph-period">Month 1–2</div>
+        <ul class="fl">
+          <li>X アカウント開設</li>
+          <li>Building in Public 開始</li>
+          <li>LP + 事前登録フォーム</li>
+          <li>競合調査・STP確定</li>
+        </ul>
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px;">
+          <span class="aarrr a1">Acquisition</span>
+        </div>
+      </div>
+      <div class="phase-block">
+        <div class="ph-num" style="background:var(--blue-soft);border-color:var(--blue);color:var(--blue);">2</div>
+        <div class="ph-title">MVP開発</div>
+        <div class="ph-period">Month 2–3</div>
+        <ul class="fl">
+          <li>コア機能のみ実装</li>
+          <li>Aha Moment を3分以内に</li>
+          <li>開発日記を X で発信</li>
+          <li>機能投票で方向修正</li>
+        </ul>
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px;">
+          <span class="aarrr a1">Acquisition</span>
+          <span class="aarrr a2">Activation</span>
+        </div>
+      </div>
+      <div class="phase-block">
+        <div class="ph-num" style="background:var(--green-soft);border-color:var(--green);color:var(--green);">3</div>
+        <div class="ph-title">β検証</div>
+        <div class="ph-period">Month 3–4</div>
+        <ul class="fl">
+          <li>先行ユーザーへ公開</li>
+          <li>PMF測定（Sean Ellisテスト）</li>
+          <li>マイクロインフルエンサーへ提供</li>
+          <li>Day-1/7/30 継続率を観測</li>
+        </ul>
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px;">
+          <span class="aarrr a2">Activation</span>
+          <span class="aarrr ret">Retention</span>
+        </div>
+      </div>
+      <div class="phase-block">
+        <div class="ph-num" style="background:var(--yellow-soft);border-color:var(--yellow);color:var(--yellow);">4</div>
+        <div class="ph-title">正式リリース</div>
+        <div class="ph-period">Month 4–5</div>
+        <ul class="fl">
+          <li>App Store / Play Store 公開</li>
+          <li>Stripe 課金フロー稼働</li>
+          <li>ASO 最適化</li>
+          <li>Product Hunt 登録</li>
+        </ul>
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px;">
+          <span class="aarrr ret">Retention</span>
+          <span class="aarrr rev">Revenue</span>
+        </div>
+      </div>
+      <div class="phase-block">
+        <div class="ph-num" style="background:var(--bg-muted);border-color:var(--border);color:var(--fg-muted);">5</div>
+        <div class="ph-title">グロース</div>
+        <div class="ph-period">Month 5–6</div>
+        <ul class="fl">
+          <li>MRR ¥50,000+ 到達</li>
+          <li>年払いプラン追加</li>
+          <li>チャーン改善・LTV最大化</li>
+          <li>口コミ設計を強化</li>
+        </ul>
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px;">
+          <span class="aarrr rev">Revenue</span>
+          <span class="aarrr ref">Referral</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="gantt anim d3" style="margin-top:18px;">
+      <div class="g-row">
+        <div class="g-label">X 発信</div>
+        <div class="g-track">
+          <div class="g-bar" style="left:0%;width:100%;background:var(--accent-soft);border:1px solid var(--border);">
+            <span class="g-bar-text" style="color:var(--accent);">週3〜4本 継続</span>
+          </div>
+        </div>
+      </div>
+      <div class="g-row">
+        <div class="g-label">LP / 事前登録</div>
+        <div class="g-track">
+          <div class="g-bar" style="left:0%;width:33%;background:var(--blue-soft);border:1px solid var(--border);">
+            <span class="g-bar-text" style="color:var(--blue);">作成・公開</span>
+          </div>
+        </div>
+      </div>
+      <div class="g-row">
+        <div class="g-label">MVP 開発</div>
+        <div class="g-track">
+          <div class="g-bar" style="left:16%;width:34%;background:var(--green-soft);border:1px solid var(--border);">
+            <span class="g-bar-text" style="color:var(--green);">スクラッチ開発</span>
+          </div>
+        </div>
+      </div>
+      <div class="g-row">
+        <div class="g-label">β テスト</div>
+        <div class="g-track">
+          <div class="g-bar" style="left:44%;width:22%;background:var(--yellow-soft);border:1px solid var(--border);">
+            <span class="g-bar-text" style="color:var(--yellow);">検証・改善</span>
+          </div>
+        </div>
+      </div>
+      <div class="g-row">
+        <div class="g-label">正式リリース</div>
+        <div class="g-track">
+          <div class="g-bar" style="left:60%;width:40%;background:var(--accent-soft);border:1px solid var(--border);">
+            <span class="g-bar-text" style="color:var(--accent);">収益化フェーズ</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 2: Phase 1 広報 ══ -->
+<div class="slide">
+  <div class="full" style="max-width:940px;">
+    <div class="mono-label anim">Phase 1 — Month 1–2</div>
+    <h2 class="anim d1">広報・仕込み — <span class="at">信頼を先に積む</span></h2>
+    <div class="grid-3" style="margin-top:20px;">
+
+      <div class="card anim d2">
+        <div style="font-size:18px;margin-bottom:8px;">𝕏</div>
+        <h3 style="margin-bottom:10px;">X アカウント立ち上げ</h3>
+        <ul class="fl" style="margin-bottom:10px;">
+          <li>@keyaki_dev を開設、川上が自律運用</li>
+          <li>初投稿「なぜADHDアプリを作るか」でストーリーを作る</li>
+          <li>週3〜4本：モック / 投票 / 日記 / ティップス</li>
+          <li>ゼロクリック設計（投稿内でコンテンツ完結）</li>
+          <li>#ADHD 当事者アカウントへ積極的にリプ</li>
+        </ul>
+        <span class="tag">目標: 200フォロワー</span>
+      </div>
+
+      <div class="card anim d3">
+        <div style="font-size:18px;margin-bottom:8px;">🖥️</div>
+        <h3 style="margin-bottom:10px;">LP + 事前登録</h3>
+        <ul class="fl" style="margin-bottom:10px;">
+          <li>Next.js + Vercel で即日デプロイ</li>
+          <li>「なぜこのアプリを作るか」の開発動機を正直に書く</li>
+          <li>スクロール不要で伝わるOne-pageLPを目指す</li>
+          <li>メアド登録で「先行アクセス権」を付与</li>
+          <li>登録翌日に自動フォローアップメールを送る</li>
+        </ul>
+        <span class="tag blue">目標: 事前登録50人</span>
+      </div>
+
+      <div class="card anim d4">
+        <div style="font-size:18px;margin-bottom:8px;">🔍</div>
+        <h3 style="margin-bottom:10px;">STP確定 + 競合調査</h3>
+        <ul class="fl" style="margin-bottom:10px;">
+          <li>競合アプリ（Forest, Focus Flow, Brain Focus 等）を全て使う</li>
+          <li>「ADHD脳に合わせた設計」という独自ポジションを言語化</li>
+          <li>ASO用キーワードリストを作成（長尾を優先）</li>
+          <li>ターゲットペルソナを1人具体的に描く</li>
+        </ul>
+        <span class="tag green">成果物: ポジショニングシート</span>
+      </div>
+
+    </div>
+    <div class="card-sm anim d5" style="margin-top:12px;border-color:var(--accent-soft);">
+      <span style="color:var(--accent);font-weight:600;">Phase 1 の鉄則：</span>
+      <span style="font-size:12px;color:var(--fg-muted);">アプリの宣伝を一切しない。「ADHDについて真剣に考えているチーム」という認知を作ることだけに集中する。PMF前にスケールしない。</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 3: Phase 2 開発 ══ -->
+<div class="slide">
+  <div class="full" style="max-width:940px;">
+    <div class="mono-label anim">Phase 2 — Month 2–3</div>
+    <h2 class="anim d1">MVP開発 — <span class="at">Aha Momentを3分以内に</span></h2>
+    <div class="row" style="margin-top:20px;align-items:flex-start;">
+      <div class="col anim d2">
+        <div class="card" style="margin-bottom:12px;">
+          <h3 style="margin-bottom:10px;">🎯 コア機能（これだけ作る）</h3>
+          <ul class="fl">
+            <li><strong style="color:var(--fg);">超短ポモドーロ（5〜15分）</strong> — ADHDの「25分は長すぎる」を解決</li>
+            <li><strong style="color:var(--fg);">タスク分解AI</strong> — 「仕事する」を小さなアクションに分割</li>
+            <li><strong style="color:var(--fg);">達成フィードバック</strong> — 完了時の気持ちいいアニメーションと音</li>
+            <li><strong style="color:var(--fg);">継続ストリーク</strong> — 「昨日も続けた」の可視化</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:10px;">⚙️ 技術スタック</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div class="card-sm"><div style="font-size:10px;color:var(--accent);font-weight:600;">Frontend</div><div style="font-size:11px;color:var(--fg-muted);margin-top:2px;">Next.js 15 + TypeScript<br>Tailwind CSS v4</div></div>
+            <div class="card-sm"><div style="font-size:10px;color:var(--green);font-weight:600;">AI</div><div style="font-size:11px;color:var(--fg-muted);margin-top:2px;">Claude API<br>（タスク分解 / AI バディ）</div></div>
+            <div class="card-sm"><div style="font-size:10px;color:var(--blue);font-weight:600;">DB / Auth</div><div style="font-size:11px;color:var(--fg-muted);margin-top:2px;">Supabase<br>（認証 + データ保存）</div></div>
+            <div class="card-sm"><div style="font-size:10px;color:var(--yellow);font-weight:600;">Deploy / 課金</div><div style="font-size:11px;color:var(--fg-muted);margin-top:2px;">Vercel + Stripe<br>（課金はβ後に追加）</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="col anim d3">
+        <div class="card" style="margin-bottom:12px;">
+          <h3 style="color:var(--green);margin-bottom:10px;">⚡ Aha Moment 設計</h3>
+          <div style="font-size:12px;color:var(--fg-muted);margin-bottom:10px;">「これだ！」と感じる瞬間を最短で届ける。登録から3分以内が目標。</div>
+          <div class="funnel-v">
+            <div class="fv" style="background:var(--accent-soft);border-color:var(--accent);">
+              <div class="fv-l" style="color:var(--accent);">① 登録（30秒）</div>
+              <div class="fv-r">メアドのみ / SNSログイン</div>
+            </div>
+            <div class="fv-arr">↓</div>
+            <div class="fv" style="background:var(--bg-muted);">
+              <div class="fv-l">② 最初のタスク入力（30秒）</div>
+              <div class="fv-r">「今日やること」を1つだけ</div>
+            </div>
+            <div class="fv-arr">↓</div>
+            <div class="fv" style="background:var(--bg-muted);">
+              <div class="fv-l">③ 5分タイマー開始（10秒）</div>
+              <div class="fv-r">ボタン1つで即スタート</div>
+            </div>
+            <div class="fv-arr">↓</div>
+            <div class="fv" style="background:var(--green-soft);border-color:var(--green);">
+              <div class="fv-l" style="color:var(--green);">★ Aha Moment（完了時）</div>
+              <div class="fv-r" style="color:var(--green);">「できた！」達成アニメーション</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:10px;">📢 開発中の X 投稿内容</h3>
+          <ul class="fl">
+            <li>週次：画面モック公開「このUIどう思いますか？」</li>
+            <li>隔週：機能投票で次の優先機能を決める</li>
+            <li>随時：「今日詰まったこと」開発日記</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 4: Phase 3 β検証 ══ -->
+<div class="slide">
+  <div class="full" style="max-width:940px;">
+    <div class="mono-label anim">Phase 3 — Month 3–4</div>
+    <h2 class="anim d1">β検証 — <span class="at">PMFを確認してから進む</span></h2>
+    <div class="grid-2" style="margin-top:20px;">
+      <div class="col" style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card anim d2">
+          <h3 style="margin-bottom:10px;">🧪 PMF 測定（Sean Ellis テスト）</h3>
+          <div style="font-size:12px;color:var(--fg-muted);margin-bottom:10px;">β版ユーザー30人以上に「使えなくなったらどう感じますか？」とアンケートを送る。</div>
+          <div style="display:flex;gap:10px;">
+            <div class="card-sm" style="flex:1;text-align:center;border-color:var(--green-soft);">
+              <div style="font-size:20px;font-family:var(--font-serif);font-weight:500;color:var(--green);">40%+</div>
+              <div style="font-size:10px;color:var(--green);margin-top:2px;">「非常に残念」</div>
+              <div style="font-size:10px;color:var(--fg-muted);">→ PMF達成。次フェーズへ</div>
+            </div>
+            <div class="card-sm" style="flex:1;text-align:center;">
+              <div style="font-size:20px;font-family:var(--font-serif);font-weight:500;color:var(--accent);">40%未満</div>
+              <div style="font-size:10px;color:var(--accent);margin-top:2px;">「非常に残念」</div>
+              <div style="font-size:10px;color:var(--fg-muted);">→ コア機能を見直す</div>
+            </div>
+          </div>
+        </div>
+        <div class="card anim d3">
+          <h3 style="margin-bottom:10px;">📊 観測するKPI</h3>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+              <span style="font-size:12px;">登録→初回完了率</span>
+              <span class="tag green">目標 50%+</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+              <span style="font-size:12px;">Day-1 継続率</span>
+              <span class="tag green">目標 40%+</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+              <span style="font-size:12px;">Day-7 継続率</span>
+              <span class="tag green">目標 20%+</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;">
+              <span style="font-size:12px;">週3回以上使ったユーザー数 <span style="font-size:10px;color:var(--accent);">★北極星</span></span>
+              <span class="tag">β期で30人+</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col" style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card anim d3">
+          <h3 style="margin-bottom:10px;">👥 マイクロインフルエンサー戦略</h3>
+          <div style="font-size:12px;color:var(--fg-muted);margin-bottom:10px;">フォロワー1,000〜10,000人のADHD当事者アカウントに無料版を提供。</div>
+          <ul class="fl">
+            <li>強制しない。正直な感想を投稿してもらうだけ</li>
+            <li>当事者の「使ってみた」体験談は広告の100倍信頼される</li>
+            <li>RT / 引用でソーシャルプルーフを積み上げる</li>
+            <li>β期に5〜10アカウントへ提供を目標</li>
+          </ul>
+        </div>
+        <div class="card anim d4">
+          <h3 style="margin-bottom:10px;">🔄 改善サイクル</h3>
+          <div style="display:flex;align-items:center;justify-content:space-around;padding:10px 0;">
+            <div style="text-align:center;">
+              <div style="font-size:20px;">📥</div>
+              <div style="font-size:11px;color:var(--fg-muted);margin-top:4px;">フィードバック<br>収集</div>
+            </div>
+            <div style="color:var(--border);font-size:18px;">→</div>
+            <div style="text-align:center;">
+              <div style="font-size:20px;">🛠️</div>
+              <div style="font-size:11px;color:var(--fg-muted);margin-top:4px;">2週間で<br>修正・実装</div>
+            </div>
+            <div style="color:var(--border);font-size:18px;">→</div>
+            <div style="text-align:center;">
+              <div style="font-size:20px;">📢</div>
+              <div style="font-size:11px;color:var(--fg-muted);margin-top:4px;">X で<br>改善報告</div>
+            </div>
+            <div style="color:var(--border);font-size:18px;">→</div>
+            <div style="text-align:center;">
+              <div style="font-size:20px;">❤️</div>
+              <div style="font-size:11px;color:var(--fg-muted);margin-top:4px;">帰属意識<br>が高まる</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--fg-muted);text-align:center;padding-top:8px;border-top:1px solid var(--border);">「意見が通った」体験の繰り返しが口コミを生む</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 5: Phase 4 リリース ══ -->
+<div class="slide">
+  <div class="full" style="max-width:940px;">
+    <div class="mono-label anim">Phase 4 — Month 4–5</div>
+    <h2 class="anim d1">正式リリース — <span class="at">ASO × 課金フロー</span></h2>
+    <div class="grid-2" style="margin-top:20px;">
+      <div class="col" style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card anim d2">
+          <h3 style="margin-bottom:10px;">🔍 ASO（ストア最適化）</h3>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="background:var(--bg-muted);border-radius:7px;padding:8px 10px;">
+              <div style="font-size:10px;color:var(--accent);font-weight:600;margin-bottom:2px;">タイトル（最重要）</div>
+              <div style="font-size:12px;font-family:var(--font-mono);">フォーカス: ADHD 集中 タイマー</div>
+            </div>
+            <div style="background:var(--bg-muted);border-radius:7px;padding:8px 10px;">
+              <div style="font-size:10px;color:var(--green);font-weight:600;margin-bottom:2px;">狙うキーワード（長尾優先）</div>
+              <div style="font-size:11px;color:var(--fg-muted);">「ADHD 集中 アプリ」「発達障害 仕事 タイマー」「ポモドーロ ADHD」</div>
+            </div>
+            <div style="background:var(--bg-muted);border-radius:7px;padding:8px 10px;">
+              <div style="font-size:10px;color:var(--blue);font-weight:600;margin-bottom:2px;">スクリーンショット 1枚目</div>
+              <div style="font-size:11px;color:var(--fg-muted);">「ADHDの方へ。25分は長すぎた。」と明記</div>
+            </div>
+            <div style="background:var(--bg-muted);border-radius:7px;padding:8px 10px;">
+              <div style="font-size:10px;color:var(--yellow);font-weight:600;margin-bottom:2px;">レビュー獲得タイミング</div>
+              <div style="font-size:11px;color:var(--fg-muted);">ポモドーロ完了時（Aha Moment直後）に依頼ダイアログ</div>
+            </div>
+          </div>
+        </div>
+        <div class="card anim d3">
+          <h3 style="margin-bottom:10px;">🚀 リリース時の告知設計</h3>
+          <ul class="fl">
+            <li>X：「一緒に作ってくれた方々へ。ついにリリースしました」</li>
+            <li>Product Hunt に登録（海外ユーザーも狙う）</li>
+            <li>事前登録者へメールで先行アクセス通知</li>
+            <li>マイクロインフルエンサーにリリース告知をお願い</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col" style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card anim d3">
+          <h3 style="margin-bottom:10px;">💳 課金フロー設計（Stripe）</h3>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <div class="fv" style="background:var(--green-soft);border-color:var(--green);">
+              <div class="fv-l" style="color:var(--green);font-size:13px;">無料プラン（永続）</div>
+              <div class="fv-r">1日3セッションまで</div>
+            </div>
+            <div class="fv-arr">↓ 3日間使って気に入ったら</div>
+            <div class="fv" style="background:var(--accent-soft);border-color:var(--accent);">
+              <div class="fv-l" style="color:var(--accent);font-size:13px;">プレミアム ¥680/月</div>
+              <div class="fv-r">無制限 + AIバディ + 週次レポート</div>
+            </div>
+            <div class="fv-arr">↓ 継続利用者には</div>
+            <div class="fv" style="background:var(--yellow-soft);border-color:var(--yellow);">
+              <div class="fv-l" style="color:var(--yellow);font-size:13px;">年払い ¥5,980/年（Month 5〜）</div>
+              <div class="fv-r">2ヶ月分お得 / チャーン防止</div>
+            </div>
+          </div>
+        </div>
+        <div class="card anim d4">
+          <h3 style="margin-bottom:10px;">📊 収益計算</h3>
+          <div class="formula" style="font-size:11px;">
+            LTV = ¥680 × 18ヶ月 = ¥12,240<br>
+            CAC ≈ ¥0（Building in Public）<br>
+            LTV / CAC → 理論上は無限大<br><br>
+            Month 5 目標: 課金80人<br>
+            MRR = ¥680 × 80 = <strong>¥54,400</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 6: Phase 5 グロース ══ -->
+<div class="slide">
+  <div class="full" style="max-width:940px;">
+    <div class="mono-label anim">Phase 5 — Month 5–6</div>
+    <h2 class="anim d1">グロース — <span class="at">Retentionで守り、口コミで攻める</span></h2>
+    <div class="grid-3" style="margin-top:20px;">
+      <div class="card anim d2">
+        <div style="font-size:18px;margin-bottom:8px;">🔄</div>
+        <h3 style="color:var(--green);margin-bottom:10px;">Retention 3原則</h3>
+        <ul class="fl">
+          <li><strong style="color:var(--fg);">Habit Loop</strong><br>朝の通知 → アプリ起動 → 継続記録確認 → 達成感</li>
+          <li><strong style="color:var(--fg);">データ蓄積</strong><br>ストリーク・集中時間の記録が積み上がり「辞めにくくなる」</li>
+          <li><strong style="color:var(--fg);">帰属意識</strong><br>「一緒に作ったユーザー」という特別感を維持する</li>
+        </ul>
+        <div style="margin-top:10px;" class="card-sm">
+          <div style="font-size:10px;color:var(--green);font-weight:600;">目標</div>
+          <div style="font-size:11px;color:var(--fg-muted);">月次チャーン率 5%以下<br>Day-30継続率 15%+</div>
+        </div>
+      </div>
+      <div class="card anim d3">
+        <div style="font-size:18px;margin-bottom:8px;">📣</div>
+        <h3 style="color:var(--accent);margin-bottom:10px;">Referral（口コミ）設計</h3>
+        <ul class="fl">
+          <li>「友達を招待で1ヶ月無料」 — Kファクターを上げる</li>
+          <li>集中セッション完了時のX共有ボタン（スクショ共有）</li>
+          <li>「10セッション達成 🎉」等のマイルストーン通知でシェアを促す</li>
+          <li>X でのユーザーの声を積極的にRT（ソーシャルプルーフ）</li>
+        </ul>
+        <div style="margin-top:10px;" class="card-sm">
+          <div style="font-size:10px;color:var(--accent);font-weight:600;">目標</div>
+          <div style="font-size:11px;color:var(--fg-muted);">Kファクター 0.3+<br>（10人のうち3人が紹介）</div>
+        </div>
+      </div>
+      <div class="card anim d4">
+        <div style="font-size:18px;margin-bottom:8px;">💰</div>
+        <h3 style="color:var(--yellow);margin-bottom:10px;">LTV最大化</h3>
+        <ul class="fl">
+          <li>年払いプラン追加（月払いより2ヶ月お得）でチャーン防止</li>
+          <li>週次「集中レポート」メールで使用継続を促進</li>
+          <li>3ヶ月継続ユーザーへのサンクスメッセージ（川上から）</li>
+          <li>解約ユーザーには「休憩プラン（無料）」を提案して完全離脱を防ぐ</li>
+        </ul>
+        <div style="margin-top:10px;" class="card-sm">
+          <div style="font-size:10px;color:var(--yellow);font-weight:600;">目標</div>
+          <div style="font-size:11px;color:var(--fg-muted);">LTV ¥12,240+<br>（平均18ヶ月継続）</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-sm anim d5" style="margin-top:12px;border-color:var(--accent-soft);">
+      <span style="color:var(--accent);font-weight:600;">1,000人の熱狂的ファン：</span>
+      <span style="font-size:12px;color:var(--fg-muted);">100万人の普通ユーザーより1,000人の熱狂的ファンで年収1,000万円は達成できる。1,000人 × ¥10,000/年 ≈ ¥1,000万。まずその1,000人を作ることに集中する。</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 7: KPI ダッシュボード ══ -->
+<div class="slide">
+  <div class="full" style="max-width:960px;">
+    <div class="mono-label anim">KPI Dashboard</div>
+    <h2 class="anim d1">フェーズ別<span class="at">KPI</span></h2>
+    <div class="card anim d2" style="margin-top:20px;padding:0;overflow:hidden;">
+      <table>
+        <thead>
+          <tr>
+            <th>指標</th>
+            <th>フレームワーク</th>
+            <th>Month 2<br>（仕込み完）</th>
+            <th>Month 3<br>（MVP完）</th>
+            <th>Month 4<br>（β完）</th>
+            <th>Month 6<br>（グロース）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>X フォロワー数</strong></td>
+            <td><span class="aarrr a1">Acquisition</span></td>
+            <td>200人</td>
+            <td>400人</td>
+            <td>600人</td>
+            <td class="kpi-green">1,000人</td>
+          </tr>
+          <tr>
+            <td><strong>事前登録数</strong></td>
+            <td><span class="aarrr a1">Acquisition</span></td>
+            <td>50人</td>
+            <td>100人</td>
+            <td>—</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><strong>登録→初回完了率</strong> <span style="font-size:10px;color:var(--accent);">★Aha</span></td>
+            <td><span class="aarrr a2">Activation</span></td>
+            <td>—</td>
+            <td>—</td>
+            <td class="kpi-green">50%+</td>
+            <td class="kpi-green">60%+</td>
+          </tr>
+          <tr>
+            <td><strong>Day-30 継続率</strong></td>
+            <td><span class="aarrr ret">Retention</span></td>
+            <td>—</td>
+            <td>—</td>
+            <td>10%+</td>
+            <td class="kpi-green">15%+</td>
+          </tr>
+          <tr>
+            <td><strong>週3回以上ユーザー数</strong> <span style="font-size:10px;color:var(--accent);">★北極星</span></td>
+            <td><span class="aarrr ret">Retention</span></td>
+            <td>—</td>
+            <td>—</td>
+            <td>30人</td>
+            <td class="kpi-green">200人</td>
+          </tr>
+          <tr>
+            <td><strong>課金ユーザー数</strong></td>
+            <td><span class="aarrr rev">Revenue</span></td>
+            <td>—</td>
+            <td>—</td>
+            <td>30人</td>
+            <td class="kpi-green">80人</td>
+          </tr>
+          <tr>
+            <td><strong>MRR</strong></td>
+            <td><span class="aarrr rev">Revenue</span></td>
+            <td>—</td>
+            <td>—</td>
+            <td>¥20,400</td>
+            <td class="kpi-green">¥54,400</td>
+          </tr>
+          <tr>
+            <td><strong>App Store 評価</strong></td>
+            <td><span class="aarrr ref">Referral</span></td>
+            <td>—</td>
+            <td>—</td>
+            <td>★4.0+</td>
+            <td class="kpi-green">★4.3+</td>
+          </tr>
+          <tr>
+            <td><strong>月次チャーン率</strong></td>
+            <td><span class="aarrr ret">Retention</span></td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td class="kpi-green">5%以下</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-sm anim d3" style="margin-top:10px;border-color:var(--accent-soft);">
+      <span style="color:var(--accent);font-weight:600;">PMFチェックポイント：</span>
+      <span style="font-size:12px;color:var(--fg-muted);">Month 3〜4のβ期に Sean Ellisテストを実施。「非常に残念」40%未満ならスケール前にコア機能を見直す。PMF確認後にのみ次フェーズへ進む。</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 8: チャネル × フェーズ ══ -->
+<div class="slide">
+  <div class="full" style="max-width:960px;">
+    <div class="mono-label anim">Channel Strategy</div>
+    <h2 class="anim d1">チャネル別<span class="at">フェーズ投資</span></h2>
+    <div class="card anim d2" style="margin-top:20px;padding:0;overflow:hidden;">
+      <table>
+        <thead>
+          <tr>
+            <th>チャネル</th>
+            <th>Phase 1<br>仕込み</th>
+            <th>Phase 2<br>MVP</th>
+            <th>Phase 3<br>β</th>
+            <th>Phase 4-5<br>リリース〜</th>
+            <th>役割</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>X（Building in Public）</strong></td>
+            <td class="kpi-green">★★★ 最重要</td>
+            <td class="kpi-green">★★★</td>
+            <td class="kpi-green">★★★</td>
+            <td class="kpi-green">★★★</td>
+            <td>信頼構築・CAC≈0</td>
+          </tr>
+          <tr>
+            <td><strong>LP + 事前登録</strong></td>
+            <td class="kpi-green">★★★ 作成</td>
+            <td>★★ 更新</td>
+            <td>★ 維持</td>
+            <td>— （ストアへ移行）</td>
+            <td>需要確認・メール獲得</td>
+          </tr>
+          <tr>
+            <td><strong>ASO</strong></td>
+            <td>— 調査のみ</td>
+            <td>★ キーワード準備</td>
+            <td>★★ 設定</td>
+            <td class="kpi-green">★★★ 継続最適化</td>
+            <td>中長期の有機流入</td>
+          </tr>
+          <tr>
+            <td><strong>マイクロインフルエンサー</strong></td>
+            <td>—</td>
+            <td>★ 接触開始</td>
+            <td class="kpi-green">★★★ 無料提供</td>
+            <td>★★ 継続</td>
+            <td>社会的証明・口コミ</td>
+          </tr>
+          <tr>
+            <td><strong>Product Hunt</strong></td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td class="kpi-yellow">★★ リリース時のみ</td>
+            <td>海外認知・エンジニア層</td>
+          </tr>
+          <tr>
+            <td><strong>有料広告</strong></td>
+            <td colspan="4" style="text-align:center;color:var(--fg-muted);">❌ PMF達成前は実施しない</td>
+            <td>PMF後に検討</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-sm anim d3" style="margin-top:10px;border-color:var(--accent-soft);">
+      <span style="color:var(--accent);font-weight:600;">やらないことの明文化：</span>
+      <span style="font-size:12px;color:var(--fg-muted);">有料広告・YouTube長尺動画・複数SNS同時運用・PMF前のスケール。「選択と集中」がリソース制約下での最大のマーケティング判断。</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 9: まとめ ══ -->
+<div class="slide">
+  <div class="full" style="max-width:860px;">
+    <div class="mono-label anim">Summary</div>
+    <h2 class="anim d1">ロードマップの<span class="at">核心</span></h2>
+    <div class="grid-2" style="margin-top:20px;">
+      <div class="col" style="display:flex;flex-direction:column;gap:10px;" class="anim d2">
+        <div class="card anim d2" style="border-left:3px solid var(--accent);">
+          <h3 style="color:var(--accent);margin-bottom:8px;">広報の原則</h3>
+          <div style="font-size:13px;color:var(--fg-muted);line-height:1.7;">「告知する」のではなく「信頼を積み上げる」。Building in Publicで、リリース日に信頼ゼロから始めない。アプリの宣伝より「ADHDについて真剣に考えているチーム」として認知される。</div>
+        </div>
+        <div class="card anim d3" style="border-left:3px solid var(--green);">
+          <h3 style="color:var(--green);margin-bottom:8px;">開発の原則</h3>
+          <div style="font-size:13px;color:var(--fg-muted);line-height:1.7;">Aha Momentまでを3分以内に。機能を増やすより「最初の達成感」を磨く。PMF確認前にスケールしない。継続率（Retention）がすべてのKPIを決める。</div>
+        </div>
+        <div class="card anim d4" style="border-left:3px solid var(--blue);">
+          <h3 style="color:var(--blue);margin-bottom:8px;">収益化の原則</h3>
+          <div style="font-size:13px;color:var(--fg-muted);line-height:1.7;">LTV/CAC比率を最大化する。CAC≈0（Building in Public）なのでLTV最大化だけに集中。チャーンを防ぐHabit Loopとデータ蓄積設計が最大の収益施策。</div>
+        </div>
+      </div>
+      <div class="col anim d3">
+        <div class="card" style="height:100%;">
+          <h3 style="margin-bottom:14px;">📋 今すぐやること（川上）</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="width:22px;height:22px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;font-family:var(--font-mono);">1</div>
+              <div><div style="font-size:13px;font-weight:600;">競合アプリ5本のレビュー・機能調査</div><div style="font-size:11px;color:var(--fg-muted);">ポジショニングシートを作成する</div></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="width:22px;height:22px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;font-family:var(--font-mono);">2</div>
+              <div><div style="font-size:13px;font-weight:600;">LP のワイヤーフレーム作成</div><div style="font-size:11px;color:var(--fg-muted);">Next.js + Vercel で即日デプロイ</div></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="width:22px;height:22px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0;font-family:var(--font-mono);">3</div>
+              <div><div style="font-size:13px;font-weight:600;">X アカウントのプロフィール設計</div><div style="font-size:11px;color:var(--fg-muted);">API 設定後すぐに動けるよう準備</div></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="width:22px;height:22px;border-radius:50%;background:var(--blue-soft);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--blue);flex-shrink:0;font-family:var(--font-mono);">4</div>
+              <div><div style="font-size:13px;font-weight:600;">（山下さん待ち）X API セットアップ</div><div style="font-size:11px;color:var(--fg-muted);">@keyaki_dev 作成 + developer.x.com でAPI発行</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+<div id="nav">
+  <button onclick="prev()">←</button>
+  <div class="dot-row" id="dots"></div>
+  <span id="counter">1 / 1</span>
+  <button onclick="next()">→</button>
+</div>
+<script>
+  const slides=document.querySelectorAll('.slide');let cur=0;
+  const dotsEl=document.getElementById('dots');const counterEl=document.getElementById('counter');
+  slides.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>go(i);dotsEl.appendChild(d);});
+  counterEl.textContent='1 / '+slides.length;slides[0].classList.add('active');
+  function go(n){slides[cur].classList.remove('active');dotsEl.children[cur].classList.remove('active');cur=(n+slides.length)%slides.length;slides[cur].classList.add('active');dotsEl.children[cur].classList.add('active');counterEl.textContent=(cur+1)+' / '+slides.length;}
+  function next(){go(cur+1);}function prev(){go(cur-1);}
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}if(e.key==='ArrowLeft'){e.preventDefault();prev();}});
+  let ts=0;document.addEventListener('touchstart',e=>{ts=e.touches[0].clientX;});
+  document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-ts;if(Math.abs(dx)>50)dx<0?next():prev();});
+</script>
+</body>
+</html>

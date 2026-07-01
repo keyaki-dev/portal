@@ -27,6 +27,18 @@ function removeH1(content) {
   return content.replace(/^#\s+.+\n?/m, "").trim();
 }
 
+// markdown を note.com 向けに正規化する
+// ① HTML コメント内のスライドURLを可視テキストに変換
+// ② 連続3行以上の空行を2行に圧縮（note.com の行間過多を防ぐ）
+function normalizeForNote(text) {
+  text = text.replace(
+    /<!--\s*slide:\s*(https?:\/\/\S+)\s*-->/g,
+    (_, url) => `スライド（2分）: ${url}`
+  );
+  text = text.replace(/\n{3,}/g, "\n\n");
+  return text;
+}
+
 function setOutput(name, value) {
   const outputFile = process.env.GITHUB_OUTPUT;
   if (outputFile) {
@@ -46,7 +58,8 @@ async function publishToNote(filename) {
   const { data, content } = matter(raw);
   const h1Title = extractTitle(content);
   const title = h1Title || data.title || "";
-  const body = h1Title ? removeH1(content) : content;
+  const rawBody = h1Title ? removeH1(content) : content;
+  const body = normalizeForNote(rawBody);
   const tags = Array.isArray(data.blog_tag) ? data.blog_tag : (Array.isArray(data.tags) ? data.tags : []);
 
   if (!title) throw new Error("タイトルが見つかりません（H1 または front matter の title が必要）");

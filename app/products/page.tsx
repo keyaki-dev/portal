@@ -7,22 +7,29 @@ const products = [
     description: "ADHD脳専用の集中サポートアプリ。超短ポモドーロタイマーとAIボディダブリング機能を搭載。",
     logo: null as string | null,
     links: [
-      { label: "LP を見る", url: "https://focusburst.keyaki-dev.com" },
-      { label: "アプリを開く", url: "https://focusburst.keyaki-dev.com/app", primary: true },
+      { label: "LP を見る", url: "https://kodou.keyaki-dev.com/focus" },
+      { label: "アプリを開く", url: "https://kodou.keyaki-dev.com/focus/app", primary: true },
     ],
     status: "β公開中",
     statusColor: "text-[#C45E3E]",
   },
   {
-    name: "Forkbox（フォークボックス）",
+    name: "edanet",
     description: "アイデアをフォークして進化させるSNS型プラットフォーム。AIで作った未完成の成果物を共有し、フォークされることが評価になる。",
     logo: "/forkbox-logo.svg" as string | null,
     links: [
-      { label: "モックを見る", url: "https://frontend-tau-neon-47.vercel.app", primary: true },
-      { label: "デザインを見る", url: "https://portal.keyaki-dev.com/xando/design" },
+      { label: "アプリを開く", url: "https://edanet.keyaki-dev.com", primary: true },
     ],
     status: "開発中",
     statusColor: "text-[#1A6EA8]",
+  },
+  {
+    name: "konoha",
+    description: "AI駆動のローカルノートアプリ（Tauri製デスクトップアプリ）。マインドマップとAIチャットを統合したオフライン対応の知識管理ツール。",
+    logo: null as string | null,
+    links: [],
+    status: "開発中",
+    statusColor: "text-[#3A7A4B]",
   },
 ];
 

@@ -5,7 +5,7 @@ hashtags: "#集中力 #タスク管理 #生産性 #kodouflow #習慣化"
 
 まず、今日お伝えしたいことをスライドにまとめました。2分ほどで読めます。テキストで続きを読みたい方は、そのままスクロールしてください。
 
-<!-- slide: https://keyaki-dev.com/slides/2026-07-03-kodouflow-how-to-use.html -->
+スライド（2分）: https://keyaki-dev.com/slides/2026-07-03-kodouflow-how-to-use.html
 
 ---
 
