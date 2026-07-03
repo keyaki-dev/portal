@@ -212,11 +212,14 @@ async function publishToNote(filename) {
       const validationError = page.locator("text=タイトル、本文を入力してください").first();
       if (await validationError.count() > 0) {
         console.warn(`バリデーションエラーを検出（試行 ${retry + 1}）。リトライします...`);
-        // モーダルを閉じる
+        // Escape でモーダルを閉じる（AIと相談パネルのオーバーレイがボタンクリックをインターセプトするため）
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(800);
+        // Escape で閉じなかった場合のフォールバック: force クリック
         for (const sel of ['button:has-text("閉じる")', 'button[aria-label="閉じる"]']) {
           const closeBtn = page.locator(sel).first();
           if (await closeBtn.count() > 0) {
-            await closeBtn.click();
+            try { await closeBtn.click({ force: true }); } catch (_) {}
             break;
           }
         }
