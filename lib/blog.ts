@@ -13,7 +13,7 @@ export interface BlogPost {
   image?: string;
   flags: string[];
   publishedUrl?: string;   // note.com の公開URL（editor URLの場合は下書きレビューURL）
-  portfolioUrl?: string;   // keyaki-dev.com のポートフォリオURL
+  portfolioUrl?: string;   // keyaki-labs.com のポートフォリオURL
   status: "draft" | "published";
   noteStatus: "none" | "review" | "published";     // none: 未投稿, review: 下書きレビューURL, published: 公開済み
   portfolioStatus: "none" | "published";
