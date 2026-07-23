@@ -4,7 +4,7 @@ import { getBlogPostBySlug, markdownToPortfolioMdx } from "@/lib/blog";
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const PORTFOLIO_OWNER = "keyaki-dev";
 const PORTFOLIO_REPO = "portfolio";
-const PORTFOLIO_BASE_URL = "https://keyaki-dev.com/blog";
+const PORTFOLIO_BASE_URL = "https://keyaki-labs.com/blog";
 
 export async function POST(req: NextRequest) {
   const { slug } = (await req.json()) as { slug: string };
