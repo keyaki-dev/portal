@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getBlogPostBySlug, markdownToPortfolioMdx } from "@/lib/blog";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const PORTFOLIO_OWNER = "keyaki-dev";
+const PORTFOLIO_OWNER = "keyaki-labs";
 const PORTFOLIO_REPO = "portfolio";
 const PORTFOLIO_BASE_URL = "https://keyaki-labs.com/blog";
 
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
   const portfolioUrl = `${PORTFOLIO_BASE_URL}/${post.date}`;
 
   // blog frontmatter の portfolio_url を更新
-  const PORTAL_OWNER = "keyaki-dev";
+  const PORTAL_OWNER = "keyaki-labs";
   const PORTAL_REPO = "portal";
   const mdPath = `blog/${post.filename}`;
   try {
