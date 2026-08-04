@@ -1,4 +1,4 @@
-name: Note に記事を投稿
+name: Note に下書きを作成
 
 on:
   workflow_dispatch:
@@ -13,10 +13,6 @@ on:
         type: string
       cover_image:
         description: "カバー画像ファイル名 (例: 2026-05-26.png)"
-        required: false
-        type: string
-      scheduled_at:
-        description: "予約投稿日時 (ISO 8601形式: 2026-06-01T07:00:00+09:00)"
         required: false
         type: string
 
@@ -46,7 +42,10 @@ jobs:
         run: npx playwright install chromium --with-deps
         working-directory: publisher
 
-      - name: Publish to Note
+      # 記事は下書きとしてNote.comに保存されるのみで、公開（投稿する操作）は行わない。
+      # 公開は山下がnote.com UI から手動で行う運用のため、
+      # frontmatterのpublished_url/2_published更新もここでは行わない（公開後に別途更新する）。
+      - name: Create draft on Note
         id: publish
         run: node publish-note.js "${{ inputs.filename }}"
         working-directory: publisher
@@ -54,15 +53,6 @@ jobs:
           NOTE_SESSION: ${{ secrets.NOTE_SESSION }}
           BLOG_DIR: ${{ github.workspace }}/blog
           COVER_IMAGE: ${{ inputs.cover_image && format('{0}/blog/images/{1}', github.workspace, inputs.cover_image) || '' }}
-          SCHEDULED_AT: ${{ inputs.scheduled_at }}
-
-      - name: Update blog frontmatter
-        if: steps.publish.outputs.note_url != ''
-        run: |
-          node update-frontmatter.js "${{ inputs.filename }}" "${{ steps.publish.outputs.note_url }}"
-        working-directory: publisher
-        env:
-          BLOG_DIR: ${{ github.workspace }}/blog
 
       - name: Upload debug screenshots
         if: always()
@@ -76,12 +66,3 @@ jobs:
             ${{ github.workspace }}/note-before-publish.png
             ${{ github.workspace }}/note-debug.png
           if-no-files-found: ignore
-
-      - name: Commit frontmatter update
-        if: steps.publish.outputs.note_url != ''
-        run: |
-          git config user.name "川上"
-          git config user.email "contact@keyaki-dev.com"
-          git add "blog/${{ inputs.filename }}"
-          git commit -m "content: ${{ inputs.title }} を Note に投稿"
-          git push

@@ -1,7 +1,8 @@
-// Note.com へ記事を投稿するスクリプト
-// 環境変数: NOTE_SESSION, BLOG_DIR, COVER_IMAGE, SCHEDULED_AT, AUTO_HEADER
+// Note.com へ記事を「下書き」として投稿するスクリプト
+// 公開（投稿する操作）は行わない。実際の公開は note.com UI から手動で行う運用。
+// 環境変数: NOTE_SESSION, BLOG_DIR, COVER_IMAGE, AUTO_HEADER
 // 引数: filename (blog/ディレクトリ内のファイル名)
-// 出力: GitHub Actions の output として note_url を設定（公開設定ページのURL）
+// 出力: GitHub Actions の output として note_url を設定（下書きの編集ページURL）
 //
 // AUTO_HEADER=1 を設定すると generate-note-header.js でヘッダー画像を自動生成して
 // カバー画像としてセットする（COVER_IMAGE 未指定時）。
@@ -15,7 +16,6 @@ const { execSync } = require("child_process");
 const BLOG_DIR = process.env.BLOG_DIR || path.join(__dirname, "../blog");
 const NOTE_SESSION = process.env.NOTE_SESSION;
 let COVER_IMAGE = process.env.COVER_IMAGE || "";
-const SCHEDULED_AT = process.env.SCHEDULED_AT || "";
 const AUTO_HEADER = process.env.AUTO_HEADER === "1";
 
 function extractTitle(content) {
@@ -250,86 +250,16 @@ async function publishToNote(filename) {
       }
     }
 
-    // 予約投稿の処理（SCHEDULED_AT が指定されている場合のみ）
-    if (SCHEDULED_AT) {
-      try {
-        const scheduleEl = await page.$("button:has-text('予約投稿'), label:has-text('予約投稿')");
-        if (scheduleEl) {
-          await scheduleEl.click();
-          await page.waitForTimeout(1000);
-          const date = new Date(SCHEDULED_AT);
-          const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
-          const dateStr = jst.toISOString().slice(0, 10);
-          const timeStr = jst.toISOString().slice(11, 16);
-          const dateInput = await page.$('input[type="date"]');
-          if (dateInput) await dateInput.fill(dateStr);
-          const timeInput = await page.$('input[type="time"]');
-          if (timeInput) await timeInput.fill(timeStr);
-          await page.waitForTimeout(500);
-          for (const sel of ["button:has-text('予約投稿する')", "button:has-text('予約する')"]) {
-            const btn = await page.$(sel);
-            if (btn) { await btn.click(); console.log(`予約投稿確定 ${dateStr} ${timeStr} JST`); break; }
-          }
-        }
-      } catch (e) {
-        console.warn("予約投稿の設定に失敗しました:", e.message);
-      }
-    } else {
-      // 即時公開：「投稿する」ボタンをクリック（複数バリアント対応）
-      const publishLabels = ["投稿する", "公開する", "更新する", "投稿して公開", "公開設定を保存"];
-      let publishClicked = false;
-      for (const label of publishLabels) {
-        const btn = page.locator(`button:has-text("${label}")`).first();
-        if (await btn.count() > 0) {
-          await btn.click();
-          console.log(`「${label}」クリック`);
-          publishClicked = true;
-          break;
-        }
-      }
-      if (!publishClicked) {
-        // デバッグ: 利用可能なボタン一覧を出力
-        const btns = await page.locator("button").all();
-        const btnTexts = await Promise.all(btns.map(b => b.textContent()));
-        console.log("利用可能なボタン:", btnTexts.filter(t => t && t.trim()).join(" / "));
-        await page.screenshot({ path: "/tmp/note-publish-debug.png" });
-        console.log("デバッグスクリーンショット: /tmp/note-publish-debug.png");
-        throw new Error("投稿ボタンが見つかりませんでした");
-      }
-      await page.waitForTimeout(3000);
-
-      // 「記事が公開されました」モーダルを待つ（なければURLから判定）
-      const successMsg = await page.waitForSelector(
-        "text=記事が公開されました, text=投稿しました",
-        { timeout: 15000 }
-      ).catch(() => null);
-      if (successMsg) {
-        console.log("投稿成功！");
-      } else {
-        console.log("成功モーダルなし（URLから判定）");
-      }
-
-      // editorのURLからnoteIDを取得して公開URLを構築
-      const currentUrl = page.url();
-      const noteId = currentUrl.match(/\/notes\/(n[a-z0-9]+)\//)?.[1];
-      const publishedLink = await page.evaluate((nid) => {
-        const ogUrl = document.querySelector('meta[property="og:url"]')?.content;
-        if (ogUrl && ogUrl.includes("/n/")) return ogUrl;
-        if (nid) {
-          const link = document.querySelector(`a[href*="/${nid}"]`);
-          if (link) return link.href;
-        }
-        return null;
-      }, noteId);
-
-      const finalUrl = publishedLink || (noteId ? `https://note.com/keyaki_dev/n/${noteId}` : currentUrl);
-      console.log(`公開URL: ${finalUrl}`);
-      setOutput("note_url", finalUrl);
-      return finalUrl;
-    }
-
-    const fallbackUrl = page.url();
-    return fallbackUrl;
+    // 公開は山下が note.com UI から手動で行う運用のため、
+    // 「投稿する」ボタンは押さず、下書き保存された状態でここまでで終了する。
+    await page.waitForTimeout(2000); // タグ設定のオートセーブ待機
+    const currentUrl = page.url();
+    const noteId = currentUrl.match(/\/notes\/(n[a-z0-9]+)\//)?.[1];
+    const editUrl = noteId ? `https://note.com/notes/${noteId}/edit` : currentUrl;
+    console.log("下書き保存完了。投稿はしません（山下が note.com から手動公開）。");
+    console.log(`編集URL: ${editUrl}`);
+    setOutput("note_url", editUrl);
+    return editUrl;
 
   } finally {
     await browser.close();
