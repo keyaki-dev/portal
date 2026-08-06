@@ -15,3 +15,6 @@ npm-debug.log*
 .env.*.local
 .vercel
 publisher/.env.test
+
+# YouTube パイプライン生成物（バイナリ大容量）
+publisher/youtube/output/
